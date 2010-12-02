@@ -17,8 +17,6 @@ COBJS = $(CSRCS:.c=.o)
 ifeq ($(INCLAPACK),1)
  FSRCS   := $(foreach DIR,$(DIRS),$(wildcard $(DIR)/*.f))
  FOBJS = $(FSRCS:.f=.o)
-else
- CFLAGS += -DNOFORTRAN
 endif
 
 # Build target #
