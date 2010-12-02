@@ -2,7 +2,7 @@
 #include "global.h"
 
 /* non-optimized, non-threaded DSCAL replacement */
-void odscal(int *n, double *alpha, double restrict *x, int *incx)
+void pmrrr_dscal(int *n, double *alpha, double restrict *x, int *incx)
 {
   int i;
   int stride = *incx;

@@ -12,10 +12,8 @@ LDFLAGS  = -D_THREAD_SAFE=1 -pthread
 MPIFLAGS = 
 
 INCPATH = ../../INCLUDE
-LIBPATH = ../../LIB
-
-# Libraries to link
-LIBS = pmrrr gfortran pthread rt m
+LIBPATH = ../../LIB $(HOME)/libs/lapack-3.2.2
+LIBS = pmrrr lapack_gnu_LINUX blas_gnu_LINUX m gfortran pthread rt
 
 
 ######################## do not edit below ###########################
@@ -30,21 +28,21 @@ all: main_all.x main_ind.x main_val.x
 
 # All eigenpairs
 main_all.x: maina.o
-	$(LD) $(LDFLAGS) $< -L$(LIBPATH) \
+	$(LD) $(LDFLAGS) $< $(foreach LIBP,$(LIBPATH),-L$(LIBP)) \
         $(foreach LIBRARY,$(LIBS),-l$(LIBRARY)) -o $@
 
 maina.o: maina.f
 
 # Subset of eigenpairs by index
 main_ind.x: maini.o
-	$(LD) $(LDFLAGS) $< -L$(LIBPATH) \
+	$(LD) $(LDFLAGS) $< $(foreach LIBP,$(LIBPATH),-L$(LIBP)) \
         $(foreach LIBRARY,$(LIBS),-l$(LIBRARY)) -o $@
 
 maini.o: maini.f
 
 # Subset of eigenpairs by value
 main_val.x: mainv.o
-	$(LD) $(LDFLAGS) $< -L$(LIBPATH) \
+	$(LD) $(LDFLAGS) $< $(foreach LIBP,$(LIBPATH),-L$(LIBP)) \
         $(foreach LIBRARY,$(LIBS),-l$(LIBRARY)) -o $@
 
 mainv.o: mainv.f

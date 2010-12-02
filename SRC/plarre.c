@@ -578,7 +578,6 @@ int eigval_subset_proc(proc_t *procinfo, char *range, in_t *Dstruct,
     
     isleft = fmax(gl, tmp1-tmp2 - HUNDRED*DBL_EPSILON*fabs(tmp1-tmp2) );
     
-    
     dlarrk_(&bl_size, &bl_size, &gl, &gu, &D[bl_begin], &E2[bl_begin],
 	    &pivmin, &rtl, &tmp1, &tmp2, &info);
     assert(info == 0);  /* if info=-1 => eigenvalue did not converge */
