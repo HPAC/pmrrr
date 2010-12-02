@@ -295,11 +295,7 @@ int PMR_process_s_task(singleton_t *sng, int tid, proc_t *procinfo,
     
     /* normalize eigenvector */
     suppsize = i_Zto - i_Zfrom + 1;
-#ifdef NOFORTRAN
-    dscal_(&suppsize, &norminv, &Z[i_Zfrom + zind*ldz], &IONE);
-#else
-    odscal_(&suppsize, &norminv, &Z[i_Zfrom + zind*ldz], &IONE);
-#endif
+    odscal(&suppsize, &norminv, &Z[i_Zfrom + zind*ldz], &IONE);
 
     sigma = L[bl_size-1];
     W[i]  = lambda + sigma;
