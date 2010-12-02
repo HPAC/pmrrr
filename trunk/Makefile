@@ -14,12 +14,11 @@ HEADERS := $(foreach DIR,$(DIRS),$(wildcard $(DIR)/*.h))
 CSRCS   := $(foreach DIR,$(DIRS),$(wildcard $(DIR)/*.c))
 COBJS = $(CSRCS:.c=.o)
 
-ifeq ($(INCLAPACK),0)
- FSRCS   := $(foreach DIR,$(DIRS),$(wildcard $(DIR)/odscal.f))
- FOBJS = $(FSRCS:.f=.o)
-else
+ifeq ($(INCLAPACK),1)
  FSRCS   := $(foreach DIR,$(DIRS),$(wildcard $(DIR)/*.f))
  FOBJS = $(FSRCS:.f=.o)
+else
+ CFLAGS += -DNOFORTRAN
 endif
 
 # Build target #
