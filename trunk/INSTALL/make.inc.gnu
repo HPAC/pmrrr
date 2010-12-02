@@ -1,4 +1,5 @@
-f# Compiler for C and Fortran
+# Compiler for C and Fortran
+# The Fortran compiler is only used if INCLAPACK is set to 1
 CC = mpicc
 FC = mpif90
 
@@ -11,7 +12,8 @@ AR = /usr/bin/ar
 ARFLAGS = rcs
 
 # To build 'libmrrr.a' without adding necessary LAPACK routines 
-# for the to the archive set value to 0; default value is 1
+# for the to the archive set value to 0; in this case linking 
+# to LAPACK and BLAS is necessary; default value is 1
 INCLAPACK = 1
 
 # On some systems 'spinlocks' are not supported, therefore 

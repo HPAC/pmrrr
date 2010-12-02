@@ -217,9 +217,29 @@ int PMR_comm_eigvals(MPI_Comm comm, int *nz, int *ifirst, double *W);
  */
 
 
-/* LAPACK function prototypes
+/* LAPACK and BLAS function prototypes
  * Note: type specifier 'extern' does not matter in declaration
  * so here used to mark routines from LAPACK and BLAS libraries */
+extern void pmrrr_dscal(int*, double*, double*, int*);
+
+#ifdef NOLAPACK
+#define dlamch_ odmch_
+#define dlanst_ odnst_
+#define dlarrr_ odrrr_
+#define dlarra_ odrra_
+#define dlarrc_ odrrc_
+#define dlarrd_ odrrd_
+#define dlarrb_ odrrb_
+#define dlarrk_ odrrk_
+#define dlaebz_ odebz_
+#define dlarnv_ odrnv_
+#define dlarrf_ odrrf_
+#define dlar1v_ odr1v_
+#define dlarrj_ odrrj_
+#define dstemr_ odstmr_
+#define dscal_  pmrrr_dscal
+#endif
+
 extern double dlamch_(char*);
 extern double dlanst_(char*, int*, double*, double*);
 extern void   dlarrr_(int*, double*, double*, int*);
@@ -257,11 +277,7 @@ extern void   dstemr_(char*, char*, int*, double*, double*, double*,
 		      double*, int*, int*, int*, double*, double*, 
 		      int*, int*, int*, int*, double*, int*, int*, 
 		      int*, int*);
-
-
-/* BLAS function prototypes - renamed version for prevending
- * use of multithreaded version */
-extern void   odscal_(int*, double*, double*, int*);
+/* BLAS function prototypes */
 extern void   dscal_(int*, double*, double*, int*);
 
 #endif /* End of header file */

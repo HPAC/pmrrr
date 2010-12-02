@@ -240,7 +240,9 @@ int pmrrr(char *jobz, char *range, int *np, double  *D,
 
   /*  Test if matrix warrants more expensive computations which
    *  guarantees high relative accuracy */
-  if (*tryracp) dlarrr_(&n, D, E, &info); /* 0 - rel acc */
+  if (*tryracp) {
+    dlarrr_(&n, D, E, &info); /* 0 - rel acc */
+  }
   else info = -1;
 
   if (info == 0) {
@@ -505,9 +507,8 @@ double scale_matrix(in_t *Dstruct, val_t *Wstruct, bool valeig)
   if (scale != 1.0) {  /* FP cmp okay */
     /* Scale matrix and matrix norm */
     itmp = n-1;
-    odscal_(&n,    &scale, D, &IONE);
-    odscal_(&itmp, &scale, E, &IONE);
-
+    dscal_(&n,    &scale, D, &IONE);
+    dscal_(&itmp, &scale, E, &IONE);
     if (valeig == true) {
       /* Scale eigenvalue bounds */
       *vl *= scale;

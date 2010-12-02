@@ -1,5 +1,5 @@
 # Compiler for C and Fortran
-# The Fortran complir is only used if INCLAPACK is set to 1
+# The Fortran compiler is only used if INCLAPACK is set to 1
 CC = mpicc
 FC = mpif90
 
