@@ -51,6 +51,7 @@
 #include <pthread.h>
 #include "mpi.h"
 #include "pmrrr.h" 
+#include "plarre.h"
 #include "global.h"
 #include "structs.h" 
 
