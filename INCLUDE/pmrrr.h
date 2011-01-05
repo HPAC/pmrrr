@@ -169,17 +169,42 @@ int pmrrr(char *jobz, char *range, int *n, double  *D,
  */
 
 
+/* Set the number of threads in case PMR_NUM_THREADS is not 
+ * specified */
+#define DEFAULT_NUM_THREADS 4
 
-#define DEFAULT_NUM_THREADS 4   /* ifndef PMR_NUM_THREADS          */
-#define MAX_GROWTH         64.0 /* Dmax<MAX_GROWTH*spdiam=>rrr OK  */
-#define MAX_TRY_RRRR       10   /* max. # of trys to get root rrr  */
-#define FUDGE_FACTOR        2.0 /* fudge of shift, to get root rrr */
-#define RAND_FACTOR         8.0 /* pert. by (1 + eps*FACTOR*rand)  */
-#define MIN_RELGAP       1e-3   /* min. relative gap               */
-#define TRY_RQC          true   /* try Rayleigh Quotient Iteration */
-#define MAXITER            10   /* min. relative gap               */
-#define DSTEMR_IF_SMALLER   4   /* call dstemr if n smaller; >= 4  */
+/* Call LAPACK's dstemr in every process to compute all desiered 
+ * eigenpairs redundantly (and discard the once that would usually 
+ * not be computed by the process) if n < DSTEMR_IF_SMALLER; 
+ * default: 4 */ 
+#define DSTEMR_IF_SMALLER   4
 
+/* Make sure that eigenpairs are sorted globally; if set to false
+ * they are in most cases sorted, but it is not double checked and 
+ * can therefore not be guaranteed; default: true */
+#define ASSERT_SORTED_EIGENPAIRS true
+
+/* Set flag if Rayleigh Quotient Correction should be used, 
+ * which is usually faster; default: true */
+#define TRY_RQC          true
+
+/* Maximum numver of iterations of inverse iteration;
+ * default: 10 */
+#define MAXITER            10
+
+/* Set the min. relative gap for an eigenvalue to be considered 
+ * well separated, that is a singleton; this is a very important 
+ * parameter of the computation; default: 10e-3 */
+#define MIN_RELGAP       1e-3
+
+/* Set the maximal allowed element growth for being accepted as 
+ * an RRR, that is if max. pivot < MAX_GROWTH * 'spectral diameter'
+ * the RRR is accepted; default: 64.0 */
+#define MAX_GROWTH         64.0
+
+/* Set how many iterations should be executed to find the root 
+ * representation; default: 6 */
+#define MAX_TRY_RRRR       10
 
 
 /*
