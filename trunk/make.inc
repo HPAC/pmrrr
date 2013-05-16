@@ -1,11 +1,11 @@
 # Compiler for C and Fortran
 # The Fortran compiler is only used if INCLAPACK is set to 1
-CC = mpicc
-FC = mpif90
+CC = $(MPICC)
+FC = $(MPIF77)
 
 # Compiler flags
-CFLAGS = -pthread -O3
-FFLAGS = -O3 -funderscoring
+CFLAGS = -pthread -O3 -restrict
+FFLAGS = -nofor_main -O3 -assume underscore
 
 # Archiver and flags used when building the archive
 AR = /usr/bin/ar 
