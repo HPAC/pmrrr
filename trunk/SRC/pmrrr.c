@@ -54,7 +54,7 @@
 #include "mpi.h"
 #include "pmrrr.h"
 #include "global.h"
-#include "plarre_new.h"
+#include "plarre.h"
 #include "plarrv.h"
 #include "structs.h"
 
@@ -299,7 +299,7 @@ int pmrrr(char *jobz, char *range, int *np, double  *D,
   }
 
   /*  Compute all eigenvalues: sorted by block */
-  info = plarre_new(procinfo, jobz, range, Dstruct, Wstruct, tolstruct, nzp, offsetp);
+  info = plarre(procinfo, jobz, range, Dstruct, Wstruct, tolstruct, nzp, offsetp);
   assert(info == 0);
 
   /* If just number of local eigenvectors are queried */
