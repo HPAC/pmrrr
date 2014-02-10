@@ -54,7 +54,7 @@
 #include "mpi.h"
 #include "pmrrr.h"
 #include "global.h"
-#include "plarre.h"
+#include "plarre_new.h"
 #include "plarrv.h"
 #include "structs.h"
 
@@ -119,6 +119,7 @@ int pmrrr(char *jobz, char *range, int *np, double  *D,
   /* Others */
   double      scale;              
   int         i, info;
+  int         ifirst, ilast, isize, ifirst_tmp, ilast_tmp, chunk, iil, iiu;
 
   /* Check input parameters */
   if(!(onlyW  || wantZ  || cntval)) return(1);
@@ -268,41 +269,65 @@ int pmrrr(char *jobz, char *range, int *np, double  *D,
   } else {
     /* Do not compute to full accuracy first, but refine later */
     tolstruct->rtol1 = sqrt(DBL_EPSILON);
-    tolstruct->rtol1 = fmin(1e-1*MIN_RELGAP, tolstruct->rtol1);
+    tolstruct->rtol1 = fmin(1e-2*MIN_RELGAP, tolstruct->rtol1);
     tolstruct->rtol2 = sqrt(DBL_EPSILON)*5.0E-3;
     tolstruct->rtol2 = fmin(5e-6*MIN_RELGAP, tolstruct->rtol2);
     tolstruct->rtol2 = fmax(4.0 * DBL_EPSILON, tolstruct->rtol2);
   }
 
-  /*  Compute eigenvalues (all in case vectors are desired too) */
-  info = plarre(procinfo, jobz, range, Dstruct, Wstruct, tolstruct,
-		nzp, offsetp);
+  /*  Compute all eigenvalues: sorted by block */
+  info = plarre_new(procinfo, jobz, range, Dstruct, Wstruct, tolstruct, nzp, offsetp);
   assert(info == 0);
 
-  /* If just number of local eigenvectors are queried return, then 
-   * value is set in 'plarre' and we can return */
-  if (cntval & valeig) {
+  /* If just number of local eigenvectors are queried */
+  if (cntval & valeig) {    
     clean_up(comm_dup, Werr, Wgap, gersch, iblock, iproc, Windex,
 	     isplit, Zindex, procinfo, Dstruct, Wstruct, Zstruct,
 	     tolstruct);
     return(0);
   }
 
-  /* If only eigenvalues are to be computed, clean up and return */
+  /* If only eigenvalues are to be computed */
   if (!wantZ) {
 
     /* Refine to high relative with respect to input T */
     if (*tryracp) {
       info = refine_to_highrac(procinfo, jobz, Dcopy, E2copy, 
-			       Dstruct, nzp, Wstruct, tolstruct);
+			                        Dstruct, nzp, Wstruct, tolstruct);
       assert(info == 0);
+    }
+
+    /* Sort eigenvalues */
+    qsort(W, n, sizeof(double), cmp);
+
+    /* Only keep subset ifirst:ilast */
+    iil = *il;
+    iiu = *iu;    
+    ifirst_tmp = iil;
+    for (i=0; i<nproc; i++) {
+      chunk  = (iiu-iil+1)/nproc + (i < (iiu-iil+1)%nproc);
+      if (i == nproc-1) {
+	ilast_tmp = iiu;
+      } else {
+	ilast_tmp = ifirst_tmp + chunk - 1;
+	ilast_tmp = imin(ilast_tmp, iiu);
+      }
+      if (i == pid) {
+	ifirst    = ifirst_tmp;
+	ilast     = ilast_tmp;
+	isize     = ilast - ifirst + 1;
+	*offsetp = ifirst - iil;
+	*nzp      = isize;
+      }
+      ifirst_tmp = ilast_tmp + 1;
+      ifirst_tmp = imin(ifirst_tmp, iiu + 1);
+    }
+    if (isize > 0) {
+      memmove(W, &W[ifirst-1], *nzp * sizeof(double));
     }
 
     /* If matrix was scaled, rescale eigenvalues */
     invscale_eigenvalues(Wstruct, scale, *nzp);
-
-    /* Sort eigenvalues */
-    if (Dstruct->nsplit > 1) qsort(W, *nzp, sizeof(double), cmp);
 
     clean_up(comm_dup, Werr, Wgap, gersch, iblock, iproc, Windex,
 	     isplit, Zindex, procinfo, Dstruct, Wstruct, Zstruct,
@@ -699,7 +724,7 @@ int sort_eigenpairs_global(int m, proc_t *procinfo, val_t *Wstruct,
       if (minmax[i] > minmax[i+1]) sorted = false;
     }
     
-    if (pid == 0) printf("sorted = %d\n", sorted);
+    // if (pid == 0) printf("sorted = %d\n", sorted);
 
   } /* end while not sorted */
 
@@ -811,8 +836,7 @@ int refine_to_highrac(proc_t *procinfo, char *jobz, double *D,
   int    *iwork;
   int    ifirst, ilast, offset, info;
   int    i, j, k;
-  int    ibegin, iend, isize;
-  int    iWbegin, iWend, nbl;
+  int    ibegin, iend, isize, nbl;
 
   work  = (double *) malloc( 2*n * sizeof(double) );
   assert (work != NULL);
@@ -824,53 +848,19 @@ int refine_to_highrac(proc_t *procinfo, char *jobz, double *D,
     
     iend   = isplit[j] - 1;
     isize  = iend - ibegin + 1;
-    nbl    = 0;
+    nbl    = isize;
     
-    /* Find eigenvalues in block */
-    if (!wantZ) {
-      /* Eigenvalues are in W[0...nbl] */
-      iWbegin = 0;
-      iWend   = 0;
-      for (i=0; i<nz; i++) {
-	if (nbl == 0 && iblock[i] == j+1) {
-	  iWbegin = i;
-	  iWend   = i;
-	  nbl++;
-	  k = i+1;
-	  while (k <nz && iblock[k] == j+1) {
-	    iWend++; nbl++; k++;
-	  }
-	}
-      }
-    } else {
-      /* eigenvalues are in W[0...(n-1)] */
-      iWbegin = iend   + 1;
-      iWend   = ibegin - 1;
-      for (i=ibegin; i<=iend; i++) {
-	if (nbl == 0 && iproc[i] == pid) {
-	  iWbegin = i;
-	  iWend   = i;
-	  nbl++;
-	  k = i+1;
-	  while (k <=iend && iproc[k] == pid) {
-	    iWend++; nbl++; k++;
-	  }
-	}
-      }
-    }
-
-    /* If no eigenvalues for process in block continue */
-    if (nbl == 0) {
+    if (nbl == 1) {
       ibegin = iend + 1;
       continue;
     }
     
-    ifirst  = Windex[iWbegin];
-    ilast   = Windex[iWend];
-    offset  = Windex[iWbegin] - 1;
+    ifirst  = 1;
+    ilast   = nbl;
+    offset  = 0;
 
     dlarrj_(&isize, &D[ibegin], &E2[ibegin], &ifirst, &ilast, &tol,
-	    &offset, &W[iWbegin], &Werr[iWbegin], work, iwork, &pivmin,
+	    &offset, &W[ibegin], &Werr[ibegin], work, iwork, &pivmin,
 	    &spdiam, &info);
     assert(info == 0);
     
@@ -881,6 +871,112 @@ int refine_to_highrac(proc_t *procinfo, char *jobz, double *D,
   free(iwork);
   return(0);
 }
+
+
+
+/* /\* */
+/*  * Refines the eigenvalue to high relative accuracy with */
+/*  * respect to the input matrix; */
+/*  * Note: In principle this part could be multithreaded too, */
+/*  * but it will only rarely be called and not much work */
+/*  * is involved, if the eigenvalues are not small in magnitude */
+/*  * even no work at all is not uncommon. Therefore using */
+/*  * multiple threads seems not to be warranted. */
+/*  *\/ */
+/* static  */
+/* int refine_to_highrac(proc_t *procinfo, char *jobz, double *D, */
+/* 		      double *E2, in_t *Dstruct, int *nzp, */
+/* 		      val_t *Wstruct, tol_t *tolstruct) */
+/* { */
+/*   int              pid    = procinfo->pid; */
+/*   bool             wantZ  = (jobz[0]  == 'V' || jobz[0]  == 'v'); */
+/*   int              n      = Dstruct->n; */
+/*   int              nsplit = Dstruct->nsplit; */
+/*   int    *restrict isplit = Dstruct->isplit; */
+/*   double           spdiam = Dstruct->spdiam; */
+/*   int              nz     = *nzp; */
+/*   double *restrict W      = Wstruct->W; */
+/*   double *restrict Werr   = Wstruct->Werr; */
+/*   int    *restrict Windex = Wstruct->Windex; */
+/*   int    *restrict iblock = Wstruct->iblock; */
+/*   int    *restrict iproc  = Wstruct->iproc; */
+/*   double           pivmin = tolstruct->pivmin;  */
+/*   double           tol    = 4 * DBL_EPSILON;  */
+  
+/*   double *work; */
+/*   int    *iwork; */
+/*   int    ifirst, ilast, offset, info; */
+/*   int    i, j, k; */
+/*   int    ibegin, iend, isize; */
+/*   int    iWbegin, iWend, nbl; */
+
+/*   work  = (double *) malloc( 2*n * sizeof(double) ); */
+/*   assert (work != NULL); */
+/*   iwork = (int *)    malloc( 2*n * sizeof(int)    ); */
+/*   assert (iwork != NULL); */
+
+/*   ibegin  = 0; */
+/*   for (j=0; j<nsplit; j++) { */
+    
+/*     iend   = isplit[j] - 1; */
+/*     isize  = iend - ibegin + 1; */
+/*     nbl    = 0; */
+    
+/*     Find eigenvalues in block */
+/*     if (!wantZ) { */
+/*       /\* Eigenvalues are in W[0...nbl] *\/ */
+/*       iWbegin = 0; */
+/*       iWend   = 0; */
+/*       for (i=0; i<nz; i++) { */
+/*     	if (nbl == 0 && iblock[i] == j+1) { */
+/*     	  iWbegin = i; */
+/*     	  iWend   = i; */
+/*     	  nbl++; */
+/*     	  k = i+1; */
+/*     	  while (k <nz && iblock[k] == j+1) { */
+/*     	    iWend++; nbl++; k++; */
+/*     	  } */
+/*     	} */
+/*       } */
+/*     } else { */
+/*       /\* eigenvalues are in W[0...(n-1)] *\/ */
+/*       iWbegin = iend   + 1; */
+/*       iWend   = ibegin - 1; */
+/*       for (i=ibegin; i<=iend; i++) { */
+/* 	if (nbl == 0 && iproc[i] == pid) { */
+/* 	  iWbegin = i; */
+/* 	  iWend   = i; */
+/* 	  nbl++; */
+/* 	  k = i+1; */
+/* 	  while (k <=iend && iproc[k] == pid) { */
+/* 	    iWend++; nbl++; k++; */
+/* 	  } */
+/* 	} */
+/*       } */
+/*     } */
+
+/*     /\* If no eigenvalues for process in block continue *\/ */
+/*     if (nbl == 0) { */
+/*       ibegin = iend + 1; */
+/*       continue; */
+/*     } */
+    
+/*     ifirst  = Windex[iWbegin]; */
+/*     ilast   = Windex[iWend]; */
+/*     offset  = Windex[iWbegin] - 1; */
+
+/*     dlarrj_(&isize, &D[ibegin], &E2[ibegin], &ifirst, &ilast, &tol, */
+/* 	    &offset, &W[iWbegin], &Werr[iWbegin], work, iwork, &pivmin, */
+/* 	    &spdiam, &info); */
+/*     assert(info == 0); */
+    
+/*     ibegin = iend + 1; */
+/*   } /\* end j *\/ */
+  
+/*   free(work); */
+/*   free(iwork); */
+/*   return(0); */
+/* } */
 
 
 

@@ -114,7 +114,7 @@ int plarrv(proc_t *procinfo, in_t *Dstruct, val_t *Wstruct,
 
   /* Assign eigenvectors to processes */
   assign_to_proc(procinfo, Dstruct, Wstruct, Zstruct, nzp,
-		 myfirstp);
+		            myfirstp);
 
   /* Create work queue Q, counter, threads to empty Q */
   workQ    = create_workQ( );
@@ -148,6 +148,14 @@ int plarrv(proc_t *procinfo, in_t *Dstruct, val_t *Wstruct,
     info = pthread_join(threads[i], &status);
     assert(info == 0 && status == NULL);
   }
+
+  /* if (procinfo->pid == 0) { */
+  /*   print_vec(procinfo->pid, "W=", Wstruct->W, "];", n, "%d: %.16e"); */
+  /*   print_vec(procinfo->pid, "Werr=", Wstruct->Werr, "];", n, "%d: %.16e"); */
+  /*   print_ivec(procinfo->pid, "Windex=", Wstruct->Windex, "];", n); */
+  /*   print_ivec(procinfo->pid, "iblock=", Wstruct->iblock, "];", n); */
+  /*   print_ivec(procinfo->pid, "iproc=", Wstruct->iproc, "];", n); */
+  /* }   */
   
   /* Clean up */
   free(Wshifted);
@@ -190,7 +198,7 @@ int assign_to_proc(proc_t *procinfo, in_t *Dstruct, val_t *Wstruct,
   sort_struct_t     *array;
 
   array = (sort_struct_t *) malloc(n*sizeof(sort_struct_t));
-
+  
   for (i=0; i<n; i++) {
     /* Find shift of block */
     iblk                    = iblock[i];
@@ -207,6 +215,7 @@ int assign_to_proc(proc_t *procinfo, in_t *Dstruct, val_t *Wstruct,
 
   qsort(array, n, sizeof(sort_struct_t), cmpa);
 
+  /* Mark eigenvectors that do not need to be computed */
   for (j = 0; j < il-1; j++ ) {
     ind = array[j].ind;
     iproc[ind]  = -1;
@@ -250,7 +259,7 @@ int assign_to_proc(proc_t *procinfo, in_t *Dstruct, val_t *Wstruct,
     iproc[ind]  = -1;
     Zindex[ind] = -1;
   }
-
+  
   free(array);
   return(0);
 }
@@ -617,6 +626,8 @@ void *empty_workQ(void *argin)
 
   /* while loop to empty the work queue */
   while (PMR_get_counter_value(num_left) > 0) {
+
+    //    printf("%d: tasks left = %d\n", procinfo->pid, PMR_get_counter_value(num_left));
 
     /* empty r-queue before processing other tasks */
     PMR_process_r_queue(tid, procinfo, Wstruct, Zstruct, tolstruct,
