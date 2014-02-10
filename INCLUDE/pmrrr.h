@@ -106,6 +106,8 @@ int pmrrr(char *jobz, char *range, int *n, double  *D,
  *                   On output the eigenvalues with index il to iu are 
  *                   computed by ALL processes.
  * tryrac            0 - do not try to achieve high relative accuracy.
+ *                   NOTE: this should be the default in context of  
+ *                         dense eigenproblems.
  *                   1 - relative accuracy will be attempted; 
  *                       on output it is set to zero if high relative 
  *                       accuracy is not achieved.
