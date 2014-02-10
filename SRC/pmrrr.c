@@ -114,7 +114,7 @@ int pmrrr(char *jobz, char *range, int *np, double  *D,
   int         nproc, pid, nthreads;             
   char        *ompvar;
   MPI_Comm    comm_dup;
-  int         thread_support;
+  int         is_init, is_final, thread_support;
 
   /* Others */
   double      scale;              
@@ -132,6 +132,12 @@ int pmrrr(char *jobz, char *range, int *np, double  *D,
   }
   
   /* MPI & multithreading info */
+  MPI_Initialized(&is_init);
+  MPI_Finalized(&is_final);
+  if (is_init!=1 || is_final==1) {
+    fprintf(stderr, "ERROR: MPI is not active! (init=%d, final=%d) \n", is_init, is_final);
+    exit(1);
+  }
   MPI_Comm_dup(comm, &comm_dup);
   MPI_Comm_size(comm_dup, &nproc);
   MPI_Comm_rank(comm_dup, &pid);
@@ -151,6 +157,23 @@ int pmrrr(char *jobz, char *range, int *np, double  *D,
       nthreads = atoi(ompvar);
     }
   }
+
+#if defined(MVAPICH2_VERSION)
+  if (nthreads>1) {
+    int           mv2_affinity=1;
+    char        *mv2_string = getenv("MV2_ENABLE_AFFINITY");
+    if (mv2_string != NULL) {
+      mv2_affinity = atoi(mv2_string);
+    }    
+    if (mv2_affinity!=0 && pid==0) {
+      fprintf(stderr, "WARNING: You are using MVAPICH2 with affinity enabled, probably by default. \n");
+      fprintf(stderr, "WARNING: This will cause performance issues if MRRR uses Pthreads. \n");
+      fprintf(stderr, "WARNING: Please rerun your job with MV2_ENABLE_AFFINITY=0 or PMR_NUM_THREADS=1. \n");
+      fflush(stderr);
+    }    
+    nthreads = 1; 
+  }
+#endif
 
   /* If only maximal number of local eigenvectors are queried
    * return if possible here */
