@@ -204,7 +204,7 @@ int pmrrr(char *jobz, char *range, int *n, double  *D,
 
 /* Set how many iterations should be executed to find the root 
  * representation; default: 6 */
-#define MAX_TRY_RRRR       10
+#define MAX_TRY_RRR       10
 
 
 /*

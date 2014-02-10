@@ -271,6 +271,8 @@ int PMR_process_s_task(singleton_t *sng, int tid, proc_t *procinfo,
     }
     Wshifted[i] = lambda;
 
+    // printf("residual = %16e\n", residual);
+
     /* compute support w.r.t. whole matrix
      * block beginning is offset for each support */
     isuppZ[2*zind    ] += bl_begin;

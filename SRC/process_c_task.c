@@ -477,7 +477,8 @@ int communicate_refined_eigvals(cluster_t *cl, proc_t *procinfo,
   int              proc_W_end   = cl->proc_W_end;
   int              left_pid     = cl->left_pid;
   int              right_pid    = cl->right_pid;
-  int              num_messages = 4*(right_pid - left_pid);
+  int              num_messages;
+  //  int              num_messages = 4*(right_pid - left_pid);
 
   int              pid          = procinfo->pid;
 
@@ -488,7 +489,7 @@ int communicate_refined_eigvals(cluster_t *cl, proc_t *procinfo,
   int    *restrict iproc        = Wstruct->iproc;
 
   /* Others */
-  int              p, i_msg, u, k;
+  int              p, i_msg, u, k, i;
   int              my_begin, my_end, my_size;
   int              other_begin, other_end, other_size;
   double           sigma;
@@ -503,6 +504,16 @@ int communicate_refined_eigvals(cluster_t *cl, proc_t *procinfo,
   if (pid == left_pid ) my_begin = cl_begin;
   if (pid == right_pid) my_end   = cl_end;
   my_size  = my_end - my_begin + 1;
+
+  num_messages = 0;
+  for (i=left_pid; i<=right_pid; i++) {
+    for (k=cl_begin; k<=cl_end; k++) {
+      if (iproc[k] == i) {
+	num_messages += 4;
+	break;
+      }
+    }    
+  }
 
   requests = (MPI_Request *) malloc( num_messages *
 					  sizeof(MPI_Request) );
