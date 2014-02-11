@@ -34,7 +34,7 @@
  * SUCH DAMAGE.
  *
  * Coded by Matthias Petschow (petschow@aices.rwth-aachen.de),
- * August 2010, Version 0.6
+ * August 2010, Version 0.7
  *
  * This code was the result of a collaboration between 
  * Matthias Petschow and Paolo Bientinesi. When you use this 
@@ -66,9 +66,6 @@ static void *eigval_subset_thread_a(void *argin);
 static void *eigval_subset_thread_r(void *argin);
 static void clean_up_plarre(double*, double*, int*, int*, int*);
 
-/* static  */
-/* int eigval_subset_proc(proc_t*, char*, in_t*, double*, int, int, */
-/* 		       tol_t*, val_t*, double*, int*); */
 
 static
 int eigval_approx_proc(proc_t *procinfo, int ifirst, int ilast, 
@@ -147,7 +144,7 @@ int plarre(proc_t *procinfo, char *jobz, char *range, in_t *Dstruct,
   int             *iwork;
 
   /* compute geschgorin disks and spectral diameter */
-  double          gl, gu, bl_gu, eold, emax, eabs;
+  double          gl, gu, eold, emax, eabs;
 
   /* compute splitting points */
   int             bl_begin, bl_end, bl_size;
@@ -344,7 +341,7 @@ int plarre(proc_t *procinfo, char *jobz, char *range, in_t *Dstruct,
     MPI_Allgatherv(iwork, isize, MPI_INT, &Windex[bl_begin], rcount, rdispl,
 		   MPI_INT, procinfo->comm);
     
-    /* /\* Ensure that within block eigenvalues sorted *\/ */
+    /* Ensure that within block eigenvalues sorted */
     /* sorted = false; */
     /* while (sorted == false) { */
     /* 	sorted = true; */
@@ -369,7 +366,8 @@ int plarre(proc_t *procinfo, char *jobz, char *range, in_t *Dstruct,
     for (j = bl_begin; j < bl_end; j++) {
       Wgap[j] = fmax(0.0, (W[j+1] - Werr[j+1]) - (W[j] + Werr[j]) );
     }
-    Wgap[bl_end] = fmax(0.0, (bl_gu - sigma) - (W[bl_end] + Werr[bl_end]) );
+    sigma = E[bl_end];
+    Wgap[bl_end] = fmax(0.0, (gu - sigma) - (W[bl_end] + Werr[bl_end]) );
 
     /* Compute UNSHIFTED eigenvalues */
     if (!wantZ) {

@@ -2,7 +2,7 @@
  * tridiagonal matrix T, given by its diagonal elements D
  * and its super-/subdiagonal elements E.
  *
- * See pmrrr.h for more information.
+ * See INCLUDE/pmrrr.h for more information.
  *
  * Copyright (c) 2010, RWTH Aachen University
  * All rights reserved.
@@ -594,8 +594,9 @@ void invscale_eigenvalues(val_t *Wstruct, double scale,
 
 
 static 
-int sort_eigenpairs_local(int m, val_t *Wstruct, vec_t *Zstruct)
+int sort_eigenpairs_local(proc_t *procinfo, int m, val_t *Wstruct, vec_t *Zstruct)
 {
+  int              pid        = procinfo->pid;
   int              n        = Wstruct->n;
   double *restrict W        = Wstruct->W;
   double *restrict work     = Wstruct->gersch;
@@ -607,7 +608,7 @@ int sort_eigenpairs_local(int m, val_t *Wstruct, vec_t *Zstruct)
   int              j;
   double           tmp;
   int              itmp1, itmp2;
-
+  
   /* Make sure that sorted correctly; ineffective implementation,
    * but usually no or very little swapping should be done here */
   sorted = false;
@@ -642,7 +643,7 @@ int sort_eigenpairs_local(int m, val_t *Wstruct, vec_t *Zstruct)
 
 
 static 
-int sort_eigenpairs_global(int m, proc_t *procinfo, val_t *Wstruct, 
+int sort_eigenpairs_global(proc_t *procinfo, int m, val_t *Wstruct, 
 			   vec_t *Zstruct)
 {
   int              pid   = procinfo->pid;
@@ -658,6 +659,7 @@ int sort_eigenpairs_global(int m, proc_t *procinfo, val_t *Wstruct,
   int              i, p, lp, itmp[2];
   bool             sorted;
   MPI_Status       status;
+  double              nan_value = 0.0/0.0;
   
   minW   = (double *) malloc(  nproc*sizeof(double));
   assert(minW != NULL);
@@ -666,11 +668,18 @@ int sort_eigenpairs_global(int m, proc_t *procinfo, val_t *Wstruct,
   minmax = (double *) malloc(2*nproc*sizeof(double));
   assert(minmax != NULL);
 
-  MPI_Allgather(&W[0], 1, MPI_DOUBLE, minW, 1, MPI_DOUBLE, 
-		procinfo->comm); 
-  MPI_Allgather(&W[m-1], 1, MPI_DOUBLE, maxW, 1, MPI_DOUBLE, 
-		procinfo->comm); 
-  
+  if (m == 0) {
+    MPI_Allgather(&nan_value, 1, MPI_DOUBLE, minW, 1, MPI_DOUBLE, 
+		  procinfo->comm); 
+    MPI_Allgather(&nan_value, 1, MPI_DOUBLE, maxW, 1, MPI_DOUBLE, 
+		  procinfo->comm); 
+  } else {
+    MPI_Allgather(&W[0], 1, MPI_DOUBLE, minW, 1, MPI_DOUBLE, 
+		  procinfo->comm); 
+    MPI_Allgather(&W[m-1], 1, MPI_DOUBLE, maxW, 1, MPI_DOUBLE, 
+		  procinfo->comm); 
+  }
+
   for (i=0; i<nproc; i++) {
     minmax[2*i]   = minW[i];
     minmax[2*i+1] = maxW[i];
@@ -730,13 +739,20 @@ int sort_eigenpairs_global(int m, proc_t *procinfo, val_t *Wstruct,
     }
 
     /* sort local again */
-    sort_eigenpairs_local(m, Wstruct, Zstruct);
+    sort_eigenpairs_local(procinfo, m, Wstruct, Zstruct);
     
     /* check again if globally sorted */
-    MPI_Allgather(&W[0], 1, MPI_DOUBLE, minW, 1, MPI_DOUBLE, 
-		  procinfo->comm); 
-    MPI_Allgather(&W[m-1], 1, MPI_DOUBLE, maxW, 1, MPI_DOUBLE, 
-		  procinfo->comm); 
+    if (m == 0) {
+      MPI_Allgather(&nan_value, 1, MPI_DOUBLE, minW, 1, MPI_DOUBLE, 
+		    procinfo->comm); 
+      MPI_Allgather(&nan_value, 1, MPI_DOUBLE, maxW, 1, MPI_DOUBLE, 
+		    procinfo->comm);       
+    } else {
+      MPI_Allgather(&W[0], 1, MPI_DOUBLE, minW, 1, MPI_DOUBLE, 
+		    procinfo->comm); 
+      MPI_Allgather(&W[m-1], 1, MPI_DOUBLE, maxW, 1, MPI_DOUBLE, 
+		    procinfo->comm); 
+    }
     
     for (i=0; i<nproc; i++) {
       minmax[2*i]   = minW[i];
@@ -747,8 +763,6 @@ int sort_eigenpairs_global(int m, proc_t *procinfo, val_t *Wstruct,
       if (minmax[i] > minmax[i+1]) sorted = false;
     }
     
-    // if (pid == 0) printf("sorted = %d\n", sorted);
-
   } /* end while not sorted */
 
   free(minW);
@@ -809,13 +823,13 @@ int sort_eigenpairs(proc_t *procinfo, val_t *Wstruct, vec_t *Zstruct)
   /* Make sure eigenpairs are sorted locally; this is a very 
    * inefficient way sorting, but in general no or very little 
    * swapping of eigenpairs is expected here */
-  sort_eigenpairs_local(im, Wstruct, Zstruct);
+  sort_eigenpairs_local(procinfo, im, Wstruct, Zstruct);
 
   /* Make sure eigenpairs are sorted globally; this is a very 
    * inefficient way sorting, but in general no or very little 
    * swapping of eigenpairs is expected here */
   if (ASSERT_SORTED_EIGENPAIRS == true)
-    sort_eigenpairs_global(im, procinfo, Wstruct, Zstruct);
+    sort_eigenpairs_global(procinfo, im, Wstruct, Zstruct);
 
   free(sort_array);
 
@@ -829,11 +843,10 @@ int sort_eigenpairs(proc_t *procinfo, val_t *Wstruct, vec_t *Zstruct)
 /*
  * Refines the eigenvalue to high relative accuracy with
  * respect to the input matrix;
- * Note: In principle this part could be multithreaded too,
+ * Note: In principle this part could be fully parallel too,
  * but it will only rarely be called and not much work
  * is involved, if the eigenvalues are not small in magnitude
- * even no work at all is not uncommon. Therefore using
- * multiple threads seems not to be warranted.
+ * even no work at all is not uncommon. 
  */
 static 
 int refine_to_highrac(proc_t *procinfo, char *jobz, double *D,
@@ -894,112 +907,6 @@ int refine_to_highrac(proc_t *procinfo, char *jobz, double *D,
   free(iwork);
   return(0);
 }
-
-
-
-/* /\* */
-/*  * Refines the eigenvalue to high relative accuracy with */
-/*  * respect to the input matrix; */
-/*  * Note: In principle this part could be multithreaded too, */
-/*  * but it will only rarely be called and not much work */
-/*  * is involved, if the eigenvalues are not small in magnitude */
-/*  * even no work at all is not uncommon. Therefore using */
-/*  * multiple threads seems not to be warranted. */
-/*  *\/ */
-/* static  */
-/* int refine_to_highrac(proc_t *procinfo, char *jobz, double *D, */
-/* 		      double *E2, in_t *Dstruct, int *nzp, */
-/* 		      val_t *Wstruct, tol_t *tolstruct) */
-/* { */
-/*   int              pid    = procinfo->pid; */
-/*   bool             wantZ  = (jobz[0]  == 'V' || jobz[0]  == 'v'); */
-/*   int              n      = Dstruct->n; */
-/*   int              nsplit = Dstruct->nsplit; */
-/*   int    *restrict isplit = Dstruct->isplit; */
-/*   double           spdiam = Dstruct->spdiam; */
-/*   int              nz     = *nzp; */
-/*   double *restrict W      = Wstruct->W; */
-/*   double *restrict Werr   = Wstruct->Werr; */
-/*   int    *restrict Windex = Wstruct->Windex; */
-/*   int    *restrict iblock = Wstruct->iblock; */
-/*   int    *restrict iproc  = Wstruct->iproc; */
-/*   double           pivmin = tolstruct->pivmin;  */
-/*   double           tol    = 4 * DBL_EPSILON;  */
-  
-/*   double *work; */
-/*   int    *iwork; */
-/*   int    ifirst, ilast, offset, info; */
-/*   int    i, j, k; */
-/*   int    ibegin, iend, isize; */
-/*   int    iWbegin, iWend, nbl; */
-
-/*   work  = (double *) malloc( 2*n * sizeof(double) ); */
-/*   assert (work != NULL); */
-/*   iwork = (int *)    malloc( 2*n * sizeof(int)    ); */
-/*   assert (iwork != NULL); */
-
-/*   ibegin  = 0; */
-/*   for (j=0; j<nsplit; j++) { */
-    
-/*     iend   = isplit[j] - 1; */
-/*     isize  = iend - ibegin + 1; */
-/*     nbl    = 0; */
-    
-/*     Find eigenvalues in block */
-/*     if (!wantZ) { */
-/*       /\* Eigenvalues are in W[0...nbl] *\/ */
-/*       iWbegin = 0; */
-/*       iWend   = 0; */
-/*       for (i=0; i<nz; i++) { */
-/*     	if (nbl == 0 && iblock[i] == j+1) { */
-/*     	  iWbegin = i; */
-/*     	  iWend   = i; */
-/*     	  nbl++; */
-/*     	  k = i+1; */
-/*     	  while (k <nz && iblock[k] == j+1) { */
-/*     	    iWend++; nbl++; k++; */
-/*     	  } */
-/*     	} */
-/*       } */
-/*     } else { */
-/*       /\* eigenvalues are in W[0...(n-1)] *\/ */
-/*       iWbegin = iend   + 1; */
-/*       iWend   = ibegin - 1; */
-/*       for (i=ibegin; i<=iend; i++) { */
-/* 	if (nbl == 0 && iproc[i] == pid) { */
-/* 	  iWbegin = i; */
-/* 	  iWend   = i; */
-/* 	  nbl++; */
-/* 	  k = i+1; */
-/* 	  while (k <=iend && iproc[k] == pid) { */
-/* 	    iWend++; nbl++; k++; */
-/* 	  } */
-/* 	} */
-/*       } */
-/*     } */
-
-/*     /\* If no eigenvalues for process in block continue *\/ */
-/*     if (nbl == 0) { */
-/*       ibegin = iend + 1; */
-/*       continue; */
-/*     } */
-    
-/*     ifirst  = Windex[iWbegin]; */
-/*     ilast   = Windex[iWend]; */
-/*     offset  = Windex[iWbegin] - 1; */
-
-/*     dlarrj_(&isize, &D[ibegin], &E2[ibegin], &ifirst, &ilast, &tol, */
-/* 	    &offset, &W[iWbegin], &Werr[iWbegin], work, iwork, &pivmin, */
-/* 	    &spdiam, &info); */
-/*     assert(info == 0); */
-    
-/*     ibegin = iend + 1; */
-/*   } /\* end j *\/ */
-  
-/*   free(work); */
-/*   free(iwork); */
-/*   return(0); */
-/* } */
 
 
 
