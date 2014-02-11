@@ -122,8 +122,8 @@ int PMR_process_s_task(singleton_t *sng, int tid, proc_t *procinfo,
       zind = Zindex[i];
       memset(&Z[zind*ldz], 0.0, n*sizeof(double) );
       Z[zind*ldz + bl_begin] = 1.0;
-      isuppZ[2*zind    ]     = bl_begin;
-      isuppZ[2*zind + 1]     = bl_begin;
+      isuppZ[2*zind    ]     = bl_begin + 1;
+      isuppZ[2*zind + 1]     = bl_begin + 1;
       continue;
     }
 

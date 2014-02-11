@@ -129,26 +129,26 @@ int pmrrr(char *jobz, char *range, int *n, double  *D,
  * W (double[n])     Locally computed eigenvalues;
  *                   The first nz entries contain the eigenvalues 
  *                   computed locally; the first entry contains the 
- *                   'offset + 1'-th eigenvalue computed and the 
+ *                   'offset + 1'-th computed eigenvalue, which is the 
  *                   'offset + il'-th eigenvalue of the input matrix 
  *                   (1-based indexing in both cases).
  *                   In some situations it is desirable to have all 
  *                   computed eigenvalues in W, instead of only 
- *                   those computed locally. In this case the 
- *                   routine 'PMR_comm_eigvals' can be called right 
- *                   after 'pmrrr' returns (see below).
+ *                   those computed locally. In this case, call 
+ *                   routine 'PMR_comm_eigvals' after 
+ *                   'pmrrr' returns (see example and interface below).
  * Z                 Locally computed eigenvectors.
  * (double[n*nz])    Enough space must be provided to store the
  *                   vectors. 'nz' should be bigger or equal 
  *                   to ceil('#eigenpairs'/'#processes'), where 
  *                   '#eigenpairs' is 'n' in case of range="A" and
- *                  'iu-il+1' in case of range="I". Alternatively, 
+ *                   'iu-il+1' in case of range="I". Alternatively, 
  *                   and for range="V" 'nz' can be obtained 
  *                   by running the routine with jobz="C". 
  * Zsupp             Support of eigenvectors, which is given by
- * (double[2*n])     Z[2*i] to Z[2*i+1] for the i-th eigenvector
- *                   stored locally (1-based indexing in both 
- *                   cases).
+ * (double[2*n])     i1=Zsupp[2*i] to i2=Zsupp[2*i+1] for the i-th local eigenvector
+ *                   (returns 1-based indexing; e.g. in C Z[i1-1:i2-1] are non-zero and
+ *                   in Fotran Z(i1:i2) are non-zero).
  *
  * RETURN VALUE: 
  * -------------
@@ -163,10 +163,23 @@ int pmrrr(char *jobz, char *range, int *n, double  *D,
  * CALL PMRRR('V', 'A', N, D, E, VL, VU, IL, IU, TRYRAC, 
  *            MPI_COMM_WORLD, NZ, MYFIRST, W, Z, LDZ, ZSUPP, INFO)
  *
- * Some additinal comments:
- * ------------------------
- * + In the case '#processors'='#nodes'*'#cores' << 16 the routine
- *   might be optimal in terms of performance.
+ *
+ * EXAMPLE CALL: 
+ * -------------
+ * char    *jobz, *range;
+ * int     n, il, iu, tryRAC=0, nz, offset, ldz, *Zsupp;
+ * double  *D, *E, *W, *Z, vl, vu;
+ *
+ * // allocate space for D, E, W, Z
+ * // initialize D, E
+ * // set jobz, range, ldz, and if necessary, il, iu or vl, vu  
+ * 
+ * info = pmrrr(jobz, range, &n, D, E, &vl, &vu, &il, &iu,
+ *              &tryRAC, MPI_COMM_WORLD, &nz, &myfirst, W,
+ *	        Z, &ldz , Zsupp);
+ *
+ * // optional: 
+ * PMR_comm_eigvals(MPI_COMM_WORLD, &nz, &myfirst, W);
  *
  */
 
