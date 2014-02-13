@@ -13,11 +13,9 @@ HEADERS := $(foreach DIR,$(DIRS),$(wildcard $(DIR)/*.h))
 CSRCS   := $(foreach DIR,$(DIRS),$(wildcard $(DIR)/*.c))
 COBJS = $(CSRCS:.c=.o)
 
-ifeq ($(INCLAPACK),1) 
- CFLAGS += -DNOLAPACK
- FSRCS  := $(foreach DIR,$(DIRS),$(wildcard $(DIR)/*.f))
- FOBJS = $(FSRCS:.f=.o)
-endif
+FSRCS  := $(foreach DIR,$(DIRS),$(wildcard $(DIR)/*.f))
+FOBJS = $(FSRCS:.f=.o)
+
 
 # Build target #
 libpmrrr.a: $(COBJS) $(FOBJS) $(HEADERS)

@@ -187,7 +187,7 @@ int PMR_process_s_task(singleton_t *sng, int tid, proc_t *procinfo,
 	tmp     = Wgap[i]; 
 	Wgap[i] = 0.0;
 	
-	dlarrb_(&bl_size, D, DLL, &i_local, &i_local, &DZERO, 
+	odrrb_(&bl_size, D, DLL, &i_local, &i_local, &DZERO, 
 		&twoeps, &offset, &Wshifted[i], &Wgap[i],
 		&Werr[i], work, iwork, &pivmin, &bl_spdiam,
 		&itmp, &info);
@@ -200,7 +200,7 @@ int PMR_process_s_task(singleton_t *sng, int tid, proc_t *procinfo,
       wantNC = (usedBS == true) ? false : true;
 
       /* compute the eigenvector corresponding to lambda */
-      dlar1v_(&bl_size, &IONE, &bl_size, &lambda, D, L, DL, DLL,
+      odr1v_(&bl_size, &IONE, &bl_size, &lambda, D, L, DL, DLL,
 	      &pivmin, &gaptol, &Z[zind*ldz+bl_begin], &wantNC,
 	      &negcount, &ztz, &mingma, &r, &isuppZ[2*zind],
 	      &norminv, &residual, &RQcorr, work);
@@ -257,14 +257,14 @@ int PMR_process_s_task(singleton_t *sng, int tid, proc_t *procinfo,
 
     } /* end k */
 
-    /* if necessary call dlar1v to improve error angle by 2nd step */
+    /* if necessary call odr1v to improve error angle by 2nd step */
     step2II = false;
     if ( usedRQ && usedBS && (bstres <= residual) ) {
       lambda = bstw;
       step2II = true;
     }
     if ( step2II == true ) {
-      dlar1v_(&bl_size, &IONE, &bl_size, &lambda, D, L, DL, DLL,
+      odr1v_(&bl_size, &IONE, &bl_size, &lambda, D, L, DL, DLL,
 	      &pivmin, &gaptol, &Z[zind*ldz+bl_begin], &wantNC,
 	      &negcount, &ztz, &mingma, &r, &isuppZ[2*zind],
 	      &norminv, &residual, &RQcorr, work);
