@@ -149,14 +149,6 @@ int plarrv(proc_t *procinfo, in_t *Dstruct, val_t *Wstruct,
     assert(info == 0 && status == NULL);
   }
 
-  /* if (procinfo->pid == 0) { */
-  /*   print_vec(procinfo->pid, "W=", Wstruct->W, "];", n, "%d: %.16e"); */
-  /*   print_vec(procinfo->pid, "Werr=", Wstruct->Werr, "];", n, "%d: %.16e"); */
-  /*   print_ivec(procinfo->pid, "Windex=", Wstruct->Windex, "];", n); */
-  /*   print_ivec(procinfo->pid, "iblock=", Wstruct->iblock, "];", n); */
-  /*   print_ivec(procinfo->pid, "iproc=", Wstruct->iproc, "];", n); */
-  /* }   */
-  
   /* Clean up */
   free(Wshifted);
   free(threads);
@@ -615,19 +607,17 @@ void *empty_workQ(void *argin)
 
   n        = Wstruct->n;
 
-  /* max. needed double precision work space: dlar1v */
+  /* max. needed double precision work space: odr1v */
   work      = (double *) malloc(4*n * sizeof(double));
   assert(work != NULL);
 
-  /* max. needed double precision work space: dlarrb */
+  /* max. needed double precision work space: odrrb */
   iwork     = (int *)    malloc(2*n * sizeof(int)   );
   assert(iwork != NULL);
 
 
   /* while loop to empty the work queue */
   while (PMR_get_counter_value(num_left) > 0) {
-
-    //    printf("%d: tasks left = %d\n", procinfo->pid, PMR_get_counter_value(num_left));
 
     /* empty r-queue before processing other tasks */
     PMR_process_r_queue(tid, procinfo, Wstruct, Zstruct, tolstruct,

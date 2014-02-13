@@ -265,7 +265,7 @@ int pmrrr(char *jobz, char *range, int *np, double  *D,
   /*  Test if matrix warrants more expensive computations which
    *  guarantees high relative accuracy */
   if (*tryracp) {
-    dlarrr_(&n, D, E, &info); /* 0 - rel acc */
+    odrrr_(&n, D, E, &info); /* 0 - rel acc */
   }
   else info = -1;
 
@@ -473,7 +473,7 @@ int handle_small_cases(char *jobz, char *range, int *np, double  *D,
   if (cntval) {
     /* Note: at the moment, jobz="C" should never get here, since
      * it is blocked before. */
-    dstemr_("V", "V", np, D, E, vlp, vup, ilp, iup, &m, W, &cnt,
+    odstmr_("V", "V", np, D, E, vlp, vup, ilp, iup, &m, W, &cnt,
 	    &ldz_tmp, &MINUSONE, Zsupp, tryracp, work, &lwork, iwork,
 	    &liwork, &info);
     assert(info == 0);
@@ -483,7 +483,7 @@ int handle_small_cases(char *jobz, char *range, int *np, double  *D,
     return(0);
   }
 
-  dstemr_(jobz, range, np, D, E, vlp, vup, ilp, iup, &m, W, Z_tmp,
+  odstmr_(jobz, range, np, D, E, vlp, vup, ilp, iup, &m, W, Z_tmp,
 	  &ldz_tmp, np, Zsupp, tryracp, work, &lwork, iwork,
 	  &liwork, &info);
   assert(info == 0);
@@ -545,7 +545,7 @@ double scale_matrix(in_t *Dstruct, val_t *Wstruct, bool valeig)
   rmax   = fmin(sqrt(bignum), 1.0 / sqrt(sqrt(DBL_MIN)));
 
   /*  Scale matrix to allowable range */
-  T_norm = dlanst_("M", &n, D, E);  /* returns max(|T(i,j)|) */
+  T_norm = odnst_("M", &n, D, E);  /* returns max(|T(i,j)|) */
   if (T_norm > 0 && T_norm < rmin) {
     scale = rmin / T_norm;
   } else if (T_norm > rmax) {
@@ -895,7 +895,7 @@ int refine_to_highrac(proc_t *procinfo, char *jobz, double *D,
     ilast   = nbl;
     offset  = 0;
 
-    dlarrj_(&isize, &D[ibegin], &E2[ibegin], &ifirst, &ilast, &tol,
+    odrrj_(&isize, &D[ibegin], &E2[ibegin], &ifirst, &ilast, &tol,
 	    &offset, &W[ibegin], &Werr[ibegin], work, iwork, &pivmin,
 	    &spdiam, &info);
     assert(info == 0);

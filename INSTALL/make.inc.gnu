@@ -5,7 +5,7 @@ FC = mpif90
 
 # Compiler flags
 CFLAGS = -pthread -O3
-FFLAGS = -O3 -funderscoring
+FFLAGS = -O3 -funderscoring -fopenmp
 
 # Archiver and flags used when building the archive
 AR = /usr/bin/ar 

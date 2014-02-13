@@ -262,62 +262,41 @@ int PMR_comm_eigvals(MPI_Comm comm, int *nz, int *ifirst, double *W);
  * so here used to mark routines from LAPACK and BLAS libraries */
 extern void pmrrr_dscal(int*, double*, double*, int*);
 
-#ifdef NOLAPACK
-#define dlamch_ odmch_
-#define dlanst_ odnst_
-#define dlarrr_ odrrr_
-#define dlarra_ odrra_
-#define dlarrc_ odrrc_
-#define dlarrd_ odrrd_
-#define dlarrb_ odrrb_
-#define dlarrk_ odrrk_
-#define dlaebz_ odebz_
-#define dlarnv_ odrnv_
-#define dlarrf_ odrrf_
-#define dlar1v_ odr1v_
-#define dlarrj_ odrrj_
-#define dstemr_ odstmr_
-#define dscal_  pmrrr_dscal
-#endif
-
-extern double dlamch_(char*);
-extern double dlanst_(char*, int*, double*, double*);
-extern void   dlarrr_(int*, double*, double*, int*);
-extern void   dlarra_(int*, double*, double*, double*, double*, 
+extern double odnst_(char*, int*, double*, double*);
+extern void   odrrr_(int*, double*, double*, int*);
+extern void   odrra_(int*, double*, double*, double*, double*, 
 		      double*, int*, int*, int*);
-extern void   dlarrc_(char*, int*, double*, double*, double*, double*,
+extern void   odrrc_(char*, int*, double*, double*, double*, double*,
 		      double*, int*, int*, int*, int*);
-extern void   dlarrd_(char*, char*, int*, double*, double*, int*, 
+extern void   odrrd_(char*, char*, int*, double*, double*, int*, 
 		      int*, double*, double*, double*, double*, 
 		      double*, double*, int*, int*, int*, double*, 
 		      double*, double*, double*, int*, int*, double*, 
 		      int*, int*);
-extern void   dlarrb_(int*, double*, double*, int*, int*, double*,
+extern void   odrrb_(int*, double*, double*, int*, int*, double*,
 		      double*, int*, double*, double*, double*, double*,
 		      int*, double*, double*, int*, int*);
-extern void   dlarrk_(int*, int*, double*, double*, double*, double*,
+extern void   odrrk_(int*, int*, double*, double*, double*, double*,
 		      double*, double*, double*, double*, int*);
-extern void   dlaebz_(int*, int*, int*, int*, int*, int*, double*, 
+extern void   odebz_(int*, int*, int*, int*, int*, int*, double*, 
 		      double*, double*, double*, double*, double*,
 		      int*, double*, double*, int*, int*, double*,
 		      int*, int*);
-extern void   dlarnv_(int*, int*, int*, double*);
-extern void   dlarrf_(int*, double*, double*, double*, int*, int*, 
+extern void   odrnv_(int*, int*, int*, double*);
+extern void   odrrf_(int*, double*, double*, double*, int*, int*, 
 		      double*, double*, double*, double*, double*, 
 		      double*, double*, double*, double*, double*, 
 		      double*, int*);
-extern void   dlar1v_(int*, int*, int*, double*, double*, double*, 
+extern void   odr1v_(int*, int*, int*, double*, double*, double*, 
 		      double*, double*, double*, double*, double*, 
 		      bool*, int*, double*, double*, int*, int*, 
 		      double*, double*, double*, double*);
-extern void   dlarrj_(int*, double*, double*, int*, int*, double*, 
+extern void   odrrj_(int*, double*, double*, int*, int*, double*, 
 		      int*, double*, double*, double*, int*, double*, 
 		      double*, int*);
-extern void   dstemr_(char*, char*, int*, double*, double*, double*, 
+extern void   odstmr_(char*, char*, int*, double*, double*, double*, 
 		      double*, int*, int*, int*, double*, double*, 
 		      int*, int*, int*, int*, double*, int*, int*, 
 		      int*, int*);
-/* BLAS function prototypes */
-extern void   dscal_(int*, double*, double*, int*);
 
 #endif /* End of header file */

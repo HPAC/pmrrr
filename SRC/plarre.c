@@ -114,7 +114,7 @@ static int cmp(const void*, const void*);
 int plarre(proc_t *procinfo, char *jobz, char *range, in_t *Dstruct, 
 	       val_t *Wstruct, tol_t *tolstruct, int *nzp, int *offsetp)
 {
-  /* /\* input variables *\/ */
+  /* input variables */
   int              pid    = procinfo->pid;
   int              nproc  = procinfo->nproc;
   bool             wantZ  = (jobz[0]  == 'V' || jobz[0]  == 'v');
@@ -175,7 +175,7 @@ int plarre(proc_t *procinfo, char *jobz, char *range, in_t *Dstruct,
     return(1);
   }
 
-  /* /\* allocate work space *\/ */
+  /* allocate work space */
   E2     = (double *) malloc(     n * sizeof(double) );
   assert(E2 != NULL);
   work   = (double *) malloc(   4*n * sizeof(double) );
@@ -215,7 +215,7 @@ int plarre(proc_t *procinfo, char *jobz, char *range, in_t *Dstruct,
   Dstruct->spdiam = gu - gl;
 
   /* compute splitting points with threshold "split" */
-  dlarra_(&n, D, E, E2, &tolstruct->split, &Dstruct->spdiam,
+  odrra_(&n, D, E, E2, &tolstruct->split, &Dstruct->spdiam,
   	  &Dstruct->nsplit, isplit, &info);
   assert(info == 0);
 
@@ -235,7 +235,7 @@ int plarre(proc_t *procinfo, char *jobz, char *range, in_t *Dstruct,
     
     /* find negcount at boundaries 'vl' and 'vu';
      * needs work of dim(n) and iwork of dim(n) */
-    dlaebz_(&IONE, &IZERO, &n, &IONE, &IONE, &IZERO,
+    odebz_(&IONE, &IZERO, &n, &IONE, &IONE, &IZERO,
   	    &DZERO, &DZERO, &tolstruct->pivmin, D, E, E2, &idummy,
   	    intervals, &dummy, &idummy, negcounts, work,
   	    iwork, &info);
@@ -443,17 +443,19 @@ int eigval_approx_proc(proc_t *procinfo, int ifirst, int ilast,
   void           *status;
 
   /* Others */
-  int    nsplit, isplit[2];
+  int    nsplit, *isplit;
   int    info, m, i, j;
   double dummy;
+  
+  /* Allocate workspace */
+  isplit = (int *) malloc( n * sizeof(int) );
+  assert(isplit != NULL);
+  threads = (pthread_t *) malloc( max_nthreads * sizeof(pthread_t) );
+  assert(threads != NULL);
 
   /* This is an unreduced block */
   nsplit = 1;
   isplit[0] = n;
-  
-  /* Allocate workspace */
-  threads = (pthread_t *) malloc( max_nthreads * sizeof(pthread_t) );
-  assert(threads != NULL);
   
   if (max_nthreads > 1) {
     pthread_attr_init(&attr);
@@ -478,7 +480,7 @@ int eigval_approx_proc(proc_t *procinfo, int ifirst, int ilast,
   nthreads = max_nthreads;
   while (nthreads > 1 && isize / nthreads < 2)
     nthreads--;
-  
+
   if (nthreads > 1) {
     
     /* each threads computes W[iifirst:iilast] and places them in
@@ -491,7 +493,7 @@ int eigval_approx_proc(proc_t *procinfo, int ifirst, int ilast,
     for (i=1; i<nthreads; i++) {
       
       iilast = iifirst + chunk - 1;
-      
+
       auxarg1 = create_auxarg1(n, D, E, E2, ifirst, ilast, iifirst, iilast,
 			       nsplit, isplit, bsrtol, pivmin, gersch,
 			       &work[0], &work[n], &iwork[n], &iwork[0]);
@@ -504,7 +506,7 @@ int eigval_approx_proc(proc_t *procinfo, int ifirst, int ilast,
       iifirst = iilast + 1;
     }
     iilast = ilast;
-    
+
     auxarg1 = create_auxarg1(n, D, E, E2, ifirst, ilast, iifirst, iilast,
 			     nsplit, isplit, bsrtol, pivmin, gersch,
 			     &work[0], &work[n], &iwork[n], &iwork[0]);
@@ -527,26 +529,10 @@ int eigval_approx_proc(proc_t *procinfo, int ifirst, int ilast,
       Windex[j] = iwork[j+n];
     }
     
-    /*   /\* sort, m counts the numbers of eigenvalues computed by process *\/ */
-    /*   m = 0; */
-    /*   for (i=1; i<=nsplit; i++) { */
-    /*     for (j=0; j<isize; j++) { */
-    /* 	if (iwork[j] == i) { */
-    /* 	  W[m]      = work[j]; */
-    /* 	  Werr[m]   = work[j+n]; */
-    /* 	  iblock[m] = iwork[j]; */
-    /* 	  Windex[m] = iwork[j+n]; */
-    /* 	  m++; */
-    /* 	} */
-    /*     } */
-    /*   } */
-
-    printf("%d: Multi-threaded DLARRD used\n", pid);        
-    
   } else {
     /* no multithreaded computation */
     
-    dlarrd_("I", "B", &n, &dummy, &dummy, &ifirst, &ilast, gersch,
+    odrrd_("I", "B", &n, &dummy, &dummy, &ifirst, &ilast, gersch,
   	    &bsrtol, D, E, E2, &pivmin, &nsplit, isplit, &m, W, Werr,
   	    &wl, &wu, iblock, Windex, work, iwork, &info);
     assert(info == 0);
@@ -560,6 +546,7 @@ int eigval_approx_proc(proc_t *procinfo, int ifirst, int ilast,
 
   /* clean up */
   free(threads);
+  free(isplit);
 
   if (max_nthreads > 1) {
     pthread_attr_destroy(&attr);
@@ -612,7 +599,7 @@ int eigval_root_proc(proc_t *procinfo, int ifirst, int ilast,
   assert(randvec != NULL);
 
   /* create random vector to perturb rrr and broadcast it */
-  dlarnv_(&ITWO, iseed, &two_n, randvec);
+  odrnv_(&ITWO, iseed, &two_n, randvec);
   
   /* store shift of initial RRR, here set to zero */
   E[n-1] = 0.0;
@@ -627,15 +614,15 @@ int eigval_root_proc(proc_t *procinfo, int ifirst, int ilast,
   spdiam = gu - gl;
   
   /* find approximation of extremal eigenvalues of the block
-   * dlarrk computes one eigenvalue of tridiagonal matrix T
+   * odrrk computes one eigenvalue of tridiagonal matrix T
    * tmp1 and tmp2 one hold the eigenvalue and error, respectively */
-  dlarrk_(&n, &IONE, &gl, &gu, D, E2,
+  odrrk_(&n, &IONE, &gl, &gu, D, E2,
 	  &pivmin, &rtl, &tmp1, &tmp2, &info);
   assert(info == 0);  /* if info=-1 => eigenvalue did not converge */
     
   isleft = fmax(gl, tmp1-tmp2 - HUNDRED*DBL_EPSILON*fabs(tmp1-tmp2) );
     
-  dlarrk_(&n, &n, &gl, &gu, D, E2,
+  odrrk_(&n, &n, &gl, &gu, D, E2,
   	    &pivmin, &rtl, &tmp1, &tmp2, &info);
   assert(info == 0);  /* if info=-1 => eigenvalue did not converge */
     
@@ -651,7 +638,7 @@ int eigval_root_proc(proc_t *procinfo, int ifirst, int ilast,
   /* cnt = number of eigenvalues in (s1,s2] = count_right - count_left
    * negcnt_lft = number of eigenvalues smaller equals than s1
    * negcnt_rgt = number of eigenvalues smaller equals than s2 */
-  dlarrc_("T", &n, &s1, &s2, D, E, &pivmin,
+  odrrc_("T", &n, &s1, &s2, D, E, &pivmin,
 	  &cnt, &negcnt_lft, &negcnt_rgt, &info);
   assert(info == 0);
   
@@ -785,7 +772,7 @@ int eigval_refine_proc(proc_t *procinfo, int ifirst, int ilast,
   void           *status;
 
   /* Others */
-  int    nsplit, isplit[2];
+  int    nsplit, *isplit;
   double spdiam;
   int    i_low, i_upp;
   double sigma;
@@ -795,14 +782,17 @@ int eigval_refine_proc(proc_t *procinfo, int ifirst, int ilast,
 
   int    info, i;
 
+  /* Allocate space */
+  threads = (pthread_t *) malloc( max_nthreads * sizeof(pthread_t) );
+  assert(threads != NULL);
+  isplit = (int *) malloc( n * sizeof(int) );
+  assert(isplit != NULL);
+
   /* This is an unreduced block */
   nsplit = 1;
   isplit[0] = n;
-
-  /* Prepare multi-threading */
-  threads = (pthread_t *) malloc( max_nthreads * sizeof(pthread_t) );
-  assert(threads != NULL);
   
+  /* Prepare multi-threading */
   if (max_nthreads > 1) {
     pthread_attr_init(&attr);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
@@ -837,8 +827,8 @@ int eigval_refine_proc(proc_t *procinfo, int ifirst, int ilast,
     Werr[i] += fabs(W[i])*DBL_EPSILON;
   }
 
-  /* work  for sequential dlarrb = work[0:2*n-1]
-   * iwork for sequential dlarrb = iwork[0:2*n-1]
+  /* work  for sequential odrrb = work[0:2*n-1]
+   * iwork for sequential odrrb = iwork[0:2*n-1]
    * DE2 = work[2*n:3*n-1] strting at bl_begin */
   off_DE2 = 2*n;
     
@@ -852,73 +842,74 @@ int eigval_refine_proc(proc_t *procinfo, int ifirst, int ilast,
     nthreads--;
   }
 
-    if (nthreads > 1) {
+  if (nthreads > 1) {
 
-      rf_begin = 0;
-      chunk    = isize / nthreads;
-      for (i=1; i<nthreads; i++) {
-	
-  	rf_end = rf_begin + chunk - 1;
-
-  	auxarg2 = create_auxarg2(n, D,
-  				 &work[off_DE2],
-				 rf_begin, rf_end, W, Werr, Wgap, Windex,
-  				 tolstruct->rtol1, tolstruct->rtol2,
-  				 pivmin, spdiam);
-	
-  	info = pthread_create(&threads[i], &attr,
-  			      eigval_subset_thread_r,
-  			      (void *) auxarg2);
-  	assert(info == 0);
-	
-  	rf_begin = rf_end + 1;
-      }
-      rf_end = isize;
-
+    rf_begin = 0;
+    chunk    = isize / nthreads;
+    for (i=1; i<nthreads; i++) {
+      
+      rf_end = rf_begin + chunk - 1;
+            
       auxarg2 = create_auxarg2(n, D,
-  			       &work[off_DE2],
-  			       rf_begin, rf_end, W, Werr, Wgap, Windex,
-  			       tolstruct->rtol1, tolstruct->rtol2,
-  			       pivmin, spdiam);
+			       &work[off_DE2],
+			       rf_begin, rf_end, W, Werr, Wgap, Windex,
+			       tolstruct->rtol1, tolstruct->rtol2,
+			       pivmin, spdiam);
       
-      status = eigval_subset_thread_r( (void *) auxarg2 );
-      assert(status == NULL);
-    
-      /* join threads */
-      for (i=1; i<nthreads; i++) {
-  	info = pthread_join(threads[i], &status);
-  	assert(info == 0 && status == NULL);
-      }
-      /* should update gaps at splitting points here, but the gaps
-       * will be recomputed anyway */
-      
-    } else {
-
-      offset = i_low-1;
-      
-      /* refine eigenvalues found by dlarrd for i_low:i_upp */
-      dlarrb_(&n, D, &work[off_DE2], &i_low,
-  	      &i_upp, &tolstruct->rtol1, &tolstruct->rtol2, &offset, W, Wgap, 
-  	      Werr, work, iwork, &pivmin, &spdiam, &n, &info);
+      info = pthread_create(&threads[i], &attr,
+  			      eigval_subset_thread_r,
+			    (void *) auxarg2);
       assert(info == 0);
-      /* needs work of dim(2*n) and iwork of dim(2*n) */
+      
+      rf_begin = rf_end + 1;
     }
-    /* dlarrb computes gaps correctly, but not last one;
-     * this is ignored since the gaps are recomputed anyway */
+    rf_end = isize-1;
 
-    // print_vec(pid, "refined_W=", W, "];", isize, "%d: %.16e");
-    // print_vec(pid, "refined_Werr=", Werr, "];", isize, "%d: %.16e");
-    // print_ivec(pid, "refined_Windex=", Windex, "];", isize);
-    // print_ivec(pid, "refined_iblock=", iblock, "];", isize);
+    auxarg2 = create_auxarg2(n, D,
+			     &work[off_DE2],
+			     rf_begin, rf_end, W, Werr, Wgap, Windex,
+			     tolstruct->rtol1, tolstruct->rtol2,
+			     pivmin, spdiam);
+      
+    status = eigval_subset_thread_r( (void *) auxarg2 );
+    assert(status == NULL);
     
-    /* clean up */
-    free(threads);
-    
-    if (max_nthreads > 1) {
-      pthread_attr_destroy(&attr);
+    /* join threads */
+    for (i=1; i<nthreads; i++) {
+      info = pthread_join(threads[i], &status);
+      assert(info == 0 && status == NULL);
     }
+    /* should update gaps at splitting points here, but the gaps
+     * will be recomputed anyway */
+      
+  } else {
     
-    return(0);
+    offset = i_low-1;
+    
+    /* refine eigenvalues found by odrrb for i_low:i_upp */
+    odrrb_(&n, D, &work[off_DE2], &i_low,
+	    &i_upp, &tolstruct->rtol1, &tolstruct->rtol2, &offset, W, Wgap, 
+	    Werr, work, iwork, &pivmin, &spdiam, &n, &info);
+    assert(info == 0);
+    /* needs work of dim(2*n) and iwork of dim(2*n) */
+  }
+  /* odrrb computes gaps correctly, but not last one;
+   * this is ignored since the gaps are recomputed anyway */
+  
+  // print_vec(pid, "refined_W=", W, "];", isize, "%d: %.16e");
+  // print_vec(pid, "refined_Werr=", Werr, "];", isize, "%d: %.16e");
+  // print_ivec(pid, "refined_Windex=", Windex, "];", isize);
+  // print_ivec(pid, "refined_iblock=", iblock, "];", isize);
+  
+  /* clean up */
+  free(threads);
+  free(isplit);
+  
+  if (max_nthreads > 1) {
+    pthread_attr_destroy(&attr);
+  }
+  
+  return(0);
 }
 
 
@@ -947,7 +938,7 @@ void *eigval_subset_thread_a(void *argin)
 		   &isplit, &bsrtol, &pivmin, &gersch,
 		   &W, &Werr, &Windex, &iblock);
 
-  /* allocate memory needed for dlarrd */
+  /* allocate memory */
   W_tmp = (double *) malloc( n * sizeof(double) );
   assert(W_tmp != NULL);
   
@@ -967,10 +958,10 @@ void *eigval_subset_thread_a(void *argin)
   assert (iwork != NULL);
 
   /* compute eigenvalues 'my_il' to 'my_iu', put into temporary arrays */
-  dlarrd_("I", "B", &n, &dummy1, &dummy2, &my_il, &my_iu, gersch,
-	  &bsrtol, D, E, E2, &pivmin, &nsplit, isplit, &num_vals,
-	  W_tmp, Werr_tmp, &dummy1, &dummy2, iblock_tmp, Windex_tmp,
-	  work, iwork, &info);
+  odrrd_("I", "B", &n, &dummy1, &dummy2, &my_il, &my_iu, gersch,
+  	  &bsrtol, D, E, E2, &pivmin, &nsplit, isplit, &num_vals,
+  	  W_tmp, Werr_tmp, &dummy1, &dummy2, iblock_tmp, Windex_tmp,
+  	  work, iwork, &info);
   assert(info == 0);
 
   /* copy computed values in W, Werr, Windex, iblock (which are work space) */
@@ -1093,9 +1084,9 @@ void *eigval_subset_thread_r(void *argin)
     Wgap[rf_begin] = 0.0;
  
   offset = Windex[rf_begin] - 1;
-
+  
   /* call bisection routine to refine the eigenvalues */
-  dlarrb_(&bl_size, D, DE2, &Windex[rf_begin], &Windex[rf_end],
+  odrrb_(&bl_size, D, DE2, &Windex[rf_begin], &Windex[rf_end],
 	  &rtol1, &rtol2, &offset, &W[rf_begin], &Wgap[rf_begin],
 	  &Werr[rf_begin], work, iwork, &pivmin, &bl_spdiam,
 	  &bl_size, &info);

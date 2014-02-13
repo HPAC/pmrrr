@@ -293,7 +293,6 @@
       EPS = ODMCH( 'P' )
       UFLOW = ODMCH( 'U' )
 
-
 *     Special Case when N=1
 *     Treat case of 1x1 matrix for quick return
       IF( N.EQ.1 ) THEN
