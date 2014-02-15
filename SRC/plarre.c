@@ -382,13 +382,6 @@ int plarre(proc_t *procinfo, char *jobz, char *range, in_t *Dstruct,
   }
   /* end of loop over unreduced blocks */    
   
-  /*  if (pid == 0) { */
-  /*  print_vec(pid, "W=", W, "];", n, "%d: %.16e"); */
-  /*  print_vec(pid, "Werr=", Werr, "];", n, "%d: %.16e"); */
-  /*  print_ivec(pid, "Windex=", Windex, "];", n); */
-  /*  print_ivec(pid, "iblock=", iblock, "];", n); */
-  /* }   */
-
   /* free memory */
   clean_up_plarre(E2, work, iwork, rcount, rdispl);
   
@@ -538,11 +531,6 @@ int eigval_approx_proc(proc_t *procinfo, int ifirst, int ilast,
     assert(info == 0);
     assert(m == ilast-ifirst+1);
   }
-
-  // print_vec(pid, "W=", W, "];", isize, "%d: %.16e");
-  // print_vec(pid, "Werr=", Werr, "];", isize, "%d: %.16e");
-  // print_ivec(pid, "Windex=", Windex, "];", isize);
-  // print_ivec(pid, "iblock=", iblock, "];", isize);
 
   /* clean up */
   free(threads);
@@ -896,11 +884,6 @@ int eigval_refine_proc(proc_t *procinfo, int ifirst, int ilast,
   /* odrrb computes gaps correctly, but not last one;
    * this is ignored since the gaps are recomputed anyway */
   
-  // print_vec(pid, "refined_W=", W, "];", isize, "%d: %.16e");
-  // print_vec(pid, "refined_Werr=", Werr, "];", isize, "%d: %.16e");
-  // print_ivec(pid, "refined_Windex=", Windex, "];", isize);
-  // print_ivec(pid, "refined_iblock=", iblock, "];", isize);
-  
   /* clean up */
   free(threads);
   free(isplit);
@@ -962,6 +945,7 @@ void *eigval_subset_thread_a(void *argin)
   	  &bsrtol, D, E, E2, &pivmin, &nsplit, isplit, &num_vals,
   	  W_tmp, Werr_tmp, &dummy1, &dummy2, iblock_tmp, Windex_tmp,
   	  work, iwork, &info);
+
   assert(info == 0);
 
   /* copy computed values in W, Werr, Windex, iblock (which are work space) */
