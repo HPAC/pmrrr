@@ -1,5 +1,4 @@
 # Compiler for C and Fortran
-# The Fortran compiler is only used if INCLAPACK is set to 1
 CC = $(MPICC)
 FC = $(MPIF77)
 
