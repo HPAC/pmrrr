@@ -342,21 +342,21 @@ int plarre(proc_t *procinfo, char *jobz, char *range, in_t *Dstruct,
 		   MPI_INT, procinfo->comm);
     
     /* Ensure that within block eigenvalues sorted */
-    /* sorted = false; */
-    /* while (sorted == false) { */
-    /* 	sorted = true; */
-    /* 	for (j=bl_begin; j < bl_end; j++) { */
-    /* 	  if (W[j+1] < W[j]) { */
-    /* 	    sorted = false; */
-    /* 	    tmp1 = W[j]; */
-    /* 	    W[j] = W[j+1]; */
-    /* 	    W[j+1] = tmp1; */
-    /* 	    tmp1 = Werr[j]; */
-    /* 	    Werr[j] = Werr[j+1]; */
-    /* 	    Werr[j+1] = tmp1; */
-    /* 	  } */
-    /* 	} */
-    /* } */
+    sorted = false;
+    while (sorted == false) {
+    	sorted = true;
+    	for (j=bl_begin; j < bl_end; j++) {
+    	  if (W[j+1] < W[j]) {
+    	    sorted = false;
+    	    tmp1 = W[j];
+    	    W[j] = W[j+1];
+    	    W[j+1] = tmp1;
+    	    tmp1 = Werr[j];
+    	    Werr[j] = Werr[j+1];
+    	    Werr[j+1] = tmp1;
+    	  }
+    	}
+    }
     
     /* Set indices index correctly */
     for (j=bl_begin; j <= bl_end; j++)
