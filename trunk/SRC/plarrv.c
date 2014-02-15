@@ -104,14 +104,6 @@ int plarrv(proc_t *procinfo, in_t *Dstruct, val_t *Wstruct,
   workQ_t        *workQ;
 
 
-  /* printf("%d: starting plarrv()\n", pid); */
-  /* if (pid == 0) { */
-  /*   print_vec(pid, "W=", Wstruct->W, "];", n, "%d: %.16e"); */
-  /*   print_vec(pid, "Werr=", Wstruct->Werr, "];", n, "%d: %.16e"); */
-  /*   print_ivec(pid, "Windex=", Wstruct->Windex, "];", n); */
-  /*   print_ivec(pid, "iblock=", Wstruct->iblock, "];", n); */
-  /* }   */
-
   /* Allocate work space and copy eigenvalues */
   Wshifted = (double *) malloc( n * sizeof(double) );
   assert(Wshifted != NULL);

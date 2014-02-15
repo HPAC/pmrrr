@@ -143,14 +143,17 @@ int PMR_process_c_task(cluster_t *cl, int tid, proc_t *procinfo,
   /* Communicate results: non-blocking */
   status = COMM_COMPLETE;
   if (left_pid != right_pid) {
+
     status = communicate_refined_eigvals(cl, procinfo, tid,
 					 Wstruct, RRR);
     /* status = COMM_INCOMPLETE if communication not finished */
   }
 
   if (status == COMM_COMPLETE) {
+    
     create_subtasks(cl, tid, procinfo, RRR, Wstruct, Zstruct,
 		    workQ, num_left);
+
     return(C_TASK_PROCESSED);
   } else {
     return(C_TASK_NOT_PROCESSED);
@@ -414,8 +417,8 @@ int refine_eigvals(cluster_t *cl, int rf_begin, int rf_end,
     for (i=0; i<num_tasks; i++) {
       ts_end = ts_begin + chunk - 1;
       
-      Wgap[ts_end] = Wshifted[ts_end + 1] - Werr[ts_end + 1]
-	             - Wshifted[ts_end] - Werr[ts_end];
+      Wgap[ts_end] = fmax(0.0, Wshifted[ts_end + 1] - Werr[ts_end + 1]
+			  - Wshifted[ts_end] - Werr[ts_end]);
       
       ts_begin = ts_end + 1;
     }
@@ -774,7 +777,7 @@ int create_subtasks(cluster_t *cl, int tid, proc_t *procinfo,
 
       /* check if process involved in processing the new cluster */
       new_lpid = nproc-1;
-      new_rpid = 0;
+      new_rpid = -1;
       for (l=new_first; l<=new_last; l++) {
 	if (iproc[l] != -1) {
 	  new_lpid = imin(new_lpid, iproc[l]);

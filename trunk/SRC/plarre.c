@@ -382,12 +382,12 @@ int plarre(proc_t *procinfo, char *jobz, char *range, in_t *Dstruct,
   }
   /* end of loop over unreduced blocks */    
   
-  //  if (pid == 0) {
-  //  print_vec(pid, "W=", W, "];", n, "%d: %.16e");
-  //  print_vec(pid, "Werr=", Werr, "];", n, "%d: %.16e");
-  //  print_ivec(pid, "Windex=", Windex, "];", n);
-  //  print_ivec(pid, "iblock=", iblock, "];", n);
-  //}  
+  /*  if (pid == 0) { */
+  /*  print_vec(pid, "W=", W, "];", n, "%d: %.16e"); */
+  /*  print_vec(pid, "Werr=", Werr, "];", n, "%d: %.16e"); */
+  /*  print_ivec(pid, "Windex=", Windex, "];", n); */
+  /*  print_ivec(pid, "iblock=", iblock, "];", n); */
+  /* }   */
 
   /* free memory */
   clean_up_plarre(E2, work, iwork, rcount, rdispl);
