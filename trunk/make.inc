@@ -11,11 +11,6 @@ FFLAGS = -nofor_main -O3 -assume underscore -openmp
 AR = /usr/bin/ar 
 ARFLAGS = rcs
 
-# To build 'libmrrr.a' without adding necessary LAPACK routines 
-# for the to the archive set value to 0; in this case linking 
-# to LAPACK and BLAS is necessary; default value is 1
-INCLAPACK = 1
-
 # On some systems 'spinlocks' are not supported, therefore 
 # here the flag to use 'mutexes' instead; default value is 1
 SPINLOCK_SUPPORT = 1
