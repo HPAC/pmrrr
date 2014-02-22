@@ -2,7 +2,7 @@
 CC = $(MPICC)
 FC = $(MPIFC)
 
-# Compiler flags
+# Compiler flags (needs multi-threading flags for hybrid mode)
 CFLAGS = -pthread -O3 -restrict 
 FFLAGS = -nofor_main -O3 -assume underscore -openmp -fp-model source
 
