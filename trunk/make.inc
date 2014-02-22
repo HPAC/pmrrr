@@ -1,10 +1,10 @@
 # Compiler for C and Fortran
 CC = $(MPICC)
-FC = $(MPIF77)
+FC = $(MPIFC)
 
 # Compiler flags
-CFLAGS = -pthread -O3 -restrict
-FFLAGS = -nofor_main -O3 -assume underscore -openmp
+CFLAGS = -pthread -O3 -restrict 
+FFLAGS = -nofor_main -O3 -assume underscore -openmp -fp-model source
 
 # Archiver and flags used when building the archive
 AR = /usr/bin/ar 
