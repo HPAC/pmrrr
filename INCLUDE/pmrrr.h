@@ -184,6 +184,7 @@ int pmrrr(char *jobz, char *range, int *n, double  *D,
  */
 
 
+
 /* Set the number of threads in case PMR_NUM_THREADS is not 
  * specified */
 #define DEFAULT_NUM_THREADS 1
@@ -220,6 +221,7 @@ int pmrrr(char *jobz, char *range, int *n, double  *D,
 /* Set how many iterations should be executed to find the root 
  * representation; default: 6 */
 #define MAX_TRY_RRR       10
+
 
 
 /*
