@@ -697,6 +697,7 @@ int create_subtasks(cluster_t *cl, int tid, proc_t *procinfo,
   int              pid       = procinfo->pid;
   int              nproc     = procinfo->nproc;
   int              nthreads  = procinfo->nthreads;
+  bool           proc_involved=true;
 
   double *restrict Wgap      = Wstruct->Wgap;
   double *restrict Wshifted  = Wstruct->Wshifted;
@@ -707,7 +708,7 @@ int create_subtasks(cluster_t *cl, int tid, proc_t *procinfo,
   int    *restrict Zindex    = Zstruct->Zindex;
 
   /* others */
-  int    i, l;
+  int    i, l, k;
   int    max_size;
   task_t *task;
   bool   task_inserted;
@@ -754,6 +755,21 @@ int create_subtasks(cluster_t *cl, int tid, proc_t *procinfo,
       if (i==cl_end || sn_size>=max_size ||
 	    Wgap[i+1] < MIN_RELGAP*fabs(Wshifted[i+1])) {
 
+	/* Check if process involved in s-task */
+	proc_involved = false;
+	for (k=sn_first; k<=sn_last; k++) {
+	  if (iproc[k] == pid) {
+	    proc_involved = true;
+	    break;
+	  }
+	}
+	if (proc_involved == false) {
+	  task_inserted = true;
+	  new_first = i + 1;
+	  continue;
+	}
+
+	/* Insert task as process is involved */
 	if (sn_first == cl_begin) {
 	  lgap = cl->lgap;
 	} else {
