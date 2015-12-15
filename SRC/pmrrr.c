@@ -555,8 +555,8 @@ double scale_matrix(in_t *Dstruct, val_t *Wstruct, bool valeig)
   if (scale != 1.0) {  /* FP cmp okay */
     /* Scale matrix and matrix norm */
     itmp = n-1;
-    dscal_(&n,    &scale, D, &IONE);
-    dscal_(&itmp, &scale, E, &IONE);
+    odscl_(&n,    &scale, D, &IONE);
+    odscl_(&itmp, &scale, E, &IONE);
     if (valeig == true) {
       /* Scale eigenvalue bounds */
       *vl *= scale;
@@ -586,7 +586,7 @@ void invscale_eigenvalues(val_t *Wstruct, double scale,
   if (scale != 1.0) {  /* FP cmp okay */
     *vl *= invscale;
     *vu *= invscale;
-    dscal_(&size, &invscale, W, &IONE);
+    odscl_(&size, &invscale, W, &IONE);
   }
 }
 
