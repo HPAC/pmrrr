@@ -52,15 +52,19 @@
 #else
  /* C89 with or without Amendment 1, see H&S p.53 */
 
+#ifndef __cplusplus
 #define restrict /*nothing*/
 #define inline   /*nothing*/
+#endif
 
 #define fmax(a,b) ( (a) > (b) ? (a) : (b) )
 #define fmin(a,b) ( (a) < (b) ? (a) : (b) )
 
+#ifndef __cplusplus
 typedef int    bool;
 #define false  0
 #define true   1
+#endif
 
 #endif
 #else  /* __STDC__ not defined */
@@ -70,16 +74,20 @@ typedef int    bool;
 
  /* in case compiler does not support type qualifiers
   * see Harbison and Steele p. 89*/
+#ifndef __cplusplus
 #define const /*nothing*/
 #define volatile /*nothing*/
 #define restrict /*nothing*/
+#endif
 
 #define fmax(a,b) ( (a) > (b) ? (a) : (b) )
 #define fmin(a,b) ( (a) < (b) ? (a) : (b) )
 
+#ifndef __cplusplus
 typedef int    bool;
 #define false  0
 #define true   1
+#endif
  
  /* need also remove all // style comments */
  /* inline ... */

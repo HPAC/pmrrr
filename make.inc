@@ -1,8 +1,9 @@
 # Compiler for C and Fortran
+MPICC = mpicc
 CC = $(MPICC)
 
 # Compiler flags
-CFLAGS = -pthread -O3 -restrict 
+CFLAGS = -pthread -O3
 
 # Archiver and flags used when building the archive
 AR = /usr/bin/ar 
