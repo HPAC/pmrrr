@@ -55,7 +55,7 @@
 #ifndef __cplusplus
 #define restrict /*nothing*/
 #define inline   /*nothing*/
-#endif
+#endif /* __cplusplus */
 
 #define fmax(a,b) ( (a) > (b) ? (a) : (b) )
 #define fmin(a,b) ( (a) < (b) ? (a) : (b) )
@@ -64,7 +64,7 @@
 typedef int    bool;
 #define false  0
 #define true   1
-#endif
+#endif /* __cplusplus */
 
 #endif
 #else  /* __STDC__ not defined */
@@ -78,7 +78,7 @@ typedef int    bool;
 #define const /*nothing*/
 #define volatile /*nothing*/
 #define restrict /*nothing*/
-#endif
+#endif /* __cplusplus */
 
 #define fmax(a,b) ( (a) > (b) ? (a) : (b) )
 #define fmin(a,b) ( (a) < (b) ? (a) : (b) )
@@ -87,7 +87,7 @@ typedef int    bool;
 typedef int    bool;
 #define false  0
 #define true   1
-#endif
+#endif /* __cplusplus */
  
  /* need also remove all // style comments */
  /* inline ... */
@@ -99,6 +99,14 @@ typedef int    bool;
 #define imax(a,b) ( (a) > (b) ? (a) : (b) )
 #define imin(a,b) ( (a) < (b) ? (a) : (b) )
 #define iceil(a,b) ( (((a)%(b))!=0) ? (((a)/(b))+1) : ((a)/(b)) )
+
+#ifdef MPRRR_INT64
+typedef int64_t PMRRR_Int;
+#define PMRRR_MPI_INT_TYPE MPI_LONG_LONG_INT
+#else
+typedef int PMRRR_Int;
+#define PMRRR_MPI_INT_TYPE MPI_INT
+#endif /* MPRRR_INT64 */
 
 /* End of header file */
 #endif

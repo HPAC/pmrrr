@@ -6,9 +6,10 @@
 #include <math.h>
 #include <float.h>
 #include <assert.h>
+#include "global.h"
 
 /* Subroutine */ 
-int ode2_(double *a, double *b, double *c__, 
+PMRRR_Int ode2_(double *a, double *b, double *c__, 
 	double *rt1, double *rt2)
 {
     /* System generated locals */

@@ -6,24 +6,25 @@
 #include <math.h>
 #include <float.h>
 #include <assert.h>
+#include "global.h"
 
 #define imin(a,b) ( (a) < (b) ? (a) : (b) )
 
 /* Subroutine */ 
-int odrnv_(int *idist, int *iseed, int *n, 
+PMRRR_Int odrnv_(PMRRR_Int *idist, PMRRR_Int *iseed, PMRRR_Int *n, 
 	double *x)
 {
     /* System generated locals */
-    int i__1, i__2, i__3;
+    PMRRR_Int i__1, i__2, i__3;
 
     /* Builtin functions */
     // double log(double), sqrt(double), cos(double);
 
     /* Local variables */
-    int i__;
+    PMRRR_Int i__;
     double u[128];
-    int il, iv, il2;
-    extern int odruv_(int *, int *, double *);
+    PMRRR_Int il, iv, il2;
+    extern PMRRR_Int odruv_(PMRRR_Int *, PMRRR_Int *, double *);
 
 
 /*  -- LAPACK auxiliary routine (version 3.2) -- */

@@ -6,30 +6,31 @@
 #include <math.h>
 #include <float.h>
 #include <assert.h>
+#include "global.h"
 
 /* Subroutine */ 
-int odrrj_(int *n, double *d__, double *e2, 
-	int *ifirst, int *ilast, double *rtol, int *offset, 
-	double *w, double *werr, double *work, int *iwork, 
-	double *pivmin, double *spdiam, int *info)
+PMRRR_Int odrrj_(PMRRR_Int *n, double *d__, double *e2, 
+	PMRRR_Int *ifirst, PMRRR_Int *ilast, double *rtol, PMRRR_Int *offset, 
+	double *w, double *werr, double *work, PMRRR_Int *iwork, 
+	double *pivmin, double *spdiam, PMRRR_Int *info)
 {
     /* System generated locals */
-    int i__1, i__2;
+    PMRRR_Int i__1, i__2;
     double d__1, d__2;
 
     /* Builtin functions */
     // double log(double);
 
     /* Local variables */
-    int i__, j, k, p;
+    PMRRR_Int i__, j, k, p;
     double s;
-    int i1, i2, ii;
+    PMRRR_Int i1, i2, ii;
     double fac, mid;
-    int cnt;
+    PMRRR_Int cnt;
     double tmp, left;
-    int iter, nint, prev, next, savi1;
+    PMRRR_Int iter, nint, prev, next, savi1;
     double right, width, dplus;
-    int olnint, maxitr;
+    PMRRR_Int olnint, maxitr;
 
 
 /*  -- LAPACK auxiliary routine (version 3.2) -- */
@@ -137,12 +138,12 @@ int odrrj_(int *n, double *d__, double *e2,
     /* Function Body */
     *info = 0;
 
-    maxitr = (int) ((log(*spdiam + *pivmin) - log(*pivmin)) / log(2.)) + 
+    maxitr = (PMRRR_Int) ((log(*spdiam + *pivmin) - log(*pivmin)) / log(2.)) + 
 	    2;
 
 /*     Initialize unconverged intervals in [ WORK(2*I-1), WORK(2*I) ]. */
 /*     The Sturm Count, Count( WORK(2*I-1) ) is arranged to be I-1, while */
-/*     Count( WORK(2*I) ) is stored in IWORK( 2*I ). The int IWORK( 2*I-1 ) */
+/*     Count( WORK(2*I) ) is stored in IWORK( 2*I ). The PMRRR_Int IWORK( 2*I-1 ) */
 /*     for an unconverged interval is set to the index of the next unconverged */
 /*     interval, and is -1 or 0 for a converged interval. Thus a linked */
 /*     list of unconverged intervals is set up. */

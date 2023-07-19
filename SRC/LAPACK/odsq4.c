@@ -6,15 +6,16 @@
 #include <math.h>
 #include <float.h>
 #include <assert.h>
+#include "global.h"
 
 /* Subroutine */ 
-int odsq4_(int *i0, int *n0, double *z__, 
-	    int *pp, int *n0in, double *dmin__, double *dmin1, 
+PMRRR_Int odsq4_(PMRRR_Int *i0, PMRRR_Int *n0, double *z__, 
+	    PMRRR_Int *pp, PMRRR_Int *n0in, double *dmin__, double *dmin1, 
 	    double *dmin2, double *dn, double *dn1, double *dn2, 
-	    double *tau, int *ttype, double *g)
+	    double *tau, PMRRR_Int *ttype, double *g)
 {
     /* System generated locals */
-    int i__1;
+    PMRRR_Int i__1;
     double d__1, d__2;
 
     /* Builtin functions */
@@ -22,7 +23,7 @@ int odsq4_(int *i0, int *n0, double *z__,
 
     /* Local variables */
     double s, a2, b1, b2;
-    int i4, nn, np;
+    PMRRR_Int i4, nn, np;
     double gam, gap1, gap2;
 
 

@@ -6,37 +6,38 @@
 #include <math.h>
 #include <float.h>
 #include <assert.h>
+#include "global.h"
 
 #define TRUE_ (1)
 #define FALSE_ (0)
 
 /* Subroutine */ 
-int odr1v_(int *n, int *b1, int *bn, double 
+PMRRR_Int odr1v_(PMRRR_Int *n, PMRRR_Int *b1, PMRRR_Int *bn, double 
 	*lambda, double *d__, double *l, double *ld, double *
-	lld, double *pivmin, double *gaptol, double *z__, int 
-	*wantnc, int *negcnt, double *ztz, double *mingma, 
-	int *r__, int *isuppz, double *nrminv, double *resid, 
+	lld, double *pivmin, double *gaptol, double *z__, PMRRR_Int 
+	*wantnc, PMRRR_Int *negcnt, double *ztz, double *mingma, 
+	PMRRR_Int *r__, PMRRR_Int *isuppz, double *nrminv, double *resid, 
 	double *rqcorr, double *work)
 {
     /* System generated locals */
-    int i__1;
+    PMRRR_Int i__1;
     double d__1, d__2, d__3;
 
     /* Builtin functions */
     //    double sqrt(double);
 
     /* Local variables */
-    int i__;
+    PMRRR_Int i__;
     double s;
-    int r1, r2;
+    PMRRR_Int r1, r2;
     double eps, tmp;
-    int neg1, neg2, indp, inds;
+    PMRRR_Int neg1, neg2, indp, inds;
     double dplus;
     // extern double odmch_(char *);
-    extern int odnan_(double *);
-    int indlpl, indumn;
+    extern PMRRR_Int odnan_(double *);
+    PMRRR_Int indlpl, indumn;
     double dminus;
-    int sawnan1, sawnan2;
+    PMRRR_Int sawnan1, sawnan2;
 
 
 /*  -- LAPACK auxiliary routine (version 3.2) -- */

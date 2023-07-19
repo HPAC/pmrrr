@@ -6,27 +6,28 @@
 #include <math.h>
 #include <float.h>
 #include <assert.h>
+#include "global.h"
 
 #define TRUE_ (1)
 #define FALSE_ (0)
 
 /* Subroutine */ 
-int odrrr_(int *n, double *d__, double *e, 
-	int *info)
+PMRRR_Int odrrr_(PMRRR_Int *n, double *d__, double *e, 
+	PMRRR_Int *info)
 {
     /* System generated locals */
-    int i__1;
+    PMRRR_Int i__1;
     double d__1;
 
     /* Builtin functions */
     // double sqrt(double);
 
     /* Local variables */
-    int i__;
+    PMRRR_Int i__;
     double eps, tmp, tmp2, rmin;
     // extern double odmch_(char *);
     double offdig, safmin;
-    int yesrel;
+    PMRRR_Int yesrel;
     double smlnum, offdig2;
 
 

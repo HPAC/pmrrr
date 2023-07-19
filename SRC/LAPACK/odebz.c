@@ -6,27 +6,28 @@
 #include <math.h>
 #include <float.h>
 #include <assert.h>
+#include "global.h"
 
 #define imax(a,b) ( (a) > (b) ? (a) : (b) )
 #define imin(a,b) ( (a) < (b) ? (a) : (b) )
 
 /* Subroutine */ 
-int odebz_(int *ijob, int *nitmax, int *n, 
-	int *mmax, int *minp, int *nbmin, double *abstol, 
+PMRRR_Int odebz_(PMRRR_Int *ijob, PMRRR_Int *nitmax, PMRRR_Int *n, 
+	PMRRR_Int *mmax, PMRRR_Int *minp, PMRRR_Int *nbmin, double *abstol, 
 	double *reltol, double *pivmin, double *d__, double *
-	e, double *e2, int *nval, double *ab, double *c__, 
-	int *mout, int *nab, double *work, int *iwork, 
-	int *info)
+	e, double *e2, PMRRR_Int *nval, double *ab, double *c__, 
+	PMRRR_Int *mout, PMRRR_Int *nab, double *work, PMRRR_Int *iwork, 
+	PMRRR_Int *info)
 {
     /* System generated locals */
-    int nab_dim1, nab_offset, ab_dim1, ab_offset, i__1, i__2, i__3, i__4, 
+    PMRRR_Int nab_dim1, nab_offset, ab_dim1, ab_offset, i__1, i__2, i__3, i__4, 
 	    i__5, i__6;
     double d__1, d__2, d__3, d__4;
 
     /* Local variables */
-    int j, kf, ji, kl, jp, jit;
+    PMRRR_Int j, kf, ji, kl, jp, jit;
     double tmp1, tmp2;
-    int itmp1, itmp2, kfnew, klnew;
+    PMRRR_Int itmp1, itmp2, kfnew, klnew;
 
 
 /*  -- LAPACK auxiliary routine (version 3.2) -- */

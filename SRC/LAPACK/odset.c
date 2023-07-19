@@ -7,18 +7,19 @@
 #include <math.h>
 #include <float.h>
 #include <assert.h>
+#include "global.h"
 
 #define imin(a,b) ( (a) < (b) ? (a) : (b) )
 
-/* Subroutine */ int odset_(char *uplo, int *m, int *n, double *alpha, 
-double *beta, double *a, int *lda)
+/* Subroutine */ PMRRR_Int odset_(char *uplo, PMRRR_Int *m, PMRRR_Int *n, double *alpha, 
+double *beta, double *a, PMRRR_Int *lda)
 {
     /* System generated locals */
-    int a_dim1, a_offset, i__1, i__2, i__3;
+    PMRRR_Int a_dim1, a_offset, i__1, i__2, i__3;
 
     /* Local variables */
-    int i__, j;
-    extern int olsame_(char *, char *);
+    PMRRR_Int i__, j;
+    extern PMRRR_Int olsame_(char *, char *);
 
 
 /*  -- LAPACK auxiliary routine (version 3.2) -- */

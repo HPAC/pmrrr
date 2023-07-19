@@ -58,19 +58,19 @@
 #include "counter.h"
 
 
-static int assign_to_proc(proc_t *procinfo, in_t *Dstruct,
-			  val_t *Wstruct, vec_t *Zstruct, int *nzp,
-			  int *myfirstp);
+static PMRRR_Int assign_to_proc(proc_t *procinfo, in_t *Dstruct,
+			  val_t *Wstruct, vec_t *Zstruct, PMRRR_Int *nzp,
+			  PMRRR_Int *myfirstp);
 static int cmpa(const void*, const void*);
-static int init_workQ(proc_t *procinfo, in_t *Dstruct,
-			   val_t *Wstruct, int *nzp,
+static PMRRR_Int init_workQ(proc_t *procinfo, in_t *Dstruct,
+			   val_t *Wstruct, PMRRR_Int *nzp,
 			   workQ_t *workQ);
 static void *empty_workQ(void*);
 static workQ_t *create_workQ();
 static void destroy_workQ(workQ_t*);
-static auxarg3_t *create_auxarg3(int, proc_t*, val_t*, vec_t*,
+static auxarg3_t *create_auxarg3(PMRRR_Int, proc_t*, val_t*, vec_t*,
 				 tol_t*, workQ_t*, counter_t*);
-static void retrieve_auxarg3(auxarg3_t*, int*, proc_t**, val_t**,
+static void retrieve_auxarg3(auxarg3_t*, PMRRR_Int*, proc_t**, val_t**,
 			     vec_t**, tol_t**, workQ_t**, 
 			     counter_t**);
 
@@ -79,14 +79,14 @@ static void retrieve_auxarg3(auxarg3_t*, int*, proc_t**, val_t**,
 /*
  * Computation of eigenvectors of a symmetric tridiagonal
  */
-int plarrv(proc_t *procinfo, in_t *Dstruct, val_t *Wstruct,
-	   vec_t *Zstruct, tol_t *tolstruct, int *nzp,
-	   int *myfirstp)
+PMRRR_Int plarrv(proc_t *procinfo, in_t *Dstruct, val_t *Wstruct,
+	   vec_t *Zstruct, tol_t *tolstruct, PMRRR_Int *nzp,
+	   PMRRR_Int *myfirstp)
 {
   /* Input variables */
-  int            pid     = procinfo->pid;
-  int            nthreads = procinfo->nthreads;
-  int            n        = Dstruct->n;
+  PMRRR_Int            pid     = procinfo->pid;
+  PMRRR_Int            nthreads = procinfo->nthreads;
+  PMRRR_Int            n        = Dstruct->n;
   double         *W       = Wstruct->W;
 
   /* Work space */
@@ -100,7 +100,7 @@ int plarrv(proc_t *procinfo, in_t *Dstruct, val_t *Wstruct,
   counter_t      *num_left;
   
   /* Others */
-  int            info, i;
+  PMRRR_Int            info, i;
   workQ_t        *workQ;
 
 
@@ -168,25 +168,25 @@ int plarrv(proc_t *procinfo, in_t *Dstruct, val_t *Wstruct,
  * Assign the computation of eigenvectors to the processes
  */
 static  
-int assign_to_proc(proc_t *procinfo, in_t *Dstruct, val_t *Wstruct,
-		   vec_t *Zstruct, int *nzp, int *myfirstp)
+PMRRR_Int assign_to_proc(proc_t *procinfo, in_t *Dstruct, val_t *Wstruct,
+		   vec_t *Zstruct, PMRRR_Int *nzp, PMRRR_Int *myfirstp)
 {
   /* From inputs */
-  int              pid     = procinfo->pid;
-  int              nproc   = procinfo->nproc;
+  PMRRR_Int              pid     = procinfo->pid;
+  PMRRR_Int              nproc   = procinfo->nproc;
   double *restrict L       = Dstruct->E;
-  int    *restrict isplit  = Dstruct->isplit;
-  int              n       = Wstruct->n;
-  int              il      = *(Wstruct->il);
-  int              iu      = *(Wstruct->iu);
+  PMRRR_Int    *restrict isplit  = Dstruct->isplit;
+  PMRRR_Int              n       = Wstruct->n;
+  PMRRR_Int              il      = *(Wstruct->il);
+  PMRRR_Int              iu      = *(Wstruct->iu);
   double *restrict W       = Wstruct->W;
-  int    *restrict Windex  = Wstruct->Windex;
-  int    *restrict iblock  = Wstruct->iblock;
-  int    *restrict iproc   = Wstruct->iproc;
-  int    *restrict Zindex  = Zstruct->Zindex;
+  PMRRR_Int    *restrict Windex  = Wstruct->Windex;
+  PMRRR_Int    *restrict iblock  = Wstruct->iblock;
+  PMRRR_Int    *restrict iproc   = Wstruct->iproc;
+  PMRRR_Int    *restrict Zindex  = Zstruct->Zindex;
   
   /* Others */
-  int               i, id, j, k, isize, iblk, ishift,
+  PMRRR_Int               i, id, j, k, isize, iblk, ishift,
                     ibegin, iend, chunk, ind;
   double            sigma;
   sort_struct_t     *array;
@@ -298,42 +298,42 @@ int cmpa(const void *a1, const void *a2)
  * into the work queue.
  */
 static 
-int init_workQ(proc_t *procinfo, in_t *Dstruct, val_t *Wstruct,
-	       int *nzp, workQ_t *workQ)
+PMRRR_Int init_workQ(proc_t *procinfo, in_t *Dstruct, val_t *Wstruct,
+	       PMRRR_Int *nzp, workQ_t *workQ)
 {
   /* Input arguments */
-  int              pid      = procinfo->pid;
-  int              nproc    = procinfo->nproc;
-  int              nthreads = procinfo->nthreads;
+  PMRRR_Int              pid      = procinfo->pid;
+  PMRRR_Int              nproc    = procinfo->nproc;
+  PMRRR_Int              nthreads = procinfo->nthreads;
   double *restrict D        = Dstruct->D;
   double *restrict L        = Dstruct->E;
-  int              nsplit   = Dstruct->nsplit;
-  int    *restrict isplit   = Dstruct->isplit;
+  PMRRR_Int              nsplit   = Dstruct->nsplit;
+  PMRRR_Int    *restrict isplit   = Dstruct->isplit;
   double *restrict W        = Wstruct->W;
   double *restrict Werr     = Wstruct->Werr;
   double *restrict Wgap     = Wstruct->Wgap;
-  int    *restrict iproc    = Wstruct->iproc;
+  PMRRR_Int    *restrict iproc    = Wstruct->iproc;
   double *restrict Wshifted = Wstruct->Wshifted;
   double *restrict gersch   = Wstruct->gersch;
-  int              nz       = *nzp;
+  PMRRR_Int              nz       = *nzp;
 
   /* Loop over blocks */
-  int              ibegin, iend, isize, iWbegin, iWend, nbl;
+  PMRRR_Int              ibegin, iend, isize, iWbegin, iWend, nbl;
   double           sigma, gl, gu, avggap, spdiam;
   double *restrict DL;
   double *restrict DLL;
   rrr_t            *RRR, *RRR_parent;
 
   /* Splitting into singletons and cluster */
-  int              new_first, new_last, new_size;
-  int              sn_first,  sn_last,  sn_size;
-  int              cl_first,  cl_last,  cl_size;
+  PMRRR_Int              new_first, new_last, new_size;
+  PMRRR_Int              sn_first,  sn_last,  sn_size;
+  PMRRR_Int              cl_first,  cl_last,  cl_size;
   bool             task_inserted;
-  int              max_size, left_pid, right_pid;
+  PMRRR_Int              max_size, left_pid, right_pid;
   double           lgap;
  
   /* Others */
-  int              i, j, k, l;
+  PMRRR_Int              i, j, k, l;
   double           tmp;
   task_t           *task;
 
@@ -589,19 +589,19 @@ static
 void *empty_workQ(void *argin)
 {
   /* input arguments */
-  int          tid;
+  PMRRR_Int          tid;
   proc_t       *procinfo;
   val_t        *Wstruct;
   vec_t        *Zstruct;
   tol_t        *tolstruct;
   workQ_t *workQ;
   counter_t    *num_left;
-  int          n;
+  PMRRR_Int          n;
 
   /* others */
   task_t       *task;
   double       *work;
-  int          *iwork;
+  PMRRR_Int          *iwork;
 
   /* retrieve necessary arguments from structures */
   retrieve_auxarg3((auxarg3_t *) argin, &tid, &procinfo, &Wstruct,
@@ -614,7 +614,7 @@ void *empty_workQ(void *argin)
   assert(work != NULL);
 
   /* max. needed double precision work space: odrrb */
-  iwork     = (int *)    malloc(2*n * sizeof(int)   );
+  iwork     = (PMRRR_Int *)    malloc(2*n * sizeof(PMRRR_Int)   );
   assert(iwork != NULL);
 
 
@@ -686,7 +686,7 @@ static void destroy_workQ(workQ_t *wq)
 
 
 static auxarg3_t*
-create_auxarg3(int tid, proc_t *procinfo, val_t *Wstruct,
+create_auxarg3(PMRRR_Int tid, proc_t *procinfo, val_t *Wstruct,
 	       vec_t *Zstruct, tol_t *tolstruct,
 	       workQ_t *workQ, counter_t *num_left)
 {
@@ -710,7 +710,7 @@ create_auxarg3(int tid, proc_t *procinfo, val_t *Wstruct,
 
 
 static void 
-retrieve_auxarg3(auxarg3_t *arg, int *tid, proc_t **procinfo,
+retrieve_auxarg3(auxarg3_t *arg, PMRRR_Int *tid, proc_t **procinfo,
 		 val_t **Wstruct, vec_t **Zstruct,
 		 tol_t **tolstruct, workQ_t **workQ,
 		 counter_t **num_left)

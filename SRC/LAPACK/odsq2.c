@@ -6,20 +6,21 @@
 #include <math.h>
 #include <float.h>
 #include <assert.h>
+#include "global.h"
 
 /* Table of constant values */
-static int c__1 = 1;
-static int c__2 = 2;
-static int c__10 = 10;
-static int c__3 = 3;
-static int c__4 = 4;
-static int c__11 = 11;
+static PMRRR_Int c__1 = 1;
+static PMRRR_Int c__2 = 2;
+static PMRRR_Int c__10 = 10;
+static PMRRR_Int c__3 = 3;
+static PMRRR_Int c__4 = 4;
+static PMRRR_Int c__11 = 11;
 
 /* Subroutine */ 
-int odsq2_(int *n, double *z__, int *info)
+PMRRR_Int odsq2_(PMRRR_Int *n, double *z__, PMRRR_Int *info)
 {
     /* System generated locals */
-    int i__1, i__2, i__3;
+    PMRRR_Int i__1, i__2, i__3;
     double d__1, d__2;
 
     /* Builtin functions */
@@ -27,38 +28,38 @@ int odsq2_(int *n, double *z__, int *info)
 
     /* Local variables */
     double d__, e, g;
-    int k;
+    PMRRR_Int k;
     double s, t;
-    int i0, i4, n0;
+    PMRRR_Int i0, i4, n0;
     double dn;
-    int pp;
+    PMRRR_Int pp;
     double dn1, dn2, dee, eps, tau, tol;
-    int ipn4;
+    PMRRR_Int ipn4;
     double tol2;
-    int ieee;
-    int nbig;
+    PMRRR_Int ieee;
+    PMRRR_Int nbig;
     double dmin__, emin, emax;
-    int kmin, ndiv, iter;
+    PMRRR_Int kmin, ndiv, iter;
     double qmin, temp, qmax, zmax;
-    int splt;
+    PMRRR_Int splt;
     double dmin1, dmin2;
-    int nfail;
+    PMRRR_Int nfail;
     double desig, trace, sigma;
-    int iinfo, ttype;
-    extern /* Subroutine */ int odsq3_(int *, int *, double *, 
-	    int *, double *, double *, double *, double *, 
-	     int *, int *, int *, int *, int *, 
+    PMRRR_Int iinfo, ttype;
+    extern /* Subroutine */ PMRRR_Int odsq3_(PMRRR_Int *, PMRRR_Int *, double *, 
+	    PMRRR_Int *, double *, double *, double *, double *, 
+	     PMRRR_Int *, PMRRR_Int *, PMRRR_Int *, PMRRR_Int *, PMRRR_Int *, 
 	    double *, double *, double *, double *, 
 	    double *, double *, double *);
     // extern double odmch_(char *);
     double deemin;
-    int iwhila, iwhilb;
+    PMRRR_Int iwhila, iwhilb;
     double oldemn, safmin;
-    extern /* Subroutine */ int oerbla_(char *, int *);
-    /* extern int oienv_(int *, char *, char *, int *, int *,  */
-    /* 	    int *, int *); */
-    extern /* Subroutine */ int odsrt_(char *, int *, double *, 
-	    int *);
+    extern /* Subroutine */ PMRRR_Int oerbla_(char *, PMRRR_Int *);
+    /* extern PMRRR_Int oienv_(PMRRR_Int *, char *, char *, PMRRR_Int *, PMRRR_Int *,  */
+    /* 	    PMRRR_Int *, PMRRR_Int *); */
+    extern /* Subroutine */ PMRRR_Int odsrt_(char *, PMRRR_Int *, double *, 
+	    PMRRR_Int *);
 
 
 /*  -- LAPACK routine (version 3.2)                                    -- */
@@ -90,7 +91,7 @@ int odsq2_(int *n, double *z__, int *info)
 /*  Z(1,3,5,,..). The tridiagonal is L*U or, if you prefer, the */
 /*  symmetric tridiagonal to which it is similar. */
 
-/*  Note : ODSQ2 defines a int variable, IEEE, which is true */
+/*  Note : ODSQ2 defines a PMRRR_Int variable, IEEE, which is true */
 /*  on machines which follow ieee-754 floating-point standard in their */
 /*  handling of infinities and NaNs, and false otherwise. This variable */
 /*  is passed to ODSQ3. */

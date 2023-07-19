@@ -6,6 +6,7 @@
 #include <math.h>
 #include <float.h>
 #include <assert.h>
+#include "global.h"
 
 #define imax(a,b) ( (a) > (b) ? (a) : (b) )
 #define imin(a,b) ( (a) < (b) ? (a) : (b) )
@@ -13,57 +14,57 @@
 #define FALSE_ (0)
 
 /* Table of constant values */
-static int c__1 = 1;
-static int c_n1 = -1;
-static int c__3 = 3;
-static int c__2 = 2;
-static int c__0 = 0;
+static PMRRR_Int c__1 = 1;
+static PMRRR_Int c_n1 = -1;
+static PMRRR_Int c__3 = 3;
+static PMRRR_Int c__2 = 2;
+static PMRRR_Int c__0 = 0;
 
 /* Subroutine */ 
-int odrrd_(char *range, char *order, int *n, double *vl,  
-	double *vu, int *il, int *iu, double *gers, 
+PMRRR_Int odrrd_(char *range, char *order, PMRRR_Int *n, double *vl,  
+	double *vu, PMRRR_Int *il, PMRRR_Int *iu, double *gers, 
 	double *reltol, double *d__, double *e, double *e2, 
-	double *pivmin, int *nsplit, int *isplit, int *m, 
+	double *pivmin, PMRRR_Int *nsplit, PMRRR_Int *isplit, PMRRR_Int *m, 
 	double *w, double *werr, double *wl, double *wu, 
-	int *iblock, int *indexw, double *work, int *iwork, 
-	int *info)
+	PMRRR_Int *iblock, PMRRR_Int *indexw, double *work, PMRRR_Int *iwork, 
+	PMRRR_Int *info)
 {
     /* System generated locals */
-    int i__1, i__2, i__3;
+    PMRRR_Int i__1, i__2, i__3;
     double d__1, d__2;
 
     /* Builtin functions */
     // double log(double);
 
     /* Local variables */
-    int i__, j, ib, ie, je, nb;
+    PMRRR_Int i__, j, ib, ie, je, nb;
     double gl;
-    int im, in;
+    PMRRR_Int im, in;
     double gu;
-    int iw, jee;
+    PMRRR_Int iw, jee;
     double eps;
-    int nwl;
+    PMRRR_Int nwl;
     double wlu, wul;
-    int nwu;
+    PMRRR_Int nwu;
     double tmp1, tmp2;
-    int iend, jblk, ioff, iout, itmp1, itmp2, jdisc;
-    extern int olsame_(char *, char *);
-    int iinfo;
+    PMRRR_Int iend, jblk, ioff, iout, itmp1, itmp2, jdisc;
+    extern PMRRR_Int olsame_(char *, char *);
+    PMRRR_Int iinfo;
     double atoli;
-    int iwoff, itmax;
+    PMRRR_Int iwoff, itmax;
     double wkill, rtoli, uflow, tnorm;
     // extern double dlamch_(char *);
-    int ibegin;
-    extern /* Subroutine */ int odebz_(int *, int *, int *, 
-	    int *, int *, int *, double *, double *, 
-	    double *, double *, double *, double *, int *, 
-	     double *, double *, int *, int *, double *, 
-	    int *, int *);
-    int irange, idiscl, idumma[1];
-    /* extern int ilaenv_(int *, char *, char *, int *, int *,  */
-    /* 	    int *, int *); */
-    int idiscu;
-    int ncnvrg, toofew;
+    PMRRR_Int ibegin;
+    extern /* Subroutine */ PMRRR_Int odebz_(PMRRR_Int *, PMRRR_Int *, PMRRR_Int *, 
+	    PMRRR_Int *, PMRRR_Int *, PMRRR_Int *, double *, double *, 
+	    double *, double *, double *, double *, PMRRR_Int *, 
+	     double *, double *, PMRRR_Int *, PMRRR_Int *, double *, 
+	    PMRRR_Int *, PMRRR_Int *);
+    PMRRR_Int irange, idiscl, idumma[1];
+    /* extern PMRRR_Int ilaenv_(PMRRR_Int *, char *, char *, PMRRR_Int *, PMRRR_Int *,  */
+    /* 	    PMRRR_Int *, PMRRR_Int *); */
+    PMRRR_Int idiscu;
+    PMRRR_Int ncnvrg, toofew;
 
 
 /*  -- LAPACK auxiliary routine (version 3.2.1)                        -- */
@@ -397,7 +398,7 @@ int odrrd_(char *range, char *order, int *n, double *vl,
 /*        RANGE='I': Compute an interval containing eigenvalues */
 /*        IL through IU. The initial interval [GL,GU] from the global */
 /*        Gerschgorin bounds GL and GU is refined by ODEBZ. */
-	itmax = (int) ((log(tnorm + *pivmin) - log(*pivmin)) / log(2.)) + 
+	itmax = (PMRRR_Int) ((log(tnorm + *pivmin) - log(*pivmin)) / log(2.)) + 
 		2;
 	work[*n + 1] = gl;
 	work[*n + 2] = gl;
@@ -584,7 +585,7 @@ int odrrd_(char *range, char *order, int *n, double *vl,
 	    nwu += iwork[in + 1];
 	    iwoff = *m - iwork[1];
 /*           Compute Eigenvalues */
-	    itmax = (int) ((log(gu - gl + *pivmin) - log(*pivmin)) / log(
+	    itmax = (PMRRR_Int) ((log(gu - gl + *pivmin) - log(*pivmin)) / log(
 		    2.)) + 2;
 	    odebz_(&c__2, &itmax, &in, &in, &c__1, &nb, &atoli, &rtoli, 
 		    pivmin, &d__[ibegin], &e[ibegin], &e2[ibegin], idumma, &

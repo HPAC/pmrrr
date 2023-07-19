@@ -6,12 +6,13 @@
 #include <math.h>
 #include <float.h>
 #include <assert.h>
+#include "global.h"
 
 /* Table of constant values */
-static int c__1 = 1;
+static PMRRR_Int c__1 = 1;
 
 /* Subroutine */ 
-int oerbla_(char *srname, int *info)
+PMRRR_Int oerbla_(char *srname, PMRRR_Int *info)
 {
     
 

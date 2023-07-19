@@ -6,26 +6,27 @@
 #include <math.h>
 #include <float.h>
 #include <assert.h>
+#include "global.h"
 
 #define imax(a,b) ( (a) > (b) ? (a) : (b) )
 #define imin(a,b) ( (a) < (b) ? (a) : (b) )
 
-int odneg_(int *n, double *d__, double *lld, double *
-	sigma, double *pivmin, int *r__)
+PMRRR_Int odneg_(PMRRR_Int *n, double *d__, double *lld, double *
+	sigma, double *pivmin, PMRRR_Int *r__)
 {
     /* System generated locals */
-    int ret_val, i__1, i__2, i__3, i__4;
+    PMRRR_Int ret_val, i__1, i__2, i__3, i__4;
 
     /* Local variables */
-    int j;
+    PMRRR_Int j;
     double p, t;
-    int bj;
+    PMRRR_Int bj;
     double tmp;
-    int neg1, neg2;
+    PMRRR_Int neg1, neg2;
     double bsav, gamma, dplus;
-    extern int odnan_(double *);
-    int negcnt;
-    int sawnan;
+    extern PMRRR_Int odnan_(double *);
+    PMRRR_Int negcnt;
+    PMRRR_Int sawnan;
     double dminus;
 
 

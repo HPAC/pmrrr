@@ -59,20 +59,20 @@
 #include "structs.h"
 
 
-static int handle_small_cases(char*, char*, int*, double*, double*,
-			      double*, double*, int*, int*, int*,
-			      MPI_Comm, int*, int*, double*, double*,
-			      int*, int*);
+static PMRRR_Int handle_small_cases(char*, char*, PMRRR_Int*, double*, double*,
+			      double*, double*, PMRRR_Int*, PMRRR_Int*, PMRRR_Int*,
+			      MPI_Comm, PMRRR_Int*, PMRRR_Int*, double*, double*,
+			      PMRRR_Int*, PMRRR_Int*);
 static int cmp(const void*, const void*);
 static int cmpb(const void*, const void*);
 static double scale_matrix(in_t*, val_t*, bool);
-static void invscale_eigenvalues(val_t*, double, int);
-static int sort_eigenpairs(proc_t*, val_t*, vec_t*);
+static void invscale_eigenvalues(val_t*, double, PMRRR_Int);
+static PMRRR_Int sort_eigenpairs(proc_t*, val_t*, vec_t*);
 static void clean_up(MPI_Comm, double*, double*, double*, 
-		     int*, int*, int*, int*, int*, proc_t*, 
+		     PMRRR_Int*, PMRRR_Int*, PMRRR_Int*, PMRRR_Int*, PMRRR_Int*, proc_t*, 
 		     in_t*, val_t*, vec_t*, tol_t*);
-static int refine_to_highrac(proc_t*, char*, double*, double*,
-			     in_t*, int*, val_t*, tol_t*);
+static PMRRR_Int refine_to_highrac(proc_t*, char*, double*, double*,
+			     in_t*, PMRRR_Int*, val_t*, tol_t*);
 
 
 
@@ -84,14 +84,14 @@ static int refine_to_highrac(proc_t*, char*, double*, double*,
  * See README or 'pmrrr.h' for details.
  */
 
-int pmrrr(char *jobz, char *range, int *np, double  *D,
-	  double *E, double *vl, double *vu, int *il,
-	  int *iu, int *tryracp, MPI_Comm comm, int *nzp,
-	  int *offsetp, double *W, double *Z, int *ldz,
-	  int *Zsupp)
+PMRRR_Int pmrrr(char *jobz, char *range, PMRRR_Int *np, double  *D,
+	  double *E, double *vl, double *vu, PMRRR_Int *il,
+	  PMRRR_Int *iu, PMRRR_Int *tryracp, MPI_Comm comm, PMRRR_Int *nzp,
+	  PMRRR_Int *offsetp, double *W, double *Z, PMRRR_Int *ldz,
+	  PMRRR_Int *Zsupp)
 {
   /* Input parameter */
-  int         n      = *np;
+  PMRRR_Int         n      = *np;
   bool        onlyW  = (jobz[0]  == 'N' || jobz[0]  == 'n');
   bool        wantZ  = (jobz[0]  == 'V' || jobz[0]  == 'v');
   bool        cntval = (jobz[0]  == 'C' || jobz[0]  == 'c');
@@ -101,7 +101,7 @@ int pmrrr(char *jobz, char *range, int *np, double  *D,
 
   /* Work space */
   double      *Werr,   *Wgap,  *gersch, *Dcopy, *E2copy;
-  int         *iblock, *iproc, *Windex, *Zindex, *isplit;
+  PMRRR_Int         *iblock, *iproc, *Windex, *Zindex, *isplit;
 
   /* Structures to store variables */
   proc_t      *procinfo;
@@ -118,8 +118,8 @@ int pmrrr(char *jobz, char *range, int *np, double  *D,
 
   /* Others */
   double      scale;              
-  int         i, info;
-  int         ifirst, ilast, isize, ifirst_tmp, ilast_tmp, chunk, iil, iiu;
+  PMRRR_Int         i, info;
+  PMRRR_Int         ifirst, ilast, isize, ifirst_tmp, ilast_tmp, chunk, iil, iiu;
 
   /* Check input parameters */
   if(!(onlyW  || wantZ  || cntval)) return(1);
@@ -160,7 +160,7 @@ int pmrrr(char *jobz, char *range, int *np, double  *D,
 
 #if defined(MVAPICH2_VERSION)
   if (nthreads>1) {
-    int           mv2_affinity=1;
+    PMRRR_Int           mv2_affinity=1;
     char        *mv2_string = getenv("MV2_ENABLE_AFFINITY");
     if (mv2_string != NULL) {
       mv2_affinity = atoi(mv2_string);
@@ -207,15 +207,15 @@ int pmrrr(char *jobz, char *range, int *np, double  *D,
   assert(Wgap != NULL);
   gersch    = (double *) malloc( 2*n*sizeof(double) );
   assert(gersch != NULL);
-  iblock    = (int *)    calloc( n , sizeof(int) );
+  iblock    = (PMRRR_Int *)    calloc( n , sizeof(PMRRR_Int) );
   assert(iblock != NULL);
-  iproc     = (int *)    malloc( n * sizeof(int) );
+  iproc     = (PMRRR_Int *)    malloc( n * sizeof(PMRRR_Int) );
   assert(iproc != NULL);
-  Windex    = (int *)    malloc( n * sizeof(int) );
+  Windex    = (PMRRR_Int *)    malloc( n * sizeof(PMRRR_Int) );
   assert(Windex != NULL);
-  isplit    = (int *)    malloc( n * sizeof(int) );
+  isplit    = (PMRRR_Int *)    malloc( n * sizeof(PMRRR_Int) );
   assert(isplit != NULL);
-  Zindex    = (int *)    malloc( n * sizeof(int) );
+  Zindex    = (PMRRR_Int *)    malloc( n * sizeof(PMRRR_Int) );
   assert(Zindex != NULL);
   procinfo  = (proc_t *) malloc( sizeof(proc_t) );
   assert(procinfo != NULL);
@@ -396,8 +396,8 @@ int pmrrr(char *jobz, char *range, int *np, double  *D,
  */
 static  
 void clean_up(MPI_Comm comm, double *Werr, double *Wgap,
-	      double *gersch, int *iblock, int *iproc,
-	      int *Windex, int *isplit, int *Zindex,
+	      double *gersch, PMRRR_Int *iblock, PMRRR_Int *iproc,
+	      PMRRR_Int *Windex, PMRRR_Int *isplit, PMRRR_Int *Zindex,
 	      proc_t *procinfo, in_t *Dstruct,
 	      val_t *Wstruct, vec_t *Zstruct,
 	      tol_t *tolstruct)
@@ -425,25 +425,25 @@ void clean_up(MPI_Comm comm, double *Werr, double *Wgap,
  * Wrapper to call LAPACKs DSTEMR for small matrices
  */
 static
-int handle_small_cases(char *jobz, char *range, int *np, double  *D,
-		       double *E, double *vlp, double *vup, int *ilp,
-		       int *iup, int *tryracp, MPI_Comm comm, int *nzp,
-		       int *myfirstp, double *W, double *Z, int *ldzp,
-		       int *Zsupp)
+PMRRR_Int handle_small_cases(char *jobz, char *range, PMRRR_Int *np, double  *D,
+		       double *E, double *vlp, double *vup, PMRRR_Int *ilp,
+		       PMRRR_Int *iup, PMRRR_Int *tryracp, MPI_Comm comm, PMRRR_Int *nzp,
+		       PMRRR_Int *myfirstp, double *W, double *Z, PMRRR_Int *ldzp,
+		       PMRRR_Int *Zsupp)
 {
   bool   cntval  = (jobz[0]  == 'C' || jobz[0]  == 'c');
   bool   onlyW   = (jobz[0]  == 'N' || jobz[0]  == 'n');
   bool   wantZ   = (jobz[0]  == 'V' || jobz[0]  == 'v');
   bool   indeig  = (range[0] == 'I' || range[0] == 'i');
-  int    n       = *np;
-  int    ldz_tmp = *np;
-  int    ldz     = *ldzp;
+  PMRRR_Int    n       = *np;
+  PMRRR_Int    ldz_tmp = *np;
+  PMRRR_Int    ldz     = *ldzp;
 
   int    nproc, pid;
-  int    m, lwork, *iwork, liwork, info;
+  PMRRR_Int    m, lwork, *iwork, liwork, info;
   double *Z_tmp, *work, cnt;
-  int    i, itmp, MINUSONE=-1;
-  int    chunk, myfirst, mylast, mysize;
+  PMRRR_Int    i, itmp, MINUSONE=-1;
+  PMRRR_Int    chunk, myfirst, mylast, mysize;
 
   MPI_Comm_size(comm, &nproc);
   MPI_Comm_rank(comm, &pid);
@@ -467,7 +467,7 @@ int handle_small_cases(char *jobz, char *range, int *np, double  *D,
 
   work = (double *) malloc( lwork  * sizeof(double));
   assert(work != NULL);
-  iwork = (int *)   malloc( liwork * sizeof(int));
+  iwork = (PMRRR_Int *)   malloc( liwork * sizeof(PMRRR_Int));
   assert(iwork != NULL);
 
   if (cntval) {
@@ -478,7 +478,7 @@ int handle_small_cases(char *jobz, char *range, int *np, double  *D,
 	    &liwork, &info);
     assert(info == 0);
     
-    *nzp = (int) ceil(cnt/nproc);
+    *nzp = (PMRRR_Int) ceil(cnt/nproc);
     free(work); free(iwork);
     return(0);
   }
@@ -527,7 +527,7 @@ int handle_small_cases(char *jobz, char *range, int *np, double  *D,
 static 
 double scale_matrix(in_t *Dstruct, val_t *Wstruct, bool valeig)
 {
-  int              n  = Dstruct->n;
+  PMRRR_Int              n  = Dstruct->n;
   double *restrict D  = Dstruct->D;
   double *restrict E  = Dstruct->E;
   double          *vl = Wstruct->vl;
@@ -536,7 +536,7 @@ double scale_matrix(in_t *Dstruct, val_t *Wstruct, bool valeig)
   double           scale = 1.0;
   double           T_norm;              
   double           smlnum, bignum, rmin, rmax;
-  int              IONE = 1, itmp;
+  PMRRR_Int              IONE = 1, itmp;
 
   /* Set some machine dependent constants */
   smlnum = DBL_MIN / DBL_EPSILON;
@@ -575,13 +575,13 @@ double scale_matrix(in_t *Dstruct, val_t *Wstruct, bool valeig)
  */
 static 
 void invscale_eigenvalues(val_t *Wstruct, double scale,
-			  int size)
+			  PMRRR_Int size)
 {
   double *vl = Wstruct->vl;
   double *vu = Wstruct->vu;
   double *W  = Wstruct->W;
   double invscale = 1.0 / scale;
-  int    IONE = 1;
+  PMRRR_Int    IONE = 1;
 
   if (scale != 1.0) {  /* FP cmp okay */
     *vl *= invscale;
@@ -594,20 +594,20 @@ void invscale_eigenvalues(val_t *Wstruct, double scale,
 
 
 static 
-int sort_eigenpairs_local(proc_t *procinfo, int m, val_t *Wstruct, vec_t *Zstruct)
+PMRRR_Int sort_eigenpairs_local(proc_t *procinfo, PMRRR_Int m, val_t *Wstruct, vec_t *Zstruct)
 {
-  int              pid        = procinfo->pid;
-  int              n        = Wstruct->n;
+  PMRRR_Int              pid        = procinfo->pid;
+  PMRRR_Int              n        = Wstruct->n;
   double *restrict W        = Wstruct->W;
   double *restrict work     = Wstruct->gersch;
-  int              ldz      = Zstruct->ldz;
+  PMRRR_Int              ldz      = Zstruct->ldz;
   double *restrict Z        = Zstruct->Z;
-  int    *restrict Zsupp    = Zstruct->Zsupp;
+  PMRRR_Int    *restrict Zsupp    = Zstruct->Zsupp;
  
   bool             sorted;
-  int              j;
+  PMRRR_Int              j;
   double           tmp;
-  int              itmp1, itmp2;
+  PMRRR_Int              itmp1, itmp2;
   
   /* Make sure that sorted correctly; ineffective implementation,
    * but usually no or very little swapping should be done here */
@@ -643,20 +643,20 @@ int sort_eigenpairs_local(proc_t *procinfo, int m, val_t *Wstruct, vec_t *Zstruc
 
 
 static 
-int sort_eigenpairs_global(proc_t *procinfo, int m, val_t *Wstruct, 
+PMRRR_Int sort_eigenpairs_global(proc_t *procinfo, PMRRR_Int m, val_t *Wstruct, 
 			   vec_t *Zstruct)
 {
-  int              pid   = procinfo->pid;
-  int              nproc = procinfo->nproc;
-  int              n     = Wstruct->n;
+  PMRRR_Int              pid   = procinfo->pid;
+  PMRRR_Int              nproc = procinfo->nproc;
+  PMRRR_Int              n     = Wstruct->n;
   double *restrict W     = Wstruct->W;
   double *restrict work  = Wstruct->gersch;
-  int              ldz   = Zstruct->ldz;
+  PMRRR_Int              ldz   = Zstruct->ldz;
   double *restrict Z     = Zstruct->Z;
-  int    *restrict Zsupp = Zstruct->Zsupp;
+  PMRRR_Int    *restrict Zsupp = Zstruct->Zsupp;
 
   double           *minW, *maxW, *minmax; 
-  int              i, p, lp, itmp[2];
+  PMRRR_Int              i, p, lp, itmp[2];
   bool             sorted;
   MPI_Status       status;
   double              nan_value = 0.0/0.0;
@@ -722,15 +722,15 @@ int sort_eigenpairs_global(proc_t *procinfo, int m, val_t *Wstruct,
        * (would better be recomputed here though) */
       if ((pid == lp || pid == p) && minW[p] < maxW[lp]) {
 	if (pid == lp) {
-          MPI_Sendrecv(&Zsupp[2*(m-1)], 2, MPI_INT, p, lp, 
-		       itmp, 2, MPI_INT, p, p, 
+          MPI_Sendrecv(&Zsupp[2*(m-1)], 2, PMRRR_MPI_INT_TYPE, p, lp, 
+		       itmp, 2, PMRRR_MPI_INT_TYPE, p, p, 
 		       procinfo->comm, &status);
 	  Zsupp[2*(m-1)]     = itmp[0];
 	  Zsupp[2*(m-1) + 1] = itmp[1];
 	}
 	if (pid == p) {
-          MPI_Sendrecv(&Zsupp[0], 2, MPI_INT, lp, p, 
-		       itmp,  2, MPI_INT, lp, lp, 
+          MPI_Sendrecv(&Zsupp[0], 2, PMRRR_MPI_INT_TYPE, lp, p, 
+		       itmp,  2, PMRRR_MPI_INT_TYPE, lp, lp, 
 		       procinfo->comm, &status);
 	  Zsupp[0] = itmp[0];
 	  Zsupp[1] = itmp[1];
@@ -777,18 +777,18 @@ int sort_eigenpairs_global(proc_t *procinfo, int m, val_t *Wstruct,
 
 /* Routine to sort the eigenpairs */
 static 
-int sort_eigenpairs(proc_t *procinfo, val_t *Wstruct, vec_t *Zstruct)
+PMRRR_Int sort_eigenpairs(proc_t *procinfo, val_t *Wstruct, vec_t *Zstruct)
 {
   /* From inputs */
-  int              pid      = procinfo->pid;
-  int              n        = Wstruct->n;
+  PMRRR_Int              pid      = procinfo->pid;
+  PMRRR_Int              n        = Wstruct->n;
   double *restrict W        = Wstruct->W;
-  int    *restrict Windex   = Wstruct->Windex;
-  int    *restrict iproc    = Wstruct->iproc;
-  int    *restrict Zindex   = Zstruct->Zindex;
+  PMRRR_Int    *restrict Windex   = Wstruct->Windex;
+  PMRRR_Int    *restrict iproc    = Wstruct->iproc;
+  PMRRR_Int    *restrict Zindex   = Zstruct->Zindex;
 
   /* Others */
-  int           im, j;
+  PMRRR_Int           im, j;
   sort_struct_t *sort_array;
 
   /* Make the first nz elements of W contains the eigenvalues
@@ -849,34 +849,34 @@ int sort_eigenpairs(proc_t *procinfo, val_t *Wstruct, vec_t *Zstruct)
  * even no work at all is not uncommon. 
  */
 static 
-int refine_to_highrac(proc_t *procinfo, char *jobz, double *D,
-		      double *E2, in_t *Dstruct, int *nzp,
+PMRRR_Int refine_to_highrac(proc_t *procinfo, char *jobz, double *D,
+		      double *E2, in_t *Dstruct, PMRRR_Int *nzp,
 		      val_t *Wstruct, tol_t *tolstruct)
 {
-  int              pid    = procinfo->pid;
+  PMRRR_Int              pid    = procinfo->pid;
   bool             wantZ  = (jobz[0]  == 'V' || jobz[0]  == 'v');
-  int              n      = Dstruct->n;
-  int              nsplit = Dstruct->nsplit;
-  int    *restrict isplit = Dstruct->isplit;
+  PMRRR_Int              n      = Dstruct->n;
+  PMRRR_Int              nsplit = Dstruct->nsplit;
+  PMRRR_Int    *restrict isplit = Dstruct->isplit;
   double           spdiam = Dstruct->spdiam;
-  int              nz     = *nzp;
+  PMRRR_Int              nz     = *nzp;
   double *restrict W      = Wstruct->W;
   double *restrict Werr   = Wstruct->Werr;
-  int    *restrict Windex = Wstruct->Windex;
-  int    *restrict iblock = Wstruct->iblock;
-  int    *restrict iproc  = Wstruct->iproc;
+  PMRRR_Int    *restrict Windex = Wstruct->Windex;
+  PMRRR_Int    *restrict iblock = Wstruct->iblock;
+  PMRRR_Int    *restrict iproc  = Wstruct->iproc;
   double           pivmin = tolstruct->pivmin; 
   double           tol    = 4 * DBL_EPSILON; 
   
   double *work;
-  int    *iwork;
-  int    ifirst, ilast, offset, info;
-  int    i, j, k;
-  int    ibegin, iend, isize, nbl;
+  PMRRR_Int    *iwork;
+  PMRRR_Int    ifirst, ilast, offset, info;
+  PMRRR_Int    i, j, k;
+  PMRRR_Int    ibegin, iend, isize, nbl;
 
   work  = (double *) malloc( 2*n * sizeof(double) );
   assert (work != NULL);
-  iwork = (int *)    malloc( 2*n * sizeof(int)    );
+  iwork = (PMRRR_Int *)    malloc( 2*n * sizeof(PMRRR_Int)    );
   assert (iwork != NULL);
 
   ibegin  = 0;
@@ -957,7 +957,7 @@ int cmp(const void *a1, const void *a2)
  * all computed eigenvalues (iu-il+1) in W; this routine is designed 
  * to be called right after 'pmrrr'.
  */
-int PMR_comm_eigvals(MPI_Comm comm, int *nz, int *myfirstp, double *W)
+PMRRR_Int PMR_comm_eigvals(MPI_Comm comm, PMRRR_Int *nz, PMRRR_Int *myfirstp, double *W)
 {
   MPI_Comm comm_dup;
   int      nproc;
@@ -978,9 +978,12 @@ int PMR_comm_eigvals(MPI_Comm comm, int *nz, int *myfirstp, double *W)
     memcpy(work, W, (*nz) * sizeof(double) );
   }
 
-  MPI_Allgather(nz, 1, MPI_INT, rcount, 1, MPI_INT, comm_dup);
+  int nz32 = (int)(*nz);
+  int myfirstp32 = (int)(*myfirstp);
 
-  MPI_Allgather(myfirstp, 1, MPI_INT, rdispl, 1, MPI_INT, comm_dup);
+  MPI_Allgather(&nz32, 1, MPI_INT, rcount, 1, MPI_INT, comm_dup);
+
+  MPI_Allgather(&myfirstp32, 1, MPI_INT, rdispl, 1, MPI_INT, comm_dup);
   
   MPI_Allgatherv(work, *nz, MPI_DOUBLE, W, rcount, rdispl,
  		 MPI_DOUBLE, comm_dup);
@@ -997,10 +1000,10 @@ int PMR_comm_eigvals(MPI_Comm comm, int *nz, int *myfirstp, double *W)
 
 
 /* Fortran function prototype */
-void pmrrr_(char *jobz, char *range, int *n, double  *D,
-	    double *E, double *vl, double *vu, int *il, int *iu,
-	    int *tryracp, MPI_Fint *comm, int *nz, int *myfirst,
-	    double *W, double *Z, int *ldz, int *Zsupp, int* info)
+void pmrrr_(char *jobz, char *range, PMRRR_Int *n, double  *D,
+	    double *E, double *vl, double *vu, PMRRR_Int *il, PMRRR_Int *iu,
+	    PMRRR_Int *tryracp, MPI_Fint *comm, PMRRR_Int *nz, PMRRR_Int *myfirst,
+	    double *W, double *Z, PMRRR_Int *ldz, PMRRR_Int *Zsupp, PMRRR_Int* info)
 {
   MPI_Comm c_comm = MPI_Comm_f2c(*comm);
 
@@ -1008,8 +1011,8 @@ void pmrrr_(char *jobz, char *range, int *n, double  *D,
 		c_comm, nz, myfirst, W, Z, ldz, Zsupp);
 }
 
-void pmr_comm_eigvals_(MPI_Fint *comm, int *nz, int *myfirstp, 
-		       double *W, int *info)
+void pmr_comm_eigvals_(MPI_Fint *comm, PMRRR_Int *nz, PMRRR_Int *myfirstp, 
+		       double *W, PMRRR_Int *info)
 {
   MPI_Comm c_comm = MPI_Comm_f2c(*comm);
 

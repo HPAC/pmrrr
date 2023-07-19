@@ -6,6 +6,7 @@
 #include <math.h>
 #include <float.h>
 #include <assert.h>
+#include "global.h"
 
 #define imax(a,b) ( (a) > (b) ? (a) : (b) )
 #define imin(a,b) ( (a) < (b) ? (a) : (b) )
@@ -14,95 +15,95 @@
 
 /* Table of constant values */
 static double c_b5 = 0.;
-static int c__1 = 1;
-static int c__2 = 2;
+static PMRRR_Int c__1 = 1;
+static PMRRR_Int c__2 = 2;
 
-/* Subroutine */ int odrrv_(int *n, double *vl, double *vu, 
-	double *d__, double *l, double *pivmin, int *isplit, 
-	int *m, int *dol, int *dou, double *minrgp, 
+/* Subroutine */ PMRRR_Int odrrv_(PMRRR_Int *n, double *vl, double *vu, 
+	double *d__, double *l, double *pivmin, PMRRR_Int *isplit, 
+	PMRRR_Int *m, PMRRR_Int *dol, PMRRR_Int *dou, double *minrgp, 
 	double *rtol1, double *rtol2, double *w, double *werr, 
-	 double *wgap, int *iblock, int *indexw, double *gers, 
-	 double *z__, int *ldz, int *isuppz, double *work, 
-	int *iwork, int *info)
+	 double *wgap, PMRRR_Int *iblock, PMRRR_Int *indexw, double *gers, 
+	 double *z__, PMRRR_Int *ldz, PMRRR_Int *isuppz, double *work, 
+	PMRRR_Int *iwork, PMRRR_Int *info)
 {
     /* System generated locals */
-    int z_dim1, z_offset, i__1, i__2, i__3, i__4, i__5;
+    PMRRR_Int z_dim1, z_offset, i__1, i__2, i__3, i__4, i__5;
     double d__1, d__2;
-    int L__1;
+    PMRRR_Int L__1;
 
     /* Builtin functions */
     // double log(double);
 
     /* Local variables */
-    int minwsize, i__, j, k, p, q, miniwsize, ii;
+    PMRRR_Int minwsize, i__, j, k, p, q, miniwsize, ii;
     double gl;
-    int im, in;
+    PMRRR_Int im, in;
     double gu, gap, eps, tau, tol, tmp;
-    int zto;
+    PMRRR_Int zto;
     double ztz;
-    int iend, jblk;
+    PMRRR_Int iend, jblk;
     double lgap;
-    int done;
+    PMRRR_Int done;
     double rgap, left;
-    int wend, iter;
+    PMRRR_Int wend, iter;
     double bstw;
-    int itmp1;
-    extern /* Subroutine */ int odscl_(int *, double *, double *, 
-	    int *);
-    int indld;
+    PMRRR_Int itmp1;
+    extern /* Subroutine */ PMRRR_Int odscl_(PMRRR_Int *, double *, double *, 
+	    PMRRR_Int *);
+    PMRRR_Int indld;
     double fudge;
-    int idone;
+    PMRRR_Int idone;
     double sigma;
-    int iinfo, iindr;
+    PMRRR_Int iinfo, iindr;
     double resid;
-    int eskip;
+    PMRRR_Int eskip;
     double right;
-    extern /* Subroutine */ int odcpy_(int *, double *, int *, 
-	    double *, int *);
-    int nclus, zfrom;
+    extern /* Subroutine */ PMRRR_Int odcpy_(PMRRR_Int *, double *, PMRRR_Int *, 
+	    double *, PMRRR_Int *);
+    PMRRR_Int nclus, zfrom;
     double rqtol;
-    int iindc1, iindc2;
-    extern /* Subroutine */ int odr1v_(int *, int *, int *, 
+    PMRRR_Int iindc1, iindc2;
+    extern /* Subroutine */ PMRRR_Int odr1v_(PMRRR_Int *, PMRRR_Int *, PMRRR_Int *, 
 	    double *, double *, double *, double *, 
-	    double *, double *, double *, double *, int *, 
-	     int *, double *, double *, int *, int *, 
+	    double *, double *, double *, double *, PMRRR_Int *, 
+	     PMRRR_Int *, double *, double *, PMRRR_Int *, PMRRR_Int *, 
 	    double *, double *, double *, double *);
-    int stp2ii;
+    PMRRR_Int stp2ii;
     double lambda;
     // extern double odmch_(char *);
-    int ibegin, indeig;
-    int needbs;
-    int indlld;
+    PMRRR_Int ibegin, indeig;
+    PMRRR_Int needbs;
+    PMRRR_Int indlld;
     double sgndef, mingma;
-    extern /* Subroutine */ int odrrb_(int *, double *, double *, 
-	     int *, int *, double *, double *, int *, 
-	    double *, double *, double *, double *, int *, 
-	     double *, double *, int *, int *);
-    int oldien, oldncl, wbegin;
+    extern /* Subroutine */ PMRRR_Int odrrb_(PMRRR_Int *, double *, double *, 
+	     PMRRR_Int *, PMRRR_Int *, double *, double *, PMRRR_Int *, 
+	    double *, double *, double *, double *, PMRRR_Int *, 
+	     double *, double *, PMRRR_Int *, PMRRR_Int *);
+    PMRRR_Int oldien, oldncl, wbegin;
     double spdiam;
-    int negcnt;
-    extern /* Subroutine */ int odrrf_(int *, double *, double *, 
-	     double *, int *, int *, double *, double *, 
+    PMRRR_Int negcnt;
+    extern /* Subroutine */ PMRRR_Int odrrf_(PMRRR_Int *, double *, double *, 
+	     double *, PMRRR_Int *, PMRRR_Int *, double *, double *, 
 	    double *, double *, double *, double *, 
 	    double *, double *, double *, double *, 
-	    double *, int *);
-    int oldcls;
+	    double *, PMRRR_Int *);
+    PMRRR_Int oldcls;
     double savgap;
-    int ndepth;
+    PMRRR_Int ndepth;
     double ssigma;
-    extern /* Subroutine */ int odset_(char *, int *, int *, 
-	    double *, double *, double *, int *);
-    int usedbs;
-    int iindwk, offset;
+    extern /* Subroutine */ PMRRR_Int odset_(char *, PMRRR_Int *, PMRRR_Int *, 
+	    double *, double *, double *, PMRRR_Int *);
+    PMRRR_Int usedbs;
+    PMRRR_Int iindwk, offset;
     double gaptol;
-    int newcls, oldfst, indwrk, windex, oldlst;
-    int usedrq;
-    int newfst, newftt, parity, windmn, windpl, isupmn, newlst, zusedl;
+    PMRRR_Int newcls, oldfst, indwrk, windex, oldlst;
+    PMRRR_Int usedrq;
+    PMRRR_Int newfst, newftt, parity, windmn, windpl, isupmn, newlst, zusedl;
     double bstres;
-    int newsiz, zusedu, zusedw;
+    PMRRR_Int newsiz, zusedu, zusedw;
     double nrminv, rqcorr;
-    int tryrqc;
-    int isupmx;
+    PMRRR_Int tryrqc;
+    PMRRR_Int isupmx;
 
 
 /*  -- LAPACK auxiliary routine (version 3.2) -- */

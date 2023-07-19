@@ -6,16 +6,17 @@
 #include <math.h>
 #include <float.h>
 #include <assert.h>
+#include "global.h"
 
-int olsame_(char *ca, char *cb)
+PMRRR_Int olsame_(char *ca, char *cb)
 {
 
 
     /* System generated locals */
-    int ret_val;
+    PMRRR_Int ret_val;
 
     /* Local variables */
-    static int inta, intb, zcode;
+    static PMRRR_Int inta, intb, zcode;
 
 
 /*  -- LAPACK auxiliary routine (version 2.0) --   

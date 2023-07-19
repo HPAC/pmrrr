@@ -47,9 +47,9 @@
 /*
  * Computation of eigenvectors of a symmetric tridiagonal
  */
-int plarrv(proc_t *procinfo, in_t *Dstruct, val_t *Wstruct,
-	   vec_t *Zstruct, tol_t *tolstruct, int *nzp,
-	   int *myfirstp);
+PMRRR_Int plarrv(proc_t *procinfo, in_t *Dstruct, val_t *Wstruct,
+	   vec_t *Zstruct, tol_t *tolstruct, PMRRR_Int *nzp,
+	   PMRRR_Int *myfirstp);
 
 #define COMM_COMPLETE        0
 #define COMM_INCOMPLETE      1

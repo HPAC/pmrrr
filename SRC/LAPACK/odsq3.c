@@ -6,16 +6,17 @@
 #include <math.h>
 #include <float.h>
 #include <assert.h>
+#include "global.h"
 
-/* Subroutine */ int odsq3_(int *i0, int *n0, double *z__, 
-	int *pp, double *dmin__, double *sigma, double *desig, 
-	 double *qmax, int *nfail, int *iter, int *ndiv, 
-	int *ieee, int *ttype, double *dmin1, double *dmin2, 
+/* Subroutine */ PMRRR_Int odsq3_(PMRRR_Int *i0, PMRRR_Int *n0, double *z__, 
+	PMRRR_Int *pp, double *dmin__, double *sigma, double *desig, 
+	 double *qmax, PMRRR_Int *nfail, PMRRR_Int *iter, PMRRR_Int *ndiv, 
+	PMRRR_Int *ieee, PMRRR_Int *ttype, double *dmin1, double *dmin2, 
 	double *dn, double *dn1, double *dn2, double *g, 
 	double *tau)
 {
     /* System generated locals */
-    int i__1;
+    PMRRR_Int i__1;
     double d__1, d__2;
 
     /* Builtin functions */
@@ -23,21 +24,21 @@
 
     /* Local variables */
     double s, t;
-    int j4, nn;
+    PMRRR_Int j4, nn;
     double eps, tol;
-    int n0in, ipn4;
+    PMRRR_Int n0in, ipn4;
     double tol2, temp;
-    extern /* Subroutine */ int odsq4_(int *, int *, double *, 
-	    int *, int *, double *, double *, double *, 
-	    double *, double *, double *, double *, int *, 
-	     double *), odsq5_(int *, int *, double *, 
-	    int *, double *, double *, double *, double *, 
-	     double *, double *, double *, int *), odsq6_(
-	    int *, int *, double *, int *, double *, 
+    extern /* Subroutine */ PMRRR_Int odsq4_(PMRRR_Int *, PMRRR_Int *, double *, 
+	    PMRRR_Int *, PMRRR_Int *, double *, double *, double *, 
+	    double *, double *, double *, double *, PMRRR_Int *, 
+	     double *), odsq5_(PMRRR_Int *, PMRRR_Int *, double *, 
+	    PMRRR_Int *, double *, double *, double *, double *, 
+	     double *, double *, double *, PMRRR_Int *), odsq6_(
+	    PMRRR_Int *, PMRRR_Int *, double *, PMRRR_Int *, double *, 
 	    double *, double *, double *, double *, 
 	    double *);
     // extern double odmch_(char *);
-    extern int odnan_(double *);
+    extern PMRRR_Int odnan_(double *);
 
 
 /*  -- LAPACK routine (version 3.2)                                    -- */

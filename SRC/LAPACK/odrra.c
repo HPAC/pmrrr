@@ -6,21 +6,22 @@
 #include <math.h>
 #include <float.h>
 #include <assert.h>
+#include "global.h"
 
 /* Subroutine */ 
-int odrra_(int *n, double *d__, double *e, 
-	double *e2, double *spltol, double *tnrm, int *nsplit, 
-	 int *isplit, int *info)
+PMRRR_Int odrra_(PMRRR_Int *n, double *d__, double *e, 
+	double *e2, double *spltol, double *tnrm, PMRRR_Int *nsplit, 
+	 PMRRR_Int *isplit, PMRRR_Int *info)
 {
     /* System generated locals */
-    int i__1;
+    PMRRR_Int i__1;
     double d__1, d__2;
 
     /* Builtin functions */
     // double sqrt(double);
 
     /* Local variables */
-    int i__;
+    PMRRR_Int i__;
     double tmp1, eabs;
 
 

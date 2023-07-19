@@ -6,17 +6,18 @@
 #include <math.h>
 #include <float.h>
 #include <assert.h>
+#include "global.h"
 
 /* Subroutine */ 
-int odssq_(int *n, double *x, int *incx, 
+PMRRR_Int odssq_(PMRRR_Int *n, double *x, PMRRR_Int *incx, 
 	double *scale, double *sumsq)
 {
     /* System generated locals */
-    int i__1, i__2;
+    PMRRR_Int i__1, i__2;
     double d__1;
 
     /* Local variables */
-    int ix;
+    PMRRR_Int ix;
     double absxi;
 
 /*  -- LAPACK auxiliary routine (version 3.2) -- */

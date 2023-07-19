@@ -45,7 +45,7 @@
 #include "global.h"
 
 typedef struct {
-  int             value;
+  PMRRR_Int             value;
 #ifdef NOSPINLOCKS
   pthread_mutex_t    lock;
 #else
@@ -53,11 +53,11 @@ typedef struct {
 #endif
 } counter_t;
 
-counter_t *PMR_create_counter(int init_value);
-int PMR_get_counter_value(counter_t *counter);
-int PMR_set_counter_value(counter_t *counter, int value);
-int PMR_decrement_counter(counter_t *counter, int amount);
-int PMR_increment_counter(counter_t *counter, int amount);
+counter_t *PMR_create_counter(PMRRR_Int init_value);
+PMRRR_Int PMR_get_counter_value(counter_t *counter);
+PMRRR_Int PMR_set_counter_value(counter_t *counter, PMRRR_Int value);
+PMRRR_Int PMR_decrement_counter(counter_t *counter, PMRRR_Int amount);
+PMRRR_Int PMR_increment_counter(counter_t *counter, PMRRR_Int amount);
 void PMR_destroy_counter(counter_t *counter);
 
 #endif
