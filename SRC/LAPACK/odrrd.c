@@ -379,8 +379,8 @@ PMRRR_Int odrrd_(char *range, char *order, PMRRR_Int *n, double *vl,
 /* Computing MAX */
     d__1 = fabs(gl), d__2 = fabs(gu);
     tnorm = fmax(d__1,d__2);
-    gl = gl - tnorm * 2. * eps * *n - *pivmin * 4.;
-    gu = gu + tnorm * 2. * eps * *n + *pivmin * 4.;
+    gl = gl - tnorm * 2. * eps * (double)(*n) - *pivmin * 4.;
+    gu = gu + tnorm * 2. * eps * (double)(*n) + *pivmin * 4.;
 /*     [JAN/28/2009] remove the line below since SPDIAM variable not use */
 /*     SPDIAM = GU - GL */
 /*     Input arguments for ODEBZ: */
@@ -552,8 +552,8 @@ PMRRR_Int odrrd_(char *range, char *order, PMRRR_Int *n, double *vl,
 /*           SPDIAM = GU - GL */
 /*           GL = GL - FUDGE*SPDIAM*EPS*IN - FUDGE*PIVMIN */
 /*           GU = GU + FUDGE*SPDIAM*EPS*IN + FUDGE*PIVMIN */
-	    gl = gl - tnorm * 2. * eps * in - *pivmin * 2.;
-	    gu = gu + tnorm * 2. * eps * in + *pivmin * 2.;
+	    gl = gl - tnorm * 2. * eps * (double)in - *pivmin * 2.;
+	    gu = gu + tnorm * 2. * eps * (double)in + *pivmin * 2.;
 
 	    if (irange > 1) {
 		if (gu < *wl) {

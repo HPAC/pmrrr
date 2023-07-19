@@ -461,7 +461,7 @@ L21:
 		goto L170;
 	    } else {
 /*              Decide whether dqds or bisection is more efficient */
-		usedqd = (double) mb > in * .5 && ! forceb;
+		usedqd = (double) mb > (double) in * .5 && ! forceb;
 		wend = wbegin + mb - 1;
 /*              Calculate gaps for the current block */
 /*              In later stages, when representations for individual */
@@ -596,7 +596,7 @@ L21:
 	if (usedqd) {
 /*           The initial SIGMA was to the outer end of the spectrum */
 /*           the matrix is definite and we need not retreat. */
-	    tau = spdiam * eps * *n + *pivmin * 2.;
+	    tau = spdiam * eps * (double)(*n) + *pivmin * 2.;
 	    tau = fmax(tau, 2 * eps * fabs(sigma));
 	} else {
 	    if (mb > 1) {
@@ -669,9 +669,9 @@ L21:
 		if (idum == 5) {
 		    if (sgndef == 1.) {
 /*                    The fudged Gerschgorin shift should succeed */
-			sigma = gl - spdiam * 2. * eps * *n - *pivmin * 4.;
+			sigma = gl - spdiam * 2. * eps * (double)(*n) - *pivmin * 4.;
 		    } else {
-			sigma = gu + spdiam * 2. * eps * *n + *pivmin * 4.;
+			sigma = gu + spdiam * 2. * eps * (double)(*n) + *pivmin * 4.;
 		    }
 		} else {
 		    sigma -= sgndef * tau;

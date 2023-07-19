@@ -105,13 +105,13 @@ PMRRR_Int plarrv(proc_t *procinfo, in_t *Dstruct, val_t *Wstruct,
 
 
   /* Allocate work space and copy eigenvalues */
-  Wshifted = (double *) malloc( n * sizeof(double) );
+  Wshifted = (double *) malloc( (size_t)n * sizeof(double) );
   assert(Wshifted != NULL);
 
-  memcpy(Wshifted, W, n*sizeof(double));
+  memcpy(Wshifted, W, (size_t)n*sizeof(double));
   Wstruct->Wshifted = Wshifted;
 
-  threads = (pthread_t *) malloc(nthreads * sizeof(pthread_t));
+  threads = (pthread_t *) malloc((size_t)nthreads * sizeof(pthread_t));
   assert(threads != NULL);
 
   /* Assign eigenvectors to processes */
@@ -191,7 +191,7 @@ PMRRR_Int assign_to_proc(proc_t *procinfo, in_t *Dstruct, val_t *Wstruct,
   double            sigma;
   sort_struct_t     *array;
 
-  array = (sort_struct_t *) malloc(n*sizeof(sort_struct_t));
+  array = (sort_struct_t *) malloc((size_t)n*sizeof(sort_struct_t));
   
   for (i=0; i<n; i++) {
     /* Find shift of block */
@@ -207,7 +207,7 @@ PMRRR_Int assign_to_proc(proc_t *procinfo, in_t *Dstruct, val_t *Wstruct,
   /* Alternatively could sort list of pointers, which
      requires less data copying */
 
-  qsort(array, n, sizeof(sort_struct_t), cmpa);
+  qsort(array, (size_t)n, sizeof(sort_struct_t), cmpa);
 
   /* Mark eigenvectors that do not need to be computed */
   for (j = 0; j < il-1; j++ ) {
@@ -275,7 +275,7 @@ int cmpa(const void *a1, const void *a2)
 
   /* Within block local index decides */
   if (arg1->block_ind == arg2->block_ind) {
-    return (arg1->local_ind - arg2->local_ind);
+    return(arg1->local_ind < arg2->local_ind ? -1 : 1);
   } else {
     if (arg1->lambda < arg2->lambda) {
       return(-1);
@@ -353,7 +353,7 @@ PMRRR_Int init_workQ(proc_t *procinfo, in_t *Dstruct, val_t *Wstruct,
       gu = fmax(gu, gersch[2*i + 1]);
     }
     spdiam = gu - gl;
-    avggap = spdiam / (isize-1);
+    avggap = spdiam / (double)(isize-1);
 
     /* Find eigenvalues in block */
     nbl = 0;
@@ -382,10 +382,10 @@ PMRRR_Int init_workQ(proc_t *procinfo, in_t *Dstruct, val_t *Wstruct,
 
     /* Compute DL and DLL for later computation of singletons
      * (freed when all singletons of root are computed) */
-    DL  = (double *) malloc(isize * sizeof(double));
+    DL  = (double *) malloc((size_t)isize * sizeof(double));
     assert(DL != NULL);
     
-    DLL = (double *) malloc(isize * sizeof(double));
+    DLL = (double *) malloc((size_t)isize * sizeof(double));
     assert(DLL != NULL);
 
     for (i=0; i<isize-1; i++) {
@@ -610,11 +610,11 @@ void *empty_workQ(void *argin)
   n        = Wstruct->n;
 
   /* max. needed double precision work space: odr1v */
-  work      = (double *) malloc(4*n * sizeof(double));
+  work      = (double *) malloc(4*(size_t)n * sizeof(double));
   assert(work != NULL);
 
   /* max. needed double precision work space: odrrb */
-  iwork     = (PMRRR_Int *)    malloc(2*n * sizeof(PMRRR_Int)   );
+  iwork     = (PMRRR_Int *)    malloc(2*(size_t)n * sizeof(PMRRR_Int)   );
   assert(iwork != NULL);
 
 

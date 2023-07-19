@@ -125,8 +125,8 @@ PMRRR_Int odrrk_(PMRRR_Int *n, PMRRR_Int *iw, double *gl,
     atoli = *pivmin * 4.;
     itmax = (PMRRR_Int) ((log(tnorm + *pivmin) - log(*pivmin)) / log(2.)) + 2;
     *info = -1;
-    left = *gl - tnorm * 2. * eps * *n - *pivmin * 4.;
-    right = *gu + tnorm * 2. * eps * *n + *pivmin * 4.;
+    left = *gl - tnorm * 2. * eps * (double)(*n) - *pivmin * 4.;
+    right = *gu + tnorm * 2. * eps * (double)(*n) + *pivmin * 4.;
     it = 0;
 L10:
 

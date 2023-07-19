@@ -201,21 +201,21 @@ PMRRR_Int pmrrr(char *jobz, char *range, PMRRR_Int *np, double  *D,
   }
 
   /* Allocate memory */
-  Werr    = (double *)   malloc( n * sizeof(double) );
+  Werr    = (double *)   malloc( (size_t)n * sizeof(double) );
   assert(Werr != NULL);
-  Wgap      = (double *) malloc( n * sizeof(double) );
+  Wgap      = (double *) malloc( (size_t)n * sizeof(double) );
   assert(Wgap != NULL);
-  gersch    = (double *) malloc( 2*n*sizeof(double) );
+  gersch    = (double *) malloc( 2*(size_t)n*sizeof(double) );
   assert(gersch != NULL);
-  iblock    = (PMRRR_Int *)    calloc( n , sizeof(PMRRR_Int) );
+  iblock    = (PMRRR_Int *)    calloc( (size_t)n , sizeof(PMRRR_Int) );
   assert(iblock != NULL);
-  iproc     = (PMRRR_Int *)    malloc( n * sizeof(PMRRR_Int) );
+  iproc     = (PMRRR_Int *)    malloc( (size_t)n * sizeof(PMRRR_Int) );
   assert(iproc != NULL);
-  Windex    = (PMRRR_Int *)    malloc( n * sizeof(PMRRR_Int) );
+  Windex    = (PMRRR_Int *)    malloc( (size_t)n * sizeof(PMRRR_Int) );
   assert(Windex != NULL);
-  isplit    = (PMRRR_Int *)    malloc( n * sizeof(PMRRR_Int) );
+  isplit    = (PMRRR_Int *)    malloc( (size_t)n * sizeof(PMRRR_Int) );
   assert(isplit != NULL);
-  Zindex    = (PMRRR_Int *)    malloc( n * sizeof(PMRRR_Int) );
+  Zindex    = (PMRRR_Int *)    malloc( (size_t)n * sizeof(PMRRR_Int) );
   assert(Zindex != NULL);
   procinfo  = (proc_t *) malloc( sizeof(proc_t) );
   assert(procinfo != NULL);
@@ -273,10 +273,10 @@ PMRRR_Int pmrrr(char *jobz, char *range, PMRRR_Int *np, double  *D,
     /* This case is extremely rare in practice */ 
     tolstruct->split = DBL_EPSILON;
     /* Copy original data needed for refinement later */
-    Dcopy  = (double *) malloc( n * sizeof(double) );
+    Dcopy  = (double *) malloc( (size_t)n * sizeof(double) );
     assert(Dcopy != NULL);
-    memcpy(Dcopy, D, n*sizeof(double));  
-    E2copy = (double *) malloc( n * sizeof(double) );
+    memcpy(Dcopy, D, (size_t)n*sizeof(double));  
+    E2copy = (double *) malloc( (size_t)n * sizeof(double) );
     assert(E2copy != NULL);
     for (i=0; i<n-1; i++) E2copy[i] = E[i]*E[i];
   } else {
@@ -321,7 +321,7 @@ PMRRR_Int pmrrr(char *jobz, char *range, PMRRR_Int *np, double  *D,
     }
 
     /* Sort eigenvalues */
-    qsort(W, n, sizeof(double), cmp);
+    qsort(W, (size_t)n, sizeof(double), cmp);
 
     /* Only keep subset ifirst:ilast */
     iil = *il;
@@ -346,7 +346,7 @@ PMRRR_Int pmrrr(char *jobz, char *range, PMRRR_Int *np, double  *D,
       ifirst_tmp = imin(ifirst_tmp, iiu + 1);
     }
     if (isize > 0) {
-      memmove(W, &W[ifirst-1], *nzp * sizeof(double));
+      memmove(W, &W[ifirst-1], (size_t)(*nzp) * sizeof(double));
     }
 
     /* If matrix was scaled, rescale eigenvalues */
@@ -459,15 +459,15 @@ PMRRR_Int handle_small_cases(char *jobz, char *range, PMRRR_Int *np, double  *D,
     liwork = 10*n;
     if (indeig) itmp = *iup-*ilp+1;
     else        itmp = n;
-    Z_tmp = (double *) malloc(n*itmp * sizeof(double));
+    Z_tmp = (double *) malloc((size_t)n*(size_t)itmp * sizeof(double));
     assert(Z_tmp != NULL);
   } else {
     return(1);
   }
 
-  work = (double *) malloc( lwork  * sizeof(double));
+  work = (double *) malloc( (size_t)lwork  * sizeof(double));
   assert(work != NULL);
-  iwork = (PMRRR_Int *)   malloc( liwork * sizeof(PMRRR_Int));
+  iwork = (PMRRR_Int *)   malloc( (size_t)liwork * sizeof(PMRRR_Int));
   assert(iwork != NULL);
 
   if (cntval) {
@@ -494,16 +494,16 @@ PMRRR_Int handle_small_cases(char *jobz, char *range, PMRRR_Int *np, double  *D,
   mysize  = mylast - myfirst + 1;
 
   if (mysize > 0) {
-    memmove(W, &W[myfirst], mysize*sizeof(double));
+    memmove(W, &W[myfirst], (size_t)mysize*sizeof(double));
     if (wantZ) {
       if (ldz == ldz_tmp) {
 	/* copy everything in one chunk */
-	memcpy(Z, &Z_tmp[myfirst*ldz_tmp], n*mysize*sizeof(double));
+	memcpy(Z, &Z_tmp[myfirst*ldz_tmp], (size_t)n*(size_t)mysize*sizeof(double));
       } else {
 	/* copy each vector seperately */
 	for (i=0; i<mysize; i++)
 	  memcpy(&Z[i*ldz], &Z_tmp[(myfirst+i)*ldz_tmp], 
-		 n*sizeof(double));
+		 (size_t)n*sizeof(double));
       } 
     } /* if (wantZ) */
   } 
@@ -629,9 +629,9 @@ PMRRR_Int sort_eigenpairs_local(proc_t *procinfo, PMRRR_Int m, val_t *Wstruct, v
 	Zsupp[2*j + 1] = Zsupp[2*(j+1) + 1];
 	Zsupp[2*(j+1) +1 ] = itmp2;
 	/* swap eigenvector */
-	memcpy(work, &Z[j*ldz], n*sizeof(double));
-	memcpy(&Z[j*ldz], &Z[(j+1)*ldz], n*sizeof(double));
-	memcpy(&Z[(j+1)*ldz], work, n*sizeof(double));
+	memcpy(work, &Z[j*ldz], (size_t)n*sizeof(double));
+	memcpy(&Z[j*ldz], &Z[(j+1)*ldz], (size_t)n*sizeof(double));
+	memcpy(&Z[(j+1)*ldz], work, (size_t)n*sizeof(double));
       }
     }
   } /* end while */
@@ -661,11 +661,11 @@ PMRRR_Int sort_eigenpairs_global(proc_t *procinfo, PMRRR_Int m, val_t *Wstruct,
   MPI_Status       status;
   double              nan_value = 0.0/0.0;
   
-  minW   = (double *) malloc(  nproc*sizeof(double));
+  minW   = (double *) malloc(  (size_t)nproc*sizeof(double));
   assert(minW != NULL);
-  maxW   = (double *) malloc(  nproc*sizeof(double));
+  maxW   = (double *) malloc(  (size_t)nproc*sizeof(double));
   assert(maxW != NULL);
-  minmax = (double *) malloc(2*nproc*sizeof(double));
+  minmax = (double *) malloc(2*(size_t)nproc*sizeof(double));
   assert(minmax != NULL);
 
   if (m == 0) {
@@ -704,17 +704,17 @@ PMRRR_Int sort_eigenpairs_global(proc_t *procinfo, PMRRR_Int m, val_t *Wstruct,
       if ((pid == lp || pid == p) && minW[p] < maxW[lp]) {
 	if (pid == lp) {
 	  W[m-1] = minW[p];
-          MPI_Sendrecv(&Z[(m-1)*ldz], n, MPI_DOUBLE, p, lp, 
-		       work, n, MPI_DOUBLE, p, p, 
+          MPI_Sendrecv(&Z[(m-1)*ldz], (int)n, MPI_DOUBLE, (int)p, (int)lp, 
+		       work, (int)n, MPI_DOUBLE, (int)p, (int)p, 
 		       procinfo->comm, &status);
-	  memcpy(&Z[(m-1)*ldz], work, n*sizeof(double));
+	  memcpy(&Z[(m-1)*ldz], work, (size_t)n*sizeof(double));
 	}
 	if (pid == p) {
 	  W[0]   = maxW[p-1];
-          MPI_Sendrecv(&Z[0], n, MPI_DOUBLE, lp, p, 
-		       work,  n, MPI_DOUBLE, lp, lp, 
+          MPI_Sendrecv(&Z[0], (int)n, MPI_DOUBLE, (int)lp, (int)p, 
+		       work,  (int)n, MPI_DOUBLE, (int)lp, (int)lp, 
 		       procinfo->comm, &status);
-	  memcpy(&Z[0], work, n*sizeof(double));
+	  memcpy(&Z[0], work, (size_t)n*sizeof(double));
 	}
       }
 
@@ -722,15 +722,15 @@ PMRRR_Int sort_eigenpairs_global(proc_t *procinfo, PMRRR_Int m, val_t *Wstruct,
        * (would better be recomputed here though) */
       if ((pid == lp || pid == p) && minW[p] < maxW[lp]) {
 	if (pid == lp) {
-          MPI_Sendrecv(&Zsupp[2*(m-1)], 2, PMRRR_MPI_INT_TYPE, p, lp, 
-		       itmp, 2, PMRRR_MPI_INT_TYPE, p, p, 
+          MPI_Sendrecv(&Zsupp[2*(m-1)], 2, PMRRR_MPI_INT_TYPE, (int)p, (int)lp, 
+		       itmp, 2, PMRRR_MPI_INT_TYPE, (int)p, (int)p, 
 		       procinfo->comm, &status);
 	  Zsupp[2*(m-1)]     = itmp[0];
 	  Zsupp[2*(m-1) + 1] = itmp[1];
 	}
 	if (pid == p) {
-          MPI_Sendrecv(&Zsupp[0], 2, PMRRR_MPI_INT_TYPE, lp, p, 
-		       itmp,  2, PMRRR_MPI_INT_TYPE, lp, lp, 
+          MPI_Sendrecv(&Zsupp[0], 2, PMRRR_MPI_INT_TYPE, (int)lp, (int)p, 
+		       itmp,  2, PMRRR_MPI_INT_TYPE, (int)lp, (int)lp, 
 		       procinfo->comm, &status);
 	  Zsupp[0] = itmp[0];
 	  Zsupp[1] = itmp[1];
@@ -803,7 +803,7 @@ PMRRR_Int sort_eigenpairs(proc_t *procinfo, val_t *Wstruct, vec_t *Zstruct)
     }
   }
 
-  sort_array = (sort_struct_t *) malloc(im*sizeof(sort_struct_t));
+  sort_array = (sort_struct_t *) malloc((size_t)im*sizeof(sort_struct_t));
 
   for (j=0; j<im; j++) {
     sort_array[j].lambda    = W[j]; 
@@ -813,7 +813,7 @@ PMRRR_Int sort_eigenpairs(proc_t *procinfo, val_t *Wstruct, vec_t *Zstruct)
   }
 
   /* Sort according to Zindex */
-  qsort(sort_array, im, sizeof(sort_struct_t), cmpb);
+  qsort(sort_array, (size_t)im, sizeof(sort_struct_t), cmpb);
 
   for (j=0; j<im; j++) {
     W[j]      = sort_array[j].lambda; 
@@ -874,9 +874,9 @@ PMRRR_Int refine_to_highrac(proc_t *procinfo, char *jobz, double *D,
   PMRRR_Int    i, j, k;
   PMRRR_Int    ibegin, iend, isize, nbl;
 
-  work  = (double *) malloc( 2*n * sizeof(double) );
+  work  = (double *) malloc( 2*(size_t)n * sizeof(double) );
   assert (work != NULL);
-  iwork = (PMRRR_Int *)    malloc( 2*n * sizeof(PMRRR_Int)    );
+  iwork = (PMRRR_Int *)    malloc( 2*(size_t)n * sizeof(PMRRR_Int)    );
   assert (iwork != NULL);
 
   ibegin  = 0;
@@ -967,15 +967,15 @@ PMRRR_Int PMR_comm_eigvals(MPI_Comm comm, PMRRR_Int *nz, PMRRR_Int *myfirstp, do
   MPI_Comm_dup(comm, &comm_dup);
   MPI_Comm_size(comm_dup, &nproc);
 
-  rcount = (int *) malloc( nproc * sizeof(int) );
+  rcount = (int *) malloc( (size_t)nproc * sizeof(int) );
   assert(rcount != NULL);
-  rdispl = (int *) malloc( nproc * sizeof(int) );
+  rdispl = (int *) malloc( (size_t)nproc * sizeof(int) );
   assert(rdispl != NULL);
-  work = (double *) malloc((*nz+1) * sizeof(double));
+  work = (double *) malloc((size_t)(*nz+1) * sizeof(double));
   assert(work != NULL);
 
   if (*nz > 0) {
-    memcpy(work, W, (*nz) * sizeof(double) );
+    memcpy(work, W, (size_t)(*nz) * sizeof(double) );
   }
 
   int nz32 = (int)(*nz);
@@ -985,7 +985,7 @@ PMRRR_Int PMR_comm_eigvals(MPI_Comm comm, PMRRR_Int *nz, PMRRR_Int *myfirstp, do
 
   MPI_Allgather(&myfirstp32, 1, MPI_INT, rdispl, 1, MPI_INT, comm_dup);
   
-  MPI_Allgatherv(work, *nz, MPI_DOUBLE, W, rcount, rdispl,
+  MPI_Allgatherv(work, (int)(*nz), MPI_DOUBLE, W, rcount, rdispl,
  		 MPI_DOUBLE, comm_dup);
 
   MPI_Comm_free(&comm_dup);

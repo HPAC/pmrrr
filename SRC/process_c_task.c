@@ -204,16 +204,16 @@ rrr_t* compute_new_rrr(cluster_t *cl, PMRRR_Int tid, proc_t *procinfo,
   PMRRR_Int              offset, IONE=1;
 
   /* Allocate memory for new representation for cluster */
-  D   = (double *) malloc(bl_size * sizeof(double));
+  D   = (double *) malloc((size_t)bl_size * sizeof(double));
   assert(D != NULL);
   
-  L   = (double *) malloc(bl_size * sizeof(double));
+  L   = (double *) malloc((size_t)bl_size * sizeof(double));
   assert(L != NULL);
   
-  DL  = (double *) malloc(bl_size * sizeof(double));
+  DL  = (double *) malloc((size_t)bl_size * sizeof(double));
   assert(DL != NULL);
   
-  DLL = (double *) malloc(bl_size * sizeof(double));
+  DLL = (double *) malloc((size_t)bl_size * sizeof(double));
   assert(DLL != NULL);
 
   /* Recompute DL and DLL */
@@ -350,8 +350,8 @@ PMRRR_Int refine_eigvals(cluster_t *cl, PMRRR_Int rf_begin, PMRRR_Int rf_end,
 
   /* Determine if refinement should be split into tasks */
   left = PMR_get_counter_value(num_left);
-  own_part = (PMRRR_Int) fmax( ceil( (double) left / nthreads ),
-			 MIN_REFINE_CHUNK);
+  own_part = (PMRRR_Int) fmax( ceil( (double) left / (double) nthreads ),
+			 (double)MIN_REFINE_CHUNK);
 
   if (own_part < rf_size) {
 
@@ -518,9 +518,9 @@ PMRRR_Int communicate_refined_eigvals(cluster_t *cl, proc_t *procinfo,
     }    
   }
 
-  requests = (MPI_Request *) malloc( num_messages *
+  requests = (MPI_Request *) malloc( (size_t)num_messages *
 					  sizeof(MPI_Request) );
-  stats    = (MPI_Status  *) malloc( num_messages * 
+  stats    = (MPI_Status  *) malloc( (size_t)num_messages * 
 					  sizeof(MPI_Status) );
 
   i_msg = 0;
@@ -537,11 +537,11 @@ PMRRR_Int communicate_refined_eigvals(cluster_t *cl, proc_t *procinfo,
     if (p != pid && proc_involved == true) {
 
       /* send message to process p (non-blocking) */
-      MPI_Isend(&Wshifted[my_begin], my_size, MPI_DOUBLE, p,
-		my_begin, procinfo->comm, &requests[4*i_msg]);
+      MPI_Isend(&Wshifted[my_begin], (int)my_size, MPI_DOUBLE, (int)p,
+		(int)my_begin, procinfo->comm, &requests[4*i_msg]);
 
-      MPI_Isend(&Werr[my_begin], my_size, MPI_DOUBLE, p,
-		my_begin, procinfo->comm, &requests[4*i_msg+1]);
+      MPI_Isend(&Werr[my_begin], (int)my_size, MPI_DOUBLE, (int)p,
+		(int)my_begin, procinfo->comm, &requests[4*i_msg+1]);
 
       /* Find eigenvalues in of process p */
       other_size = 0;
@@ -576,11 +576,11 @@ PMRRR_Int communicate_refined_eigvals(cluster_t *cl, proc_t *procinfo,
       }
 
       /* receive message from process p (non-blocking) */
-      MPI_Irecv(&Wshifted[other_begin], other_size, MPI_DOUBLE,	p,
-		other_begin, procinfo->comm, &requests[4*i_msg+2]);
+      MPI_Irecv(&Wshifted[other_begin], (int)other_size, MPI_DOUBLE,	(int)p,
+		(int)other_begin, procinfo->comm, &requests[4*i_msg+2]);
 
-      MPI_Irecv(&Werr[other_begin], other_size, MPI_DOUBLE, p,
-		other_begin, procinfo->comm, &requests[4*i_msg+3]);
+      MPI_Irecv(&Werr[other_begin], (int)other_size, MPI_DOUBLE, (int)p,
+		(int)other_begin, procinfo->comm, &requests[4*i_msg+3]);
      
       i_msg++;
     }
@@ -588,7 +588,7 @@ PMRRR_Int communicate_refined_eigvals(cluster_t *cl, proc_t *procinfo,
   } /* end for p */
   num_messages = 4*i_msg; /* messages actually send */
 
-  status = MPI_Testall(num_messages, requests, 
+  status = MPI_Testall((int)num_messages, requests, 
 		       &communication_done, stats);
   assert(status == MPI_SUCCESS);
 
@@ -649,7 +649,7 @@ PMRRR_Int test_comm_status(cluster_t *cl, val_t *Wstruct)
   double      sigma;
 
   /* Test if communication complete */
-  status = MPI_Testall(num_messages, requests, 
+  status = MPI_Testall((int)num_messages, requests, 
 		       &communication_done, stats);
   assert(status == MPI_SUCCESS);
 
@@ -831,14 +831,14 @@ PMRRR_Int create_subtasks(cluster_t *cl, PMRRR_Int tid, proc_t *procinfo,
       if (copy_parent_rrr == true) {
 	/* Copy parent RRR into alloceted arrays and mark them
 	 * for freeing later */
-	D_parent = (double *) malloc(bl_size * sizeof(double));
+	D_parent = (double *) malloc((size_t)bl_size * sizeof(double));
 	assert(D_parent != NULL);
 	
-	L_parent = (double *) malloc(bl_size * sizeof(double));
+	L_parent = (double *) malloc((size_t)bl_size * sizeof(double));
 	assert(L_parent != NULL);
 
-	memcpy(D_parent, RRR->D, bl_size*sizeof(double));
-	memcpy(L_parent, RRR->L, bl_size*sizeof(double));
+	memcpy(D_parent, RRR->D, (size_t)bl_size*sizeof(double));
+	memcpy(L_parent, RRR->L, (size_t)bl_size*sizeof(double));
 
 	RRR_parent = PMR_create_rrr(D_parent, L_parent, NULL, 
 				    NULL, bl_size, depth);
@@ -847,9 +847,9 @@ PMRRR_Int create_subtasks(cluster_t *cl, PMRRR_Int tid, proc_t *procinfo,
       } else {
 	/* copy parent RRR into Z to make cluster task independent */
 	memcpy(&Z[new_ftt1*ldz+bl_begin], RRR->D, 
-	       bl_size*sizeof(double));
+	       (size_t)bl_size*sizeof(double));
 	memcpy(&Z[new_ftt2*ldz+bl_begin], RRR->L, 
-	       bl_size*sizeof(double));
+	       (size_t)bl_size*sizeof(double));
 
 	RRR_parent = PMR_create_rrr(&Z[new_ftt1*ldz + bl_begin],
 				    &Z[new_ftt2*ldz + bl_begin],

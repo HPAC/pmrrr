@@ -176,15 +176,15 @@ PMRRR_Int plarre(proc_t *procinfo, char *jobz, char *range, in_t *Dstruct,
   }
 
   /* allocate work space */
-  E2     = (double *) malloc(     n * sizeof(double) );
+  E2     = (double *) malloc(     (size_t)n * sizeof(double) );
   assert(E2 != NULL);
-  work   = (double *) malloc(   4*n * sizeof(double) );
+  work   = (double *) malloc(   4*(size_t)n * sizeof(double) );
   assert(work != NULL);
-  iwork  = (PMRRR_Int *)    malloc(   3*n * sizeof(PMRRR_Int) );
+  iwork  = (PMRRR_Int *)    malloc(   3*(size_t)n * sizeof(PMRRR_Int) );
   assert(iwork != NULL);
-  rcount = (int *)    malloc( nproc * sizeof(int) );
+  rcount = (int *)    malloc( (size_t)nproc * sizeof(int) );
   assert(rcount != NULL);
-  rdispl = (int *)    malloc( nproc * sizeof(int) );
+  rdispl = (int *)    malloc( (size_t)nproc * sizeof(int) );
   assert(rdispl != NULL);
 
   /* Compute square of off-diagonal elements */
@@ -295,8 +295,8 @@ PMRRR_Int plarre(proc_t *procinfo, char *jobz, char *range, in_t *Dstruct,
 	*offsetp = ifirst - iil;
 	*nzp      = isize;
       }
-      rcount[i]  = ilast_tmp - ifirst_tmp + 1;
-      rdispl[i]  = ifirst_tmp - iil;
+      rcount[i]  = (int)(ilast_tmp - ifirst_tmp + 1);
+      rdispl[i]  = (int)(ifirst_tmp - iil);
       ifirst_tmp = ilast_tmp + 1;
       ifirst_tmp = imin(ifirst_tmp, iiu + 1);
     }
@@ -329,16 +329,16 @@ PMRRR_Int plarre(proc_t *procinfo, char *jobz, char *range, in_t *Dstruct,
       assert(info == 0);    
     }
     
-    memcpy(work, &W[bl_begin], isize * sizeof(double) );
-    MPI_Allgatherv(work, isize, MPI_DOUBLE, &W[bl_begin], rcount, rdispl,
+    memcpy(work, &W[bl_begin], (size_t)isize * sizeof(double) );
+    MPI_Allgatherv(work, (int)isize, MPI_DOUBLE, &W[bl_begin], rcount, rdispl,
 		   MPI_DOUBLE, procinfo->comm);
     
-    memcpy(work, &Werr[bl_begin], isize * sizeof(double) );
-    MPI_Allgatherv(work, isize, MPI_DOUBLE, &Werr[bl_begin], rcount, rdispl,
+    memcpy(work, &Werr[bl_begin], (size_t)isize * sizeof(double) );
+    MPI_Allgatherv(work, (int)isize, MPI_DOUBLE, &Werr[bl_begin], rcount, rdispl,
 		   MPI_DOUBLE, procinfo->comm);
     
-    memcpy(iwork, &Windex[bl_begin], isize * sizeof(PMRRR_Int) );
-    MPI_Allgatherv(iwork, isize, PMRRR_MPI_INT_TYPE, &Windex[bl_begin], rcount, rdispl,
+    memcpy(iwork, &Windex[bl_begin], (size_t)isize * sizeof(PMRRR_Int) );
+    MPI_Allgatherv(iwork, (int)isize, PMRRR_MPI_INT_TYPE, &Windex[bl_begin], rcount, rdispl,
 		   PMRRR_MPI_INT_TYPE, procinfo->comm);
     
     /* Ensure that within block eigenvalues sorted */
@@ -441,9 +441,9 @@ PMRRR_Int eigval_approx_proc(proc_t *procinfo, PMRRR_Int ifirst, PMRRR_Int ilast
   double dummy;
   
   /* Allocate workspace */
-  isplit = (PMRRR_Int *) malloc( n * sizeof(PMRRR_Int) );
+  isplit = (PMRRR_Int *) malloc( (size_t)n * sizeof(PMRRR_Int) );
   assert(isplit != NULL);
-  threads = (pthread_t *) malloc( max_nthreads * sizeof(pthread_t) );
+  threads = (pthread_t *) malloc( (size_t)max_nthreads * sizeof(pthread_t) );
   assert(threads != NULL);
 
   /* This is an unreduced block */
@@ -583,7 +583,7 @@ PMRRR_Int eigval_root_proc(proc_t *procinfo, PMRRR_Int ifirst, PMRRR_Int ilast,
   rtl    = sqrt(DBL_EPSILON);
   
   /* Allocate workspace */
-  randvec = (double *) malloc( 2*n * sizeof(double) );
+  randvec = (double *) malloc( 2*(size_t)n * sizeof(double) );
   assert(randvec != NULL);
 
   /* create random vector to perturb rrr and broadcast it */
@@ -644,7 +644,7 @@ PMRRR_Int eigval_root_proc(proc_t *procinfo, PMRRR_Int ifirst, PMRRR_Int ilast,
 
   /* define increment to perturb initial shift to find RRR
    * with not too much element growth */
-  tau = spdiam*DBL_EPSILON*n + 2.0*pivmin;
+  tau = spdiam*DBL_EPSILON*(double)n + 2.0*pivmin;
 
 
   /* try to find initial RRR of block:
@@ -686,17 +686,17 @@ PMRRR_Int eigval_root_proc(proc_t *procinfo, PMRRR_Int ifirst, PMRRR_Int ilast,
        * so we should not end here */
       if (jtry == MAX_TRY_RRR-2) {
 	if (sgndef == ONE) { /* floating point comparison okay here */
-	  sigma = gl - FUDGE_FACTOR*spdiam*DBL_EPSILON*n
+	  sigma = gl - FUDGE_FACTOR*spdiam*DBL_EPSILON*(double)n
 	    - FUDGE_FACTOR*2.0*pivmin;
 	} else {
-	  sigma = gu + FUDGE_FACTOR*spdiam*DBL_EPSILON*n
+	  sigma = gu + FUDGE_FACTOR*spdiam*DBL_EPSILON*(double)n
 	    + FUDGE_FACTOR*2.0*pivmin;
 	}
       } else if (jtry == MAX_TRY_RRR-1) {
 	fprintf(stderr,"No initial representation could be found.\n");
 	exit(3);
       } else {
-	sigma -= sgndef*tau;
+	sigma -= (double)sgndef*tau;
 	tau   *= 2.0;
 	continue;
       }
@@ -707,8 +707,8 @@ PMRRR_Int eigval_root_proc(proc_t *procinfo, PMRRR_Int ifirst, PMRRR_Int ilast,
   /* end trying to find initial RRR of block */
 
   /* save initial RRR and corresponding shift */
-  memcpy(D, &work[0],  n    * sizeof(double) );
-  memcpy(E, &work[n], (n-1) * sizeof(double) );
+  memcpy(D, &work[0], (size_t)n     * sizeof(double) );
+  memcpy(E, &work[n], (size_t)(n-1) * sizeof(double) );
   E[n-1] = sigma;
   /* work[0:4*n-1] can now be used again for anything */
 
@@ -771,9 +771,9 @@ PMRRR_Int eigval_refine_proc(proc_t *procinfo, PMRRR_Int ifirst, PMRRR_Int ilast
   PMRRR_Int    info, i;
 
   /* Allocate space */
-  threads = (pthread_t *) malloc( max_nthreads * sizeof(pthread_t) );
+  threads = (pthread_t *) malloc( (size_t)max_nthreads * sizeof(pthread_t) );
   assert(threads != NULL);
-  isplit = (PMRRR_Int *) malloc( n * sizeof(PMRRR_Int) );
+  isplit = (PMRRR_Int *) malloc( (size_t)n * sizeof(PMRRR_Int) );
   assert(isplit != NULL);
 
   /* This is an unreduced block */
@@ -922,22 +922,22 @@ void *eigval_subset_thread_a(void *argin)
 		   &W, &Werr, &Windex, &iblock);
 
   /* allocate memory */
-  W_tmp = (double *) malloc( n * sizeof(double) );
+  W_tmp = (double *) malloc( (size_t)n * sizeof(double) );
   assert(W_tmp != NULL);
   
-  Werr_tmp = (double *) malloc( n * sizeof(double) );
+  Werr_tmp = (double *) malloc( (size_t)n * sizeof(double) );
   assert(Werr_tmp != NULL);
   
-  Windex_tmp = (PMRRR_Int *) malloc( n * sizeof(PMRRR_Int) );
+  Windex_tmp = (PMRRR_Int *) malloc( (size_t)n * sizeof(PMRRR_Int) );
   assert(Windex_tmp != NULL);
 
-  iblock_tmp = (PMRRR_Int *) malloc( n * sizeof(PMRRR_Int) );
+  iblock_tmp = (PMRRR_Int *) malloc( (size_t)n * sizeof(PMRRR_Int) );
   assert(iblock_tmp != NULL);
 
-  work  = (double *) malloc( 4*n * sizeof(double) );
+  work  = (double *) malloc( 4*(size_t)n * sizeof(double) );
   assert (work != NULL);
 
-  iwork = (PMRRR_Int *) malloc( 3*n * sizeof(PMRRR_Int) );
+  iwork = (PMRRR_Int *) malloc( 3*(size_t)n * sizeof(PMRRR_Int) );
   assert (iwork != NULL);
 
   /* compute eigenvalues 'my_il' to 'my_iu', put into temporary arrays */
@@ -949,10 +949,10 @@ void *eigval_subset_thread_a(void *argin)
   assert(info == 0);
 
   /* copy computed values in W, Werr, Windex, iblock (which are work space) */
-  memcpy(&W[my_il-il],      W_tmp,      num_vals * sizeof(double) );
-  memcpy(&Werr[my_il-il],   Werr_tmp,   num_vals * sizeof(double) );
-  memcpy(&Windex[my_il-il], Windex_tmp, num_vals * sizeof(PMRRR_Int)    );
-  memcpy(&iblock[my_il-il], iblock_tmp, num_vals * sizeof(PMRRR_Int)    );
+  memcpy(&W[my_il-il],      W_tmp,      (size_t)num_vals * sizeof(double) );
+  memcpy(&Werr[my_il-il],   Werr_tmp,   (size_t)num_vals * sizeof(double) );
+  memcpy(&Windex[my_il-il], Windex_tmp, (size_t)num_vals * sizeof(PMRRR_Int)    );
+  memcpy(&iblock[my_il-il], iblock_tmp, (size_t)num_vals * sizeof(PMRRR_Int)    );
   
   free(W_tmp);
   free(Werr_tmp);
@@ -1057,10 +1057,10 @@ void *eigval_subset_thread_r(void *argin)
 		   &pivmin, &bl_spdiam);
 
   /* malloc work space */
-  work = (double *) malloc( 2*bl_size * sizeof(double) );
+  work = (double *) malloc( 2*(size_t)bl_size * sizeof(double) );
   assert(work != NULL);
   
-  iwork = (PMRRR_Int *)   malloc( 2*bl_size * sizeof(PMRRR_Int) );
+  iwork = (PMRRR_Int *)   malloc( 2*(size_t)bl_size * sizeof(PMRRR_Int) );
   assert(iwork != NULL);
 
   /* special case of only one eigenvalue */

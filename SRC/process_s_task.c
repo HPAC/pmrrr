@@ -120,7 +120,7 @@ PMRRR_Int PMR_process_s_task(singleton_t *sng, PMRRR_Int tid, proc_t *procinfo,
     if (bl_size == 1) {
       /* set eigenvector to column of identity matrix */
       zind = Zindex[i];
-      memset(&Z[zind*ldz], 0.0, n*sizeof(double) );
+      memset(&Z[zind*ldz], 0.0, (size_t)n*sizeof(double) );
       Z[zind*ldz + bl_begin] = 1.0;
       isuppZ[2*zind    ]     = bl_begin + 1;
       isuppZ[2*zind + 1]     = bl_begin + 1;
@@ -174,7 +174,7 @@ PMRRR_Int PMR_process_s_task(singleton_t *sng, PMRRR_Int tid, proc_t *procinfo,
 
     /* IEEE floating point is assumed, so that all 0 bits are 0.0 */
     zind = Zindex[i];
-    memset(&Z[zind*ldz], 0.0, n*sizeof(double));
+    memset(&Z[zind*ldz], 0.0, (size_t)n*sizeof(double));
 
     /* inverse iteration with twisted factorization */
     for (k=1; k<=MAXITER; k++) {
@@ -228,7 +228,7 @@ PMRRR_Int PMR_process_s_task(singleton_t *sng, PMRRR_Int tid, proc_t *procinfo,
 	  sgndef =  1;    /* wanted eigenvalue lies to the right */
 	}
 	
-	if ( RQcorr*sgndef >= 0.0
+	if ( RQcorr*(double)sgndef >= 0.0
 	     && lambda+RQcorr <= right 
 	     && lambda+RQcorr >= left ) {
 	  usedRQ = true;

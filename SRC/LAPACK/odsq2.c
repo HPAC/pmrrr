@@ -586,7 +586,7 @@ L170:
 /* Computing 2nd power */
     i__1 = *n;
     z__[(*n << 1) + 4] = (double) ndiv / (double) (i__1 * i__1);
-    z__[(*n << 1) + 5] = nfail * 100. / (double) iter;
+    z__[(*n << 1) + 5] = (double) nfail * 100. / (double) iter;
     return 0;
 
 /*     End of ODSQ2 */
