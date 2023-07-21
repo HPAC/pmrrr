@@ -174,15 +174,15 @@ Note: Do not forget to tell mpiexec/mpirun about the environment
 variable PMR_NUM_THREADS if you use it. This is typically done via the 
 option '-env' or '-x'.
 
-The PMRRR_Int type is either 32-bit or 64-bit signed integer.
-64-bit is used, if -DPMRRR_INT64 compilation flag is set.
+The 'PMRRR_Int' type is either 32-bit or 64-bit signed integer.
+64-bit is used, if '-DPMRRR_INT64' compilation flag is set.
 64-bit integers allow you to solve problems with more than 4 Gb
 blocks per node.
 
-Please note that in Fortran, you must use INTEGER*8 for all the
-pmrrr-related integers when the library is compiled with -DPMRRR_INT64.
-In C/C++, you can use the PMRRR_Int alias defined via 'pmrrr.h', but
-you must also compile your program with or without -DPMRRR_INT64,
+Please note that in Fortran, you must use 'INTEGER*8' for all the
+pmrrr-related integers when the library is compiled with '-DPMRRR_INT64'.
+In C/C++, you can use the 'PMRRR_Int' alias defined via 'pmrrr.h', but
+you must also compile your program with or without '-DPMRRR_INT64',
 depending on how the library was compiled. Maybe in the future, auto-generated
 headers will be introduced to make this easier.
 

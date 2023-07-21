@@ -16,7 +16,7 @@ static void print_vector(char*, double*, char*, PMRRR_Int);
 static void print_matrix(char*, double*, PMRRR_Int, PMRRR_Int, PMRRR_Int);
 
 
-PMRRR_Int main(PMRRR_Int argc, char **argv)
+int main(int argc, char **argv)
 {
   /* Input parameter to 'pmrrr' */
   PMRRR_Int n;              /* Matrix size */
