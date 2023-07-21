@@ -54,8 +54,8 @@
 #include "process_task.h"
 
 
-int PMR_process_r_task(refine_t *rf, proc_t *procinfo, val_t *Wstruct,
-		       tol_t *tolstruct, double *work, int *iwork);
+PMRRR_Int PMR_process_r_task(refine_t *rf, proc_t *procinfo, val_t *Wstruct,
+		       tol_t *tolstruct, double *work, PMRRR_Int *iwork);
 
 
 /*
@@ -63,14 +63,14 @@ int PMR_process_r_task(refine_t *rf, proc_t *procinfo, val_t *Wstruct,
  * call. This routine is called to make sure that all tasks in the 
  * queue are dequeued before continueing with other tasks.
  */
-void PMR_process_r_queue(int tid, proc_t *procinfo, val_t *Wstruct, 
+void PMR_process_r_queue(PMRRR_Int tid, proc_t *procinfo, val_t *Wstruct, 
 			 vec_t *Zstruct, tol_t *tolstruct, 
 			 workQ_t *workQ, counter_t *num_left, 
-			 double *work, int *iwork)
+			 double *work, PMRRR_Int *iwork)
 {
-  int        thread_support = procinfo->thread_support;
-  int        t, num_tasks;
-  int        status;
+  PMRRR_Int        thread_support = procinfo->thread_support;
+  PMRRR_Int        t, num_tasks;
+  PMRRR_Int        status;
   task_t     *task;
 
   num_tasks = PMR_get_num_tasks(workQ->r_queue);
@@ -118,23 +118,23 @@ void PMR_process_r_queue(int tid, proc_t *procinfo, val_t *Wstruct,
 /*
  * Process the task of refining a subset of eigenvalues.
  */
-int PMR_process_r_task(refine_t *rf, proc_t *procinfo, 
+PMRRR_Int PMR_process_r_task(refine_t *rf, proc_t *procinfo, 
 		       val_t *Wstruct, tol_t *tolstruct, 
-		       double *work, int *iwork)
+		       double *work, PMRRR_Int *iwork)
 {
   /* From inputs */
-  int              ts_begin  = rf->begin;
+  PMRRR_Int              ts_begin  = rf->begin;
   double *restrict D         = rf->D;
   double *restrict DLL       = rf->DLL;
-  int              p         = rf->p;
-  int              q         = rf->q;
-  int              bl_size   = rf->bl_size;
+  PMRRR_Int              p         = rf->p;
+  PMRRR_Int              q         = rf->q;
+  PMRRR_Int              bl_size   = rf->bl_size;
   double           bl_spdiam = rf->bl_spdiam;
   sem_t            *sem      = rf->sem;
 
   double *restrict Werr      = Wstruct->Werr;
   double *restrict Wgap      = Wstruct->Wgap;
-  int    *restrict Windex    = Wstruct->Windex;
+  PMRRR_Int    *restrict Windex    = Wstruct->Windex;
   double *restrict Wshifted  = Wstruct->Wshifted;
   
   double           rtol1     = tolstruct->rtol1;
@@ -142,8 +142,8 @@ int PMR_process_r_task(refine_t *rf, proc_t *procinfo,
   double           pivmin    = tolstruct->pivmin;
 
   /* Others */
-  int    info, offset;
-  double savegap;
+  PMRRR_Int    info, offset;
+  double savegap = 0.0;
 
   offset = Windex[ts_begin] - 1;
 

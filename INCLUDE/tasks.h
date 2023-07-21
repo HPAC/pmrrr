@@ -52,28 +52,28 @@
 #define REFINE_TASK_FLAG     2
 
 typedef struct {
-  int        begin;
-  int        end;
-  int        depth;
-  int        bl_begin;
-  int        bl_end;
+  PMRRR_Int        begin;
+  PMRRR_Int        end;
+  PMRRR_Int        depth;
+  PMRRR_Int        bl_begin;
+  PMRRR_Int        bl_end;
   double     bl_spdiam;
   double     lgap;
   rrr_t      *RRR;
 } singleton_t;
 
 typedef struct {
-  int        begin;
-  int        end;
-  int        depth;
-  int        bl_begin;   /* In priciple not needed since info */
-  int        bl_end;     /* also contained in iblock+isplit */
+  PMRRR_Int        begin;
+  PMRRR_Int        end;
+  PMRRR_Int        depth;
+  PMRRR_Int        bl_begin;   /* In priciple not needed since info */
+  PMRRR_Int        bl_end;     /* also contained in iblock+isplit */
   double     bl_spdiam;
   double     lgap;
-  int        proc_W_begin;
-  int        proc_W_end;
-  int        left_pid;
-  int        right_pid;
+  PMRRR_Int        proc_W_begin;
+  PMRRR_Int        proc_W_end;
+  PMRRR_Int        left_pid;
+  PMRRR_Int        right_pid;
   rrr_t      *RRR;
   bool       wait_until_refined;
   comm_t     *messages;
@@ -81,33 +81,33 @@ typedef struct {
 
 
 typedef struct {
-  int        begin;
-  int        end;
+  PMRRR_Int        begin;
+  PMRRR_Int        end;
   double     *D;
   double     *DLL;
-  int        p;
-  int        q;
-  int        bl_size;
+  PMRRR_Int        p;
+  PMRRR_Int        q;
+  PMRRR_Int        bl_size;
   double     bl_spdiam;
-  int        producer_tid; // not longer needed
+  PMRRR_Int        producer_tid; // not longer needed
   sem_t      *sem; /* since semt_t is a handle could also store it
 		      instead of pointer to it, but pointer is all
                       that is needed */
 } refine_t;
 
 
-task_t *PMR_create_s_task(int first, int last, int depth,
-			  int bl_begin, int bl_end, double spdiam,
+task_t *PMR_create_s_task(PMRRR_Int first, PMRRR_Int last, PMRRR_Int depth,
+			  PMRRR_Int bl_begin, PMRRR_Int bl_end, double spdiam,
 			  double lgap, rrr_t *RRR);
 
-task_t *PMR_create_c_task(int first, int last, int depth,
-			  int bl_begin, int bl_end, double spdiam,
-			  double lgap, int proc_W_begin, 
-			  int proc_W_end, int left_pid, int right_pid, 
+task_t *PMR_create_c_task(PMRRR_Int first, PMRRR_Int last, PMRRR_Int depth,
+			  PMRRR_Int bl_begin, PMRRR_Int bl_end, double spdiam,
+			  double lgap, PMRRR_Int proc_W_begin, 
+			  PMRRR_Int proc_W_end, PMRRR_Int left_pid, PMRRR_Int right_pid, 
 			  rrr_t *RRR);
 
-task_t *PMR_create_r_task(int begin, int end, double *D,
-			  double *DLL, int p, int q, int bl_size,
-			  double bl_spdiam, int tid, sem_t *sem);
+task_t *PMR_create_r_task(PMRRR_Int begin, PMRRR_Int end, double *D,
+			  double *DLL, PMRRR_Int p, PMRRR_Int q, PMRRR_Int bl_size,
+			  double bl_spdiam, PMRRR_Int tid, sem_t *sem);
 
 #endif

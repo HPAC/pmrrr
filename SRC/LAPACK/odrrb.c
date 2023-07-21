@@ -6,31 +6,32 @@
 #include <math.h>
 #include <float.h>
 #include <assert.h>
+#include "global.h"
 
 /* Subroutine */ 
-int odrrb_(int *n, double *d__, double *lld, 
-	int *ifirst, int *ilast, double *rtol1, double *rtol2, 
-	 int *offset, double *w, double *wgap, double *werr, 
-	double *work, int *iwork, double *pivmin, double *
-	spdiam, int *twist, int *info)
+PMRRR_Int odrrb_(PMRRR_Int *n, double *d__, double *lld, 
+	PMRRR_Int *ifirst, PMRRR_Int *ilast, double *rtol1, double *rtol2, 
+	 PMRRR_Int *offset, double *w, double *wgap, double *werr, 
+	double *work, PMRRR_Int *iwork, double *pivmin, double *
+	spdiam, PMRRR_Int *twist, PMRRR_Int *info)
 {
     /* System generated locals */
-    int i__1;
+    PMRRR_Int i__1;
     double d__1, d__2;
 
     /* Builtin functions */
     //    double log(double);
 
     /* Local variables */
-    int i__, k, r__, i1, ii, ip;
+    PMRRR_Int i__, k, r__, i1, ii, ip;
     double gap, mid, tmp, back, lgap, rgap, left;
-    int iter, nint, prev, next;
+    PMRRR_Int iter, nint, prev, next;
     double cvrgd, right, width;
-    extern int odneg_(int *, double *, double *, double *
-, double *, int *);
-    int negcnt;
+    extern PMRRR_Int odneg_(PMRRR_Int *, double *, double *, double *
+, double *, PMRRR_Int *);
+    PMRRR_Int negcnt;
     double mnwdth;
-    int olnint, maxitr;
+    PMRRR_Int olnint, maxitr;
 
 /*  -- LAPACK auxiliary routine (version 3.2) -- */
 /*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
@@ -158,7 +159,7 @@ int odrrb_(int *n, double *d__, double *lld,
     /* Function Body */
     *info = 0;
 
-    maxitr = (int) ((log(*spdiam + *pivmin) - log(*pivmin)) / log(2.)) + 
+    maxitr = (PMRRR_Int) ((log(*spdiam + *pivmin) - log(*pivmin)) / log(2.)) + 
 	    2;
     mnwdth = *pivmin * 2.;
 
@@ -169,7 +170,7 @@ int odrrb_(int *n, double *d__, double *lld,
 
 /*     Initialize unconverged intervals in [ WORK(2*I-1), WORK(2*I) ]. */
 /*     The Sturm Count, Count( WORK(2*I-1) ) is arranged to be I-1, while */
-/*     Count( WORK(2*I) ) is stored in IWORK( 2*I ). The int IWORK( 2*I-1 ) */
+/*     Count( WORK(2*I) ) is stored in IWORK( 2*I ). The PMRRR_Int IWORK( 2*I-1 ) */
 /*     for an unconverged interval is set to the index of the next unconverged */
 /*     interval, and is -1 or 0 for a converged interval. Thus a linked */
 /*     list of unconverged intervals is set up. */

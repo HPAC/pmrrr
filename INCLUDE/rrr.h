@@ -49,26 +49,26 @@ typedef struct {
   double          *restrict L;
   double          *restrict DL;
   double          *restrict DLL;
-  int             size;
-  int             depth;
+  PMRRR_Int             size;
+  PMRRR_Int             depth;
   bool            parent_processed;
   bool            copied_parent_rrr;
-  int             ndepend;
+  PMRRR_Int             ndepend;
   pthread_mutex_t mutex;
 } rrr_t;
 
 
 rrr_t *PMR_create_rrr(double *restrict D, double *restrict L,
 		      double *restrict DL, double *restrict DLL,
-		      int size, int depth);
+		      PMRRR_Int size, PMRRR_Int depth);
 
 rrr_t *PMR_reset_rrr (rrr_t *restrict RRR, double *restrict D,
 		      double *restrict L, double *restrict DL,
-		      double *restrict DLL, int size, int depth);
+		      double *restrict DLL, PMRRR_Int size, PMRRR_Int depth);
 
-int  PMR_increment_rrr_dependencies(rrr_t *RRR);
-int  PMR_set_parent_processed_flag (rrr_t *RRR);
-int  PMR_set_copied_parent_rrr_flag(rrr_t *RRR, bool val);
-int  PMR_try_destroy_rrr(rrr_t *RRR);
+PMRRR_Int  PMR_increment_rrr_dependencies(rrr_t *RRR);
+PMRRR_Int  PMR_set_parent_processed_flag (rrr_t *RRR);
+PMRRR_Int  PMR_set_copied_parent_rrr_flag(rrr_t *RRR, bool val);
+PMRRR_Int  PMR_try_destroy_rrr(rrr_t *RRR);
 
 #endif

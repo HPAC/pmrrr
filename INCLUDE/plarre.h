@@ -51,8 +51,8 @@
  * Note: this implementation is here is not really optimized in
  * terms of performance and memory usage.
  */
-int plarre(proc_t *procinfo, char *jobz, char *range, in_t *Dstruct, 
-	       val_t *Wstruct, tol_t *tolstruct, int *nzp, int *offsetp);
+PMRRR_Int plarre(proc_t *procinfo, char *jobz, char *range, in_t *Dstruct, 
+	       val_t *Wstruct, tol_t *tolstruct, PMRRR_Int *nzp, PMRRR_Int *offsetp);
 
 /* Perturb the initial root representation by "1 + eps*RAND_FACTOR*rand"; 
  * default: 8.0 */ 

@@ -6,14 +6,15 @@
 #include <math.h>
 #include <float.h>
 #include <assert.h>
+#include "global.h"
 
-int odnan_(double *din)
+PMRRR_Int odnan_(double *din)
 {
     /* System generated locals */
-    int ret_val;
+    PMRRR_Int ret_val;
 
     /* Local variables */
-    extern int odsnan_(double *, double *);
+    extern PMRRR_Int odsnan_(double *, double *);
 
 
 /*  -- LAPACK auxiliary routine (version 3.2) -- */

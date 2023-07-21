@@ -53,17 +53,17 @@
 #include "process_task.h"
 
 
-int PMR_process_s_task(singleton_t *sng, int tid, proc_t *procinfo,
+PMRRR_Int PMR_process_s_task(singleton_t *sng, PMRRR_Int tid, proc_t *procinfo,
 		       val_t *Wstruct, vec_t *Zstruct, 
 		       tol_t *tolstruct, counter_t *num_left, 
-		       double *work, int *iwork)
+		       double *work, PMRRR_Int *iwork)
 {
   /* Inputs */
-  int    begin         = sng->begin; 
-  int    end           = sng->end;
-  int    bl_begin      = sng->bl_begin;
-  int    bl_end        = sng->bl_end;
-  int    bl_size       = bl_end - bl_begin + 1;
+  PMRRR_Int    begin         = sng->begin; 
+  PMRRR_Int    end           = sng->end;
+  PMRRR_Int    bl_begin      = sng->bl_begin;
+  PMRRR_Int    bl_end        = sng->bl_end;
+  PMRRR_Int    bl_size       = bl_end - bl_begin + 1;
   double bl_spdiam     = sng->bl_spdiam; 
   rrr_t  *RRR          = sng->RRR;
   double *restrict D   = RRR->D; 
@@ -71,42 +71,44 @@ int PMR_process_s_task(singleton_t *sng, int tid, proc_t *procinfo,
   double *restrict DL  = RRR->DL;
   double *restrict DLL = RRR->DLL;
 
-  int              pid      = procinfo->pid;  
-  int              n        = Wstruct->n;
+  PMRRR_Int              pid      = procinfo->pid;  
+  PMRRR_Int              n        = Wstruct->n;
   double *restrict W        = Wstruct->W;
   double *restrict Werr     = Wstruct->Werr;
   double *restrict Wgap     = Wstruct->Wgap;
-  int    *restrict Windex   = Wstruct->Windex;  
-  int    *restrict iproc    = Wstruct->iproc;  
+  PMRRR_Int    *restrict Windex   = Wstruct->Windex;  
+  PMRRR_Int    *restrict iproc    = Wstruct->iproc;  
   double *restrict Wshifted = Wstruct->Wshifted;
-  int              ldz      = Zstruct->ldz;
+  PMRRR_Int              ldz      = Zstruct->ldz;
   double *restrict Z        = Zstruct->Z;
-  int    *restrict isuppZ   = Zstruct->Zsupp;;
-  int    *restrict Zindex   = Zstruct->Zindex;
+  PMRRR_Int    *restrict isuppZ   = Zstruct->Zsupp;;
+  PMRRR_Int    *restrict Zindex   = Zstruct->Zindex;
   double           pivmin   = tolstruct->pivmin;
 
   /* others */
-  int              info, i, k, itmp, num_decrement=0;
-  int              IONE = 1;
+  PMRRR_Int              info, i, k, itmp, num_decrement=0;
+  PMRRR_Int              IONE = 1;
   double           DZERO = 0.0;
   double           tol, lambda, left, right;
-  int              i_local, zind;
+  PMRRR_Int              i_local, zind;
   double           gap, lgap, rgap, gaptol, savedgap, tmp;
   bool             usedBS, usedRQ, needBS, wantNC, step2II;
-  int              r, offset;
+  PMRRR_Int              r, offset;
   double           twoeps = 2*DBL_EPSILON, RQtol = 2*DBL_EPSILON;
   double           residual, bstres, bstw; 
-  int              i_supmn, i_supmx;
+  PMRRR_Int              i_supmn, i_supmx;
   double           RQcorr;
-  int              negcount;
-  int              sgndef, suppsize;
+  PMRRR_Int              negcount;
+  PMRRR_Int              sgndef, suppsize;
   double           sigma;
-  int              i_Zfrom, i_Zto;
+  PMRRR_Int              i_Zfrom, i_Zto;
   double           ztz, norminv, mingma;
 
 
   /* set tolerance parameter */
   tol  = 4.0 * log( (double) bl_size ) * DBL_EPSILON;
+
+  bstres = bstw = 0.0;
 
   /* loop over all singletons in the task */
   for (i=begin; i<=end; i++) {
@@ -120,7 +122,7 @@ int PMR_process_s_task(singleton_t *sng, int tid, proc_t *procinfo,
     if (bl_size == 1) {
       /* set eigenvector to column of identity matrix */
       zind = Zindex[i];
-      memset(&Z[zind*ldz], 0.0, n*sizeof(double) );
+      memset(&Z[zind*ldz], 0.0, (size_t)n*sizeof(double) );
       Z[zind*ldz + bl_begin] = 1.0;
       isuppZ[2*zind    ]     = bl_begin + 1;
       isuppZ[2*zind + 1]     = bl_begin + 1;
@@ -174,7 +176,7 @@ int PMR_process_s_task(singleton_t *sng, int tid, proc_t *procinfo,
 
     /* IEEE floating point is assumed, so that all 0 bits are 0.0 */
     zind = Zindex[i];
-    memset(&Z[zind*ldz], 0.0, n*sizeof(double));
+    memset(&Z[zind*ldz], 0.0, (size_t)n*sizeof(double));
 
     /* inverse iteration with twisted factorization */
     for (k=1; k<=MAXITER; k++) {
@@ -228,7 +230,7 @@ int PMR_process_s_task(singleton_t *sng, int tid, proc_t *procinfo,
 	  sgndef =  1;    /* wanted eigenvalue lies to the right */
 	}
 	
-	if ( RQcorr*sgndef >= 0.0
+	if ( RQcorr*(double)sgndef >= 0.0
 	     && lambda+RQcorr <= right 
 	     && lambda+RQcorr >= left ) {
 	  usedRQ = true;

@@ -46,9 +46,9 @@
 
 
 
-counter_t *PMR_create_counter(int init_value)
+counter_t *PMR_create_counter(PMRRR_Int init_value)
 {
-  int info;
+  PMRRR_Int info;
   counter_t *counter;
 
   counter = (counter_t *) malloc( sizeof(counter_t) );
@@ -78,9 +78,9 @@ void PMR_destroy_counter(counter_t *counter)
 
 
 
-int PMR_get_counter_value(counter_t *counter)
+PMRRR_Int PMR_get_counter_value(counter_t *counter)
 {
-  int value, info;
+  PMRRR_Int value, info;
 
 #ifdef NOSPINLOCKS
   info = pthread_mutex_lock(&counter->lock);
@@ -103,9 +103,9 @@ int PMR_get_counter_value(counter_t *counter)
 
 
 
-inline int PMR_set_counter_value(counter_t *counter, int value)
+inline PMRRR_Int PMR_set_counter_value(counter_t *counter, PMRRR_Int value)
 {
-  int info;
+  PMRRR_Int info;
 
 #ifdef NOSPINLOCKS
   info = pthread_mutex_lock(&counter->lock);
@@ -128,9 +128,9 @@ inline int PMR_set_counter_value(counter_t *counter, int value)
 
 
 
-int PMR_decrement_counter(counter_t *counter, int amount)
+PMRRR_Int PMR_decrement_counter(counter_t *counter, PMRRR_Int amount)
 {
-  int value, info;
+  PMRRR_Int value, info;
 
 #ifdef NOSPINLOCKS
   info = pthread_mutex_lock(&counter->lock);
@@ -155,9 +155,9 @@ int PMR_decrement_counter(counter_t *counter, int amount)
 
 
 
-int PMR_increment_counter(counter_t *counter, int amount)
+PMRRR_Int PMR_increment_counter(counter_t *counter, PMRRR_Int amount)
 {
-  int value, info;
+  PMRRR_Int value, info;
 
 #ifdef NOSPINLOCKS
   info = pthread_mutex_lock(&counter->lock);

@@ -6,16 +6,17 @@
 #include <math.h>
 #include <float.h>
 #include <assert.h>
+#include "global.h"
 
 /* Subroutine */ 
-int odswap_(int *n, double *dx, int *incx, 
-	double *dy, int *incy)
+PMRRR_Int odswap_(PMRRR_Int *n, double *dx, PMRRR_Int *incx, 
+	double *dy, PMRRR_Int *incy)
 {
     /* System generated locals */
-    int i__1;
+    PMRRR_Int i__1;
 
     /* Local variables */
-    int i__, m, ix, iy, mp1;
+    PMRRR_Int i__, m, ix, iy, mp1;
     double dtemp;
 
 /*     .. Scalar Arguments .. */

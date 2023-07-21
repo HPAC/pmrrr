@@ -40,10 +40,12 @@ For more information please see 'INCLUDE/pmrrr.h'.
 ######################################################################
 # C function prototype:                                              #
 ###################################################################### 
-# int pmrrr(char *jobz, char *range, int *n, double  *D,             #
-#           double *E, double *vl, double *vu, int *il, int *iu,     #
-#           int *tryrac, MPI_Comm comm, int *nz, int *offset,        #
-#           double *W, double *Z, int *ldz, int *Zsupp);             #
+# PMRRR_Int pmrrr(char *jobz, char *range, PMRRR_Int *n,             #
+#           double  *D, double *E, double *vl, double *vu,           # 
+#           PMRRR_Int *il, PMRRR_Int *iu,                            #
+#           PMRRR_Int *tryrac, MPI_Comm comm,                        #
+#           PMRRR_Int *nz, PMRRR_Int *offset,                        #
+#           double *W, double *Z, PMRRR_Int *ldz, PMRRR_Int *Zsupp); #
 #                                                                    #
 # Arguments:                                                         #
 # ----------                                                         #
@@ -172,6 +174,18 @@ Note: Do not forget to tell mpiexec/mpirun about the environment
 variable PMR_NUM_THREADS if you use it. This is typically done via the 
 option '-env' or '-x'.
 
+The 'PMRRR_Int' type is either 32-bit or 64-bit signed integer.
+64-bit is used, if '-DPMRRR_INT64' compilation flag is set.
+64-bit integers allow you to solve problems with more than 4 Gb
+blocks per node.
+
+Please note that in Fortran, you must use 'INTEGER*8' for all the
+pmrrr-related integers when the library is compiled with '-DPMRRR_INT64'.
+In C/C++, you can use the 'PMRRR_Int' alias defined via 'pmrrr.h', but
+you must also compile your program with or without '-DPMRRR_INT64',
+depending on how the library was compiled. Maybe in the future, auto-generated
+headers will be introduced to make this easier.
+
 
 Some additinal comments:
 ------------------------
@@ -189,8 +203,8 @@ given below. For more information please see 'pmrrr.h'.
 ######################################################################
 # C function prototype:                                              #
 ###################################################################### 
-# int PMR_comm_eigvals(MPI_Comm comm, int *nz, int *offset,          # 
-#                      double *W);                                   #
+# PMRRR_Int PMR_comm_eigvals(MPI_Comm comm,                          #
+#                      PMRRR_Int *nz, PMRRR_Int *offset, double *W); #
 ######################################################################
 
 ######################################################################

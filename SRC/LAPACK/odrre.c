@@ -6,81 +6,82 @@
 #include <math.h>
 #include <float.h>
 #include <assert.h>
+#include "global.h"
 
 /* Table of constant values */
-static int c__1 = 1;
-static int c__2 = 2;
+static PMRRR_Int c__1 = 1;
+static PMRRR_Int c__2 = 2;
 #define TRUE_ (1)
 #define FALSE_ (0)
 
 /* Subroutine */ 
-int odrre_(char *range, int *n, double *vl, 
-	double *vu, int *il, int *iu, double *d__, double *e, 
+PMRRR_Int odrre_(char *range, PMRRR_Int *n, double *vl, 
+	double *vu, PMRRR_Int *il, PMRRR_Int *iu, double *d__, double *e, 
 	double *e2, double *rtol1, double *rtol2, double *spltol, 
-	int *nsplit, int *isplit, int *m, double *w, 
-	double *werr, double *wgap, int *iblock, int *indexw, 
-	double *gers, double *pivmin, double *work, int *
-	iwork, int *info)
+	PMRRR_Int *nsplit, PMRRR_Int *isplit, PMRRR_Int *m, double *w, 
+	double *werr, double *wgap, PMRRR_Int *iblock, PMRRR_Int *indexw, 
+	double *gers, double *pivmin, double *work, PMRRR_Int *
+	iwork, PMRRR_Int *info)
 {
     /* System generated locals */
-    int i__1, i__2;
+    PMRRR_Int i__1, i__2;
     double d__1, d__2, d__3;
 
     /* Builtin functions */
     //    double sqrt(double), log(double);
 
     /* Local variables */
-    int i__, j;
+    PMRRR_Int i__, j;
     double s1, s2;
-    int mb;
+    PMRRR_Int mb;
     double gl;
-    int in, mm;
+    PMRRR_Int in, mm;
     double gu;
-    int cnt;
+    PMRRR_Int cnt;
     double eps, tau, tmp, rtl;
-    int cnt1, cnt2;
+    PMRRR_Int cnt1, cnt2;
     double tmp1, eabs;
-    int iend, jblk;
+    PMRRR_Int iend, jblk;
     double eold;
-    int indl;
+    PMRRR_Int indl;
     double dmax__, emax;
-    int wend, idum, indu;
+    PMRRR_Int wend, idum, indu;
     double rtol;
-    int iseed[4];
+    PMRRR_Int iseed[4];
     double avgap, sigma;
-    extern int olsame_(char *, char *);
-    int iinfo;
-    extern /* Subroutine */ int odcpy_(int *, double *, int *, 
-	    double *, int *);
+    extern PMRRR_Int olsame_(char *, char *);
+    PMRRR_Int iinfo;
+    extern /* Subroutine */ PMRRR_Int odcpy_(PMRRR_Int *, double *, PMRRR_Int *, 
+	    double *, PMRRR_Int *);
     long double norep;
-    extern /* Subroutine */ int odsq2_(int *, double *, int *);
+    extern /* Subroutine */ PMRRR_Int odsq2_(PMRRR_Int *, double *, PMRRR_Int *);
     // extern double odmch_(char *);
-    int ibegin;
+    PMRRR_Int ibegin;
     long double forceb;
-    int irange;
+    PMRRR_Int irange;
     double sgndef;
-    extern /* Subroutine */ int odrra_(int *, double *, double *, 
-	     double *, double *, double *, int *, int *, 
-	    int *), odrrb_(int *, double *, double *, 
-	    int *, int *, double *, double *, int *, 
-	    double *, double *, double *, double *, int *, 
-	     double *, double *, int *, int *), odrrc_(char *
-, int *, double *, double *, double *, double 
-	    *, double *, int *, int *, int *, int *);
-    int wbegin;
-    extern /* Subroutine */ int odrrd_(char *, char *, int *, double 
-	    *, double *, int *, int *, double *, double *, 
-	     double *, double *, double *, double *, int *
-, int *, int *, double *, double *, double *, 
-	    double *, int *, int *, double *, int *, 
-	    int *);
+    extern /* Subroutine */ PMRRR_Int odrra_(PMRRR_Int *, double *, double *, 
+	     double *, double *, double *, PMRRR_Int *, PMRRR_Int *, 
+	    PMRRR_Int *), odrrb_(PMRRR_Int *, double *, double *, 
+	    PMRRR_Int *, PMRRR_Int *, double *, double *, PMRRR_Int *, 
+	    double *, double *, double *, double *, PMRRR_Int *, 
+	     double *, double *, PMRRR_Int *, PMRRR_Int *), odrrc_(char *
+, PMRRR_Int *, double *, double *, double *, double 
+	    *, double *, PMRRR_Int *, PMRRR_Int *, PMRRR_Int *, PMRRR_Int *);
+    PMRRR_Int wbegin;
+    extern /* Subroutine */ PMRRR_Int odrrd_(char *, char *, PMRRR_Int *, double 
+	    *, double *, PMRRR_Int *, PMRRR_Int *, double *, double *, 
+	     double *, double *, double *, double *, PMRRR_Int *
+, PMRRR_Int *, PMRRR_Int *, double *, double *, double *, 
+	    double *, PMRRR_Int *, PMRRR_Int *, double *, PMRRR_Int *, 
+	    PMRRR_Int *);
     double safmin, spdiam;
-    extern /* Subroutine */ int odrrk_(int *, int *, double *, 
+    extern /* Subroutine */ PMRRR_Int odrrk_(PMRRR_Int *, PMRRR_Int *, double *, 
 	    double *, double *, double *, double *, 
-	    double *, double *, double *, int *);
+	    double *, double *, double *, PMRRR_Int *);
     long double usedqd;
     double clwdth, isleft;
-    extern /* Subroutine */ int odrnv_(int *, int *, int *, 
+    extern /* Subroutine */ PMRRR_Int odrnv_(PMRRR_Int *, PMRRR_Int *, PMRRR_Int *, 
 	    double *);
     double isrght, bsrtol, dpivot;
 
@@ -282,6 +283,9 @@ int odrre_(char *range, int *n, double *vl,
 
     /* Function Body */
     *info = 0;
+    mb = 0;
+    wend = 0;
+    irange = 0;
 
 /*     Decode RANGE */
 
@@ -460,7 +464,7 @@ L21:
 		goto L170;
 	    } else {
 /*              Decide whether dqds or bisection is more efficient */
-		usedqd = (double) mb > in * .5 && ! forceb;
+		usedqd = (double) mb > (double) in * .5 && ! forceb;
 		wend = wbegin + mb - 1;
 /*              Calculate gaps for the current block */
 /*              In later stages, when representations for individual */
@@ -595,7 +599,7 @@ L21:
 	if (usedqd) {
 /*           The initial SIGMA was to the outer end of the spectrum */
 /*           the matrix is definite and we need not retreat. */
-	    tau = spdiam * eps * *n + *pivmin * 2.;
+	    tau = spdiam * eps * (double)(*n) + *pivmin * 2.;
 	    tau = fmax(tau, 2 * eps * fabs(sigma));
 	} else {
 	    if (mb > 1) {
@@ -668,9 +672,9 @@ L21:
 		if (idum == 5) {
 		    if (sgndef == 1.) {
 /*                    The fudged Gerschgorin shift should succeed */
-			sigma = gl - spdiam * 2. * eps * *n - *pivmin * 4.;
+			sigma = gl - spdiam * 2. * eps * (double)(*n) - *pivmin * 4.;
 		    } else {
-			sigma = gu + spdiam * 2. * eps * *n + *pivmin * 4.;
+			sigma = gu + spdiam * 2. * eps * (double)(*n) + *pivmin * 4.;
 		    }
 		} else {
 		    sigma -= sgndef * tau;

@@ -6,16 +6,17 @@
 #include <math.h>
 #include <float.h>
 #include <assert.h>
+#include "global.h"
 
 #define imax(a,b) ( (a) > (b) ? (a) : (b) )
 #define imin(a,b) ( (a) < (b) ? (a) : (b) )
 
 /* Subroutine */ 
-int odruv_(int *iseed, int *n, double *x)
+PMRRR_Int odruv_(PMRRR_Int *iseed, PMRRR_Int *n, double *x)
 {
     /* Initialized data */
 
-    static int mm[512]	/* was [128][4] */ = { 494,2637,255,2008,1253,
+    static PMRRR_Int mm[512]	/* was [128][4] */ = { 494,2637,255,2008,1253,
 	    3344,4084,1739,3143,3468,688,1657,1238,3166,1292,3422,1270,2016,
 	    154,2862,697,1706,491,931,1444,444,3577,3944,2184,1661,3482,657,
 	    3023,3618,1267,1828,164,3798,3087,2400,2870,3876,1905,1593,1797,
@@ -56,10 +57,10 @@ int odruv_(int *iseed, int *n, double *x)
 	    3537,517,3017,2141,1537 };
 
     /* System generated locals */
-    int i__1;
+    PMRRR_Int i__1;
 
     /* Local variables */
-    int i__, i1, i2, i3, i4, it1, it2, it3, it4;
+    PMRRR_Int i__, i1, i2, i3, i4, it1, it2, it3, it4;
 
 
 /*  -- LAPACK auxiliary routine (version 3.2) -- */
@@ -103,7 +104,7 @@ int odruv_(int *iseed, int *n, double *x)
 /*  2**b: an exhaustive analysis for b = 32 and a partial analysis for */
 /*  b = 48', Math. Comp. 189, pp 331-344, 1990). */
 
-/*  48-bit ints are stored in 4 int array elements with 12 bits */
+/*  48-bit ints are stored in 4 PMRRR_Int array elements with 12 bits */
 /*  per element. Hence the routine is portable across machines with */
 /*  ints of 32 bits or more. */
 
@@ -131,6 +132,8 @@ int odruv_(int *iseed, int *n, double *x)
     i3 = iseed[3];
     i4 = iseed[4];
 
+    it1 = it2 = it3 = it4 = 0;
+
     i__1 = imin(*n,128);
     for (i__ = 1; i__ <= i__1; ++i__) {
 
@@ -152,7 +155,7 @@ L20:
 		127] + i4 * mm[i__ - 1];
 	it1 %= 4096;
 
-/*        Convert 48-bit int to a real number in the interval (0,1) */
+/*        Convert 48-bit PMRRR_Int to a real number in the interval (0,1) */
 
 	x[i__] = ((double) it1 + ((double) it2 + ((double) it3 + (
 		double) it4 * 2.44140625e-4) * 2.44140625e-4) * 
@@ -160,7 +163,7 @@ L20:
 
 	if (x[i__] == 1.) {
 /*           If a real number has n bits of precision, and the first */
-/*           n bits of the 48-bit int above happen to be all 1 (which */
+/*           n bits of the 48-bit PMRRR_Int above happen to be all 1 (which */
 /*           will occur about once every 2**n calls), then X( I ) will */
 /*           be rounded to exactly 1.0. */
 /*           Since X( I ) is not supposed to return exactly 0.0 or 1.0, */

@@ -6,16 +6,17 @@
 #include <math.h>
 #include <float.h>
 #include <assert.h>
+#include "global.h"
 
 /* Subroutine */ 
-int odscl_(int *n, double *da, double *dx, 
-	int *incx)
+PMRRR_Int odscl_(PMRRR_Int *n, double *da, double *dx, 
+	PMRRR_Int *incx)
 {
     /* System generated locals */
-    int i__1, i__2;
+    PMRRR_Int i__1, i__2;
 
     /* Local variables */
-    int i__, m, mp1, nincx;
+    PMRRR_Int i__, m, mp1, nincx;
 
 /*     .. Scalar Arguments .. */
 /*     .. */

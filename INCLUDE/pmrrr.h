@@ -55,10 +55,10 @@
  *
  * Function prototype: */
 
-int pmrrr(char *jobz, char *range, int *n, double  *D,
-	  double *E, double *vl, double *vu, int *il, int *iu,
-	  int *tryrac, MPI_Comm comm, int *nz, int *offset,
-	  double *W, double *Z, int *ldz, int *Zsupp);
+PMRRR_Int pmrrr(char *jobz, char *range, PMRRR_Int *n, double  *D,
+	  double *E, double *vl, double *vu, PMRRR_Int *il, PMRRR_Int *iu,
+	  PMRRR_Int *tryrac, MPI_Comm comm, PMRRR_Int *nz, PMRRR_Int *offset,
+	  double *W, double *Z, PMRRR_Int *ldz, PMRRR_Int *Zsupp);
 
 /* Arguments:
  * ----------
@@ -167,7 +167,7 @@ int pmrrr(char *jobz, char *range, int *n, double  *D,
  * EXAMPLE CALL: 
  * -------------
  * char    *jobz, *range;
- * int     n, il, iu, tryRAC=0, nz, offset, ldz, *Zsupp;
+ * PMRRR_Int     n, il, iu, tryRAC=0, nz, offset, ldz, *Zsupp;
  * double  *D, *E, *W, *Z, vl, vu;
  *
  * // allocate space for D, E, W, Z
@@ -229,7 +229,7 @@ int pmrrr(char *jobz, char *range, int *n, double  *D,
  * all computed eigenvalues (iu-il+1) in W; this routine is designed 
  * to be called right after 'pmrrr'.
  */
-int PMR_comm_eigvals(MPI_Comm comm, int *nz, int *ifirst, double *W);
+PMRRR_Int PMR_comm_eigvals(MPI_Comm comm, PMRRR_Int *nz, PMRRR_Int *ifirst, double *W);
 /* Arguments:
  * ----------
  *
@@ -262,43 +262,45 @@ int PMR_comm_eigvals(MPI_Comm comm, int *nz, int *ifirst, double *W);
 /* LAPACK and BLAS function prototypes
  * Note: type specifier 'extern' does not matter in declaration
  * so here used to mark routines from LAPACK and BLAS libraries */
-extern void pmrrr_dscal(int*, double*, double*, int*);
+extern void pmrrr_dscal(PMRRR_Int*, double*, double*, PMRRR_Int*);
 
-extern double odnst_(char*, int*, double*, double*);
-extern void   odrrr_(int*, double*, double*, int*);
-extern void   odrra_(int*, double*, double*, double*, double*, 
-		      double*, int*, int*, int*);
-extern void   odrrc_(char*, int*, double*, double*, double*, double*,
-		      double*, int*, int*, int*, int*);
-extern void   odrrd_(char*, char*, int*, double*, double*, int*, 
-		      int*, double*, double*, double*, double*, 
-		      double*, double*, int*, int*, int*, double*, 
-		      double*, double*, double*, int*, int*, double*, 
-		      int*, int*);
-extern void   odrrb_(int*, double*, double*, int*, int*, double*,
-		      double*, int*, double*, double*, double*, double*,
-		      int*, double*, double*, int*, int*);
-extern void   odrrk_(int*, int*, double*, double*, double*, double*,
-		      double*, double*, double*, double*, int*);
-extern void   odebz_(int*, int*, int*, int*, int*, int*, double*, 
+extern double odnst_(char*, PMRRR_Int*, double*, double*);
+extern void   odrrr_(PMRRR_Int*, double*, double*, PMRRR_Int*);
+extern void   odrra_(PMRRR_Int*, double*, double*, double*, double*, 
+		      double*, PMRRR_Int*, PMRRR_Int*, PMRRR_Int*);
+extern void   odrrc_(char*, PMRRR_Int*, double*, double*, double*, double*,
+		      double*, PMRRR_Int*, PMRRR_Int*, PMRRR_Int*, PMRRR_Int*);
+extern void   odrrd_(char*, char*, PMRRR_Int*, double*, double*, PMRRR_Int*, 
+		      PMRRR_Int*, double*, double*, double*, double*, 
+		      double*, double*, PMRRR_Int*, PMRRR_Int*, PMRRR_Int*, double*, 
+		      double*, double*, double*, PMRRR_Int*, PMRRR_Int*, double*, 
+		      PMRRR_Int*, PMRRR_Int*);
+extern void   odrrb_(PMRRR_Int*, double*, double*, PMRRR_Int*, PMRRR_Int*, double*,
+		      double*, PMRRR_Int*, double*, double*, double*, double*,
+		      PMRRR_Int*, double*, double*, PMRRR_Int*, PMRRR_Int*);
+extern void   odrrk_(PMRRR_Int*, PMRRR_Int*, double*, double*, double*, double*,
+		      double*, double*, double*, double*, PMRRR_Int*);
+extern void   odebz_(PMRRR_Int*, PMRRR_Int*, PMRRR_Int*, PMRRR_Int*, PMRRR_Int*, PMRRR_Int*, double*, 
 		      double*, double*, double*, double*, double*,
-		      int*, double*, double*, int*, int*, double*,
-		      int*, int*);
-extern void   odrnv_(int*, int*, int*, double*);
-extern void   odrrf_(int*, double*, double*, double*, int*, int*, 
+		      PMRRR_Int*, double*, double*, PMRRR_Int*, PMRRR_Int*, double*,
+		      PMRRR_Int*, PMRRR_Int*);
+extern void   odrnv_(PMRRR_Int*, PMRRR_Int*, PMRRR_Int*, double*);
+extern void   odrrf_(PMRRR_Int*, double*, double*, double*, PMRRR_Int*, PMRRR_Int*, 
 		      double*, double*, double*, double*, double*, 
 		      double*, double*, double*, double*, double*, 
-		      double*, int*);
-extern void   odr1v_(int*, int*, int*, double*, double*, double*, 
+		      double*, PMRRR_Int*);
+extern void   odr1v_(PMRRR_Int*, PMRRR_Int*, PMRRR_Int*, double*, double*, double*, 
 		      double*, double*, double*, double*, double*, 
-		      bool*, int*, double*, double*, int*, int*, 
+		      bool*, PMRRR_Int*, double*, double*, PMRRR_Int*, PMRRR_Int*, 
 		      double*, double*, double*, double*);
-extern void   odrrj_(int*, double*, double*, int*, int*, double*, 
-		      int*, double*, double*, double*, int*, double*, 
-		      double*, int*);
-extern void   odstmr_(char*, char*, int*, double*, double*, double*, 
-		      double*, int*, int*, int*, double*, double*, 
-		      int*, int*, int*, int*, double*, int*, int*, 
-		      int*, int*);
+extern void   odrrj_(PMRRR_Int*, double*, double*, PMRRR_Int*, PMRRR_Int*, double*, 
+		      PMRRR_Int*, double*, double*, double*, PMRRR_Int*, double*, 
+		      double*, PMRRR_Int*);
+extern void   odstmr_(char*, char*, PMRRR_Int*, double*, double*, double*, 
+		      double*, PMRRR_Int*, PMRRR_Int*, PMRRR_Int*, double*, double*, 
+		      PMRRR_Int*, PMRRR_Int*, PMRRR_Int*, PMRRR_Int*, double*, PMRRR_Int*, PMRRR_Int*, 
+		      PMRRR_Int*, PMRRR_Int*);
+
+extern PMRRR_Int odscl_(PMRRR_Int *n, double *da, double *dx, PMRRR_Int *incx);
 
 #endif /* End of header file */

@@ -11,30 +11,30 @@
 #include "mpi.h"
 #include "pmrrr.h"
 
-static int  read_tri_mat(char*, double**, double**);
-static void print_vector(char*, double*, char*, int);
-static void print_matrix(char*, double*, int, int, int);
+static PMRRR_Int  read_tri_mat(char*, double**, double**);
+static void print_vector(char*, double*, char*, PMRRR_Int);
+static void print_matrix(char*, double*, PMRRR_Int, PMRRR_Int, PMRRR_Int);
 
 
 int main(int argc, char **argv)
 {
   /* Input parameter to 'pmrrr' */
-  int     n;              /* Matrix size */
-  int     il, iu;         
-  int     tryRAC = 1;     /* Try high rel. accuracy */
-  double  *D, *E;         /* Diagonal and off-diagonal elements */
-  double  vl, vu;         
+  PMRRR_Int n;              /* Matrix size */
+  PMRRR_Int il, iu;         
+  PMRRR_Int tryRAC = 1;     /* Try high rel. accuracy */
+  double    *D, *E;         /* Diagonal and off-diagonal elements */
+  double    vl, vu;         
 
-  double  *W;             /* eigenvalues */
-  int     nz;             /* # local eigenvectors */
-  int     offset;
-  double  *Z;             /* eigenvectors; stored by colums */
-  int     ldz;
-  int     *Zsupp;         /* eigenvector support */
+  double    *W;             /* eigenvalues */
+  PMRRR_Int nz;             /* # local eigenvectors */
+  PMRRR_Int offset;
+  double    *Z;             /* eigenvectors; stored by colums */
+  PMRRR_Int ldz;
+  PMRRR_Int *Zsupp;         /* eigenvector support */
 
   /* Others */
-  int     pid, nproc, info, status;
-  int     i;
+  PMRRR_Int pid, nproc, status;
+  int       info, i;
 
   MPI_Init_thread(&argc, &argv, MPI_THREAD_MULTIPLE, &status);
   MPI_Comm_rank(MPI_COMM_WORLD, &pid);
@@ -59,7 +59,7 @@ int main(int argc, char **argv)
 
   /* Allocate memory */
   W     = (double *) malloc( n    * sizeof(double) );
-  Zsupp = (int *)    malloc( 2*n  * sizeof(int)    );
+  Zsupp = (PMRRR_Int *)    malloc( 2*n  * sizeof(PMRRR_Int)    );
 
   info = pmrrr("Count", "Value", &n, D, E, &vl, &vu, &il, &iu,
 	       &tryRAC, MPI_COMM_WORLD, &nz, &offset, W,
@@ -107,9 +107,9 @@ int main(int argc, char **argv)
 /* 
  * Reads the triadiagonal matrix from a file.
  */
-static int read_tri_mat(char *filename, double **Dp, double **Ep)
+static PMRRR_Int read_tri_mat(char *filename, double **Dp, double **Ep)
 {
-  int    i, n;
+  PMRRR_Int    i, n;
   FILE   *filedes;
 
   filedes = fopen(filename, "r");
@@ -135,9 +135,9 @@ static int read_tri_mat(char *filename, double **Dp, double **Ep)
 
 
 
-static void print_vector(char *pre, double *v, char *post, int n)
+static void print_vector(char *pre, double *v, char *post, PMRRR_Int n)
 {
-  int i;
+  PMRRR_Int i;
 
   printf("\n%s\n", pre);
   for (i=0; i<n; i++) {
@@ -149,10 +149,10 @@ static void print_vector(char *pre, double *v, char *post, int n)
 
 
 
-static void print_matrix(char *name, double *A, int lda, 
-			 int numcols, int offset)
+static void print_matrix(char *name, double *A, PMRRR_Int lda, 
+			 PMRRR_Int numcols, PMRRR_Int offset)
 {
-  int i, j;
+  PMRRR_Int i, j;
   char str1[20], str2[20];
 
   for (j=1; j<=numcols; j++) {

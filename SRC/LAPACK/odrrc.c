@@ -6,22 +6,23 @@
 #include <math.h>
 #include <float.h>
 #include <assert.h>
+#include "global.h"
 
 
 /* Subroutine */ 
-int odrrc_(char *jobt, int *n, double *vl, 
+PMRRR_Int odrrc_(char *jobt, PMRRR_Int *n, double *vl, 
 	double *vu, double *d__, double *e, double *pivmin, 
-	int *eigcnt, int *lcnt, int *rcnt, int *info)
+	PMRRR_Int *eigcnt, PMRRR_Int *lcnt, PMRRR_Int *rcnt, PMRRR_Int *info)
 {
     /* System generated locals */
-    int i__1;
+    PMRRR_Int i__1;
     double d__1;
 
     /* Local variables */
-    int i__;
+    PMRRR_Int i__;
     double sl, su, tmp, tmp2;
-    int matt;
-    extern int olsame_(char *, char *);
+    PMRRR_Int matt;
+    extern PMRRR_Int olsame_(char *, char *);
     double lpivot, rpivot;
 
 

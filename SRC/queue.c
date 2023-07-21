@@ -49,7 +49,7 @@
 
 queue_t *PMR_create_empty_queue(void)
 {
-  int     info;
+  PMRRR_Int     info;
   queue_t *queue;
   
   queue = (queue_t *) malloc(sizeof(queue_t));
@@ -83,9 +83,9 @@ void PMR_destroy_queue(queue_t *queue)
 
 
 
-int PMR_insert_task_at_front(queue_t *queue, task_t *task)
+PMRRR_Int PMR_insert_task_at_front(queue_t *queue, task_t *task)
 {
-  int info;
+  PMRRR_Int info;
   
 #ifdef NOSPINLOCKS
   info = pthread_mutex_lock(&queue->lock);
@@ -115,9 +115,9 @@ int PMR_insert_task_at_front(queue_t *queue, task_t *task)
 
 
 
-int PMR_insert_task_at_back(queue_t *queue, task_t *task)
+PMRRR_Int PMR_insert_task_at_back(queue_t *queue, task_t *task)
 {
-  int info;
+  PMRRR_Int info;
 
 #ifdef NOSPINLOCKS
   info = pthread_mutex_lock(&queue->lock);
@@ -150,7 +150,7 @@ int PMR_insert_task_at_back(queue_t *queue, task_t *task)
 
 task_t *PMR_remove_task_at_front(queue_t *queue)
 {
-  int    info;
+  PMRRR_Int    info;
   task_t *task;
   
 #ifdef NOSPINLOCKS
@@ -191,7 +191,7 @@ task_t *PMR_remove_task_at_front(queue_t *queue)
 
 task_t *PMR_remove_task_at_back (queue_t *queue)
 {
-  int    info;
+  PMRRR_Int    info;
   task_t *task;
 
 #ifdef NOSPINLOCKS
@@ -230,9 +230,9 @@ task_t *PMR_remove_task_at_back (queue_t *queue)
 
 
 
-int PMR_get_num_tasks(queue_t *queue)
+PMRRR_Int PMR_get_num_tasks(queue_t *queue)
 {
-  int info, num_tasks;
+  PMRRR_Int info, num_tasks;
 
 #ifdef NOSPINLOCKS
   info = pthread_mutex_lock(&queue->lock);

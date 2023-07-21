@@ -46,8 +46,8 @@
 #include "rrr.h"
 
 
-task_t *PMR_create_s_task(int first, int last, int depth,
-			  int bl_begin, int bl_end, 
+task_t *PMR_create_s_task(PMRRR_Int first, PMRRR_Int last, PMRRR_Int depth,
+			  PMRRR_Int bl_begin, PMRRR_Int bl_end, 
 			  double spdiam, double lgap, rrr_t *RRR)
 {
   task_t      *t;
@@ -77,10 +77,10 @@ task_t *PMR_create_s_task(int first, int last, int depth,
 }
 
 
-task_t *PMR_create_c_task(int first, int last, int depth, 
-			  int bl_begin, int bl_end, double spdiam,
-			  double lgap, int proc_W_begin, 
-			  int proc_W_end, int lpid, int rpid, 
+task_t *PMR_create_c_task(PMRRR_Int first, PMRRR_Int last, PMRRR_Int depth, 
+			  PMRRR_Int bl_begin, PMRRR_Int bl_end, double spdiam,
+			  double lgap, PMRRR_Int proc_W_begin, 
+			  PMRRR_Int proc_W_end, PMRRR_Int lpid, PMRRR_Int rpid, 
 			  rrr_t *RRR)
 {
   task_t    *t;
@@ -116,9 +116,9 @@ task_t *PMR_create_c_task(int first, int last, int depth,
 
 
 
-task_t *PMR_create_r_task(int begin, int end, double *D,
-			  double *DLL, int p, int q, int bl_size,
-			  double bl_spdiam, int tid, sem_t *sem)
+task_t *PMR_create_r_task(PMRRR_Int begin, PMRRR_Int end, double *D,
+			  double *DLL, PMRRR_Int p, PMRRR_Int q, PMRRR_Int bl_size,
+			  double bl_spdiam, PMRRR_Int tid, sem_t *sem)
 {
   task_t   *t;
   refine_t *r;

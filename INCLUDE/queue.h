@@ -47,13 +47,13 @@
 typedef struct task_aux task_t;
 struct task_aux {
   void       *data;       /* ptr to data, has to be casted */
-  int         flag;       /* flag specifying the task */
+  PMRRR_Int         flag;       /* flag specifying the task */
   task_t     *next;       /* ptr to next  task; NULL if non-existing; */
   task_t     *prev;       /* ptr to prev. task; NULL if non-existing; */
 };
 
 typedef struct {
-  int                num_tasks;
+  PMRRR_Int                num_tasks;
   task_t            *head;
   task_t            *back;
 #ifdef NOSPINLOCKS
@@ -66,11 +66,11 @@ typedef struct {
 
 /* functionality of the queue */
 queue_t *PMR_create_empty_queue  (void);
-int     PMR_insert_task_at_front (queue_t *queue, task_t *task);
-int     PMR_insert_task_at_back  (queue_t *queue, task_t *task);
+PMRRR_Int     PMR_insert_task_at_front (queue_t *queue, task_t *task);
+PMRRR_Int     PMR_insert_task_at_back  (queue_t *queue, task_t *task);
 task_t  *PMR_remove_task_at_front(queue_t *queue);
 task_t  *PMR_remove_task_at_back (queue_t *queue);
-int     PMR_get_num_tasks(queue_t *queue);
+PMRRR_Int     PMR_get_num_tasks(queue_t *queue);
 void    PMR_destroy_queue(queue_t *queue);
 
 #endif

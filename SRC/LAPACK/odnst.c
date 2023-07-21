@@ -6,25 +6,26 @@
 #include <math.h>
 #include <float.h>
 #include <assert.h>
+#include "global.h"
 
 /* Table of constant values */
-static int c__1 = 1;
+static PMRRR_Int c__1 = 1;
 
-double odnst_(char *norm, int *n, double *d__, double *e)
+double odnst_(char *norm, PMRRR_Int *n, double *d__, double *e)
 {
     /* System generated locals */
-    int i__1;
+    PMRRR_Int i__1;
     double ret_val, d__1, d__2, d__3, d__4, d__5;
 
     /* Builtin functions */
     // double sqrt(double);
 
     /* Local variables */
-    int i__;
+    PMRRR_Int i__;
     double sum, scale;
-    extern int olsame_(char *, char *);
+    extern PMRRR_Int olsame_(char *, char *);
     double anorm;
-    extern /* Subroutine */ int odssq_(int *, double *, int *, 
+    extern /* Subroutine */ PMRRR_Int odssq_(PMRRR_Int *, double *, PMRRR_Int *, 
 	    double *, double *);
 
 
@@ -96,6 +97,8 @@ double odnst_(char *norm, int *n, double *d__, double *e)
     /* Parameter adjustments */
     --e;
     --d__;
+
+    anorm = 0.0;
 
     /* Function Body */
     if (*n <= 0) {

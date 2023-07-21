@@ -6,26 +6,27 @@
 #include <math.h>
 #include <float.h>
 #include <assert.h>
+#include "global.h"
 
 /* Subroutine */ 
-int odsrt_(char *id, int *n, double *d__, int *
+PMRRR_Int odsrt_(char *id, PMRRR_Int *n, double *d__, PMRRR_Int *
 	info)
 {
     /* System generated locals */
-    int i__1, i__2;
+    PMRRR_Int i__1, i__2;
 
     /* Local variables */
-    int i__, j;
+    PMRRR_Int i__, j;
     double d1, d2, d3;
-    int dir;
+    PMRRR_Int dir;
     double tmp;
-    int endd;
-    extern int olsame_(char *, char *);
-    int stack[64]	/* was [2][32] */;
+    PMRRR_Int endd;
+    extern PMRRR_Int olsame_(char *, char *);
+    PMRRR_Int stack[64]	/* was [2][32] */;
     double dmnmx;
-    int start;
-    extern /* Subroutine */ int oerbla_(char *, int *);
-    int stkpnt;
+    PMRRR_Int start;
+    extern /* Subroutine */ PMRRR_Int oerbla_(char *, PMRRR_Int *);
+    PMRRR_Int stkpnt;
 
 
 /*  -- LAPACK routine (version 3.2) -- */

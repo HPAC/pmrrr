@@ -64,105 +64,103 @@
 
 static void *eigval_subset_thread_a(void *argin);
 static void *eigval_subset_thread_r(void *argin);
-static void clean_up_plarre(double*, double*, int*, int*, int*);
+static void clean_up_plarre(double*, double*, PMRRR_Int*, int*, int*);
 
 
 static
-int eigval_approx_proc(proc_t *procinfo, int ifirst, int ilast, 
-			   int n, double *D, double *E, double *E2,  
-			   int *Windex, int *iblock, double *gersch, tol_t *tolstruct, 
+PMRRR_Int eigval_approx_proc(proc_t *procinfo, PMRRR_Int ifirst, PMRRR_Int ilast, 
+			   PMRRR_Int n, double *D, double *E, double *E2,  
+			   PMRRR_Int *Windex, PMRRR_Int *iblock, double *gersch, tol_t *tolstruct, 
 			   double *W, double *Werr, double *Wgap, double *work,
-			   int *iwork);
+			   PMRRR_Int *iwork);
 
 static
-int eigval_root_proc(proc_t *procinfo, int ifirst, int ilast, 
-			   int n, double *D, double *E, double *E2,  
-			   int *Windex, int *iblock, double *gersch, tol_t *tolstruct, 
+PMRRR_Int eigval_root_proc(proc_t *procinfo, PMRRR_Int ifirst, PMRRR_Int ilast, 
+			   PMRRR_Int n, double *D, double *E, double *E2,  
+			   PMRRR_Int *Windex, PMRRR_Int *iblock, double *gersch, tol_t *tolstruct, 
 			   double *W, double *Werr, double *Wgap, double *work,
-			 int *iwork);
+			 PMRRR_Int *iwork);
 
 static
-int eigval_refine_proc(proc_t *procinfo, int ifirst, int ilast, 
-			   int n, double *D, double *E, double *E2,  
-			   int *Windex, int *iblock, double *gersch, tol_t *tolstruct, 
+PMRRR_Int eigval_refine_proc(proc_t *procinfo, PMRRR_Int ifirst, PMRRR_Int ilast, 
+			   PMRRR_Int n, double *D, double *E, double *E2,  
+			   PMRRR_Int *Windex, PMRRR_Int *iblock, double *gersch, tol_t *tolstruct, 
 			   double *W, double *Werr, double *Wgap, double *work,
-			   int *iwork);
+			   PMRRR_Int *iwork);
 
 static 
-auxarg1_t *create_auxarg1(int, double*, double*, double*, int, int, 
-			  int, int, int, int*, double,  double,
-			  double*, double*, double*, int*, int*);
+auxarg1_t *create_auxarg1(PMRRR_Int, double*, double*, double*, PMRRR_Int, PMRRR_Int, 
+			  PMRRR_Int, PMRRR_Int, PMRRR_Int, PMRRR_Int*, double,  double,
+			  double*, double*, double*, PMRRR_Int*, PMRRR_Int*);
 static 
-void retrieve_auxarg1(auxarg1_t*, int*, double**, double**, double**,
-		      int*, int*, int*, int*, int*, int**, double*, 
-		      double*, double**, double**, double**, int**, 
-		      int**);
+void retrieve_auxarg1(auxarg1_t*, PMRRR_Int*, double**, double**, double**,
+		      PMRRR_Int*, PMRRR_Int*, PMRRR_Int*, PMRRR_Int*, PMRRR_Int*, PMRRR_Int**, double*, 
+		      double*, double**, double**, double**, PMRRR_Int**, 
+		      PMRRR_Int**);
 static
-auxarg2_t *create_auxarg2(int, double*, double*, int, int, double*,
-			      double*,double*,int*,double, double, double, double);
+auxarg2_t *create_auxarg2(PMRRR_Int, double*, double*, PMRRR_Int, PMRRR_Int, double*,
+			      double*,double*,PMRRR_Int*,double, double, double, double);
 static
-void retrieve_auxarg2(auxarg2_t*, int*, double**, double**, int*,
-			  int*, double**, double**, double**, int**, double*, double*, double*,
+void retrieve_auxarg2(auxarg2_t*, PMRRR_Int*, double**, double**, PMRRR_Int*,
+			  PMRRR_Int*, double**, double**, double**, PMRRR_Int**, double*, double*, double*,
 		      double*);
-
-static int cmp(const void*, const void*);
 
 
 
 
 /* Routine to compute eigenvalues */
-int plarre(proc_t *procinfo, char *jobz, char *range, in_t *Dstruct, 
-	       val_t *Wstruct, tol_t *tolstruct, int *nzp, int *offsetp)
+PMRRR_Int plarre(proc_t *procinfo, char *jobz, char *range, in_t *Dstruct, 
+	       val_t *Wstruct, tol_t *tolstruct, PMRRR_Int *nzp, PMRRR_Int *offsetp)
 {
   /* input variables */
-  int              pid    = procinfo->pid;
-  int              nproc  = procinfo->nproc;
+  PMRRR_Int              pid    = procinfo->pid;
+  PMRRR_Int              nproc  = procinfo->nproc;
   bool             wantZ  = (jobz[0]  == 'V' || jobz[0]  == 'v');
   bool             cntval = (jobz[0]  == 'C' || jobz[0]  == 'c');
-  int              n      = Dstruct->n;
+  PMRRR_Int              n      = Dstruct->n;
   double *restrict D      = Dstruct->D;
   double *restrict E      = Dstruct->E;
-  int    *restrict isplit = Dstruct->isplit;
+  PMRRR_Int    *restrict isplit = Dstruct->isplit;
   double           *vl    = Wstruct->vl;
   double           *vu    = Wstruct->vu;
-  int              *il    = Wstruct->il;
-  int              *iu    = Wstruct->iu;
+  PMRRR_Int              *il    = Wstruct->il;
+  PMRRR_Int              *iu    = Wstruct->iu;
   double *restrict W      = Wstruct->W;
   double *restrict Werr   = Wstruct->Werr;
   double *restrict Wgap   = Wstruct->Wgap;
-  int    *restrict Windex = Wstruct->Windex;
-  int    *restrict iblock = Wstruct->iblock;
+  PMRRR_Int    *restrict Windex = Wstruct->Windex;
+  PMRRR_Int    *restrict iblock = Wstruct->iblock;
   double *restrict gersch = Wstruct->gersch;
 
   /* constants */
-  int             IZERO = 0,   IONE = 1;
+  PMRRR_Int             IZERO = 0,   IONE = 1;
   double          DZERO = 0.0;
 
   /* work space */
   double          *E2;
   double         *work;
-  int             *iwork;
+  PMRRR_Int             *iwork;
 
   /* compute geschgorin disks and spectral diameter */
   double          gl, gu, eold, emax, eabs;
 
   /* compute splitting points */
-  int             bl_begin, bl_end, bl_size;
+  PMRRR_Int             bl_begin, bl_end, bl_size;
 
   /* distribute work among processes */
-  int             ifirst, ilast, ifirst_tmp, ilast_tmp;
-  int             chunk, isize, iil, iiu;
+  PMRRR_Int             ifirst, ilast, ifirst_tmp, ilast_tmp;
+  PMRRR_Int             chunk, isize, iil, iiu;
 
   /* gather results */
   int             *rcount, *rdispl;
 
   /* others */
-  int             info, i, j, jbl, idummy;
+  PMRRR_Int             info, i, j, jbl, idummy;
   double          tmp1, dummy;
   bool             sorted;
   enum range_enum {allrng=1, valrng=2, indrng=3} irange;
   double          intervals[2];
-  int             negcounts[2];
+  PMRRR_Int             negcounts[2];
   double          sigma;
 
   if (range[0] == 'A' || range[0] == 'a') {
@@ -176,15 +174,15 @@ int plarre(proc_t *procinfo, char *jobz, char *range, in_t *Dstruct,
   }
 
   /* allocate work space */
-  E2     = (double *) malloc(     n * sizeof(double) );
+  E2     = (double *) malloc(     (size_t)n * sizeof(double) );
   assert(E2 != NULL);
-  work   = (double *) malloc(   4*n * sizeof(double) );
+  work   = (double *) malloc(   4*(size_t)n * sizeof(double) );
   assert(work != NULL);
-  iwork  = (int *)    malloc(   3*n * sizeof(int) );
+  iwork  = (PMRRR_Int *)    malloc(   3*(size_t)n * sizeof(PMRRR_Int) );
   assert(iwork != NULL);
-  rcount = (int *)    malloc( nproc * sizeof(int) );
+  rcount = (int *)    malloc( (size_t)nproc * sizeof(int) );
   assert(rcount != NULL);
-  rdispl = (int *)    malloc( nproc * sizeof(int) );
+  rdispl = (int *)    malloc( (size_t)nproc * sizeof(int) );
   assert(rdispl != NULL);
 
   /* Compute square of off-diagonal elements */
@@ -255,7 +253,8 @@ int plarre(proc_t *procinfo, char *jobz, char *range, in_t *Dstruct,
 
 
   /* loop over unreduced blocks */  
-  bl_begin  = 0;
+  bl_begin = 0;
+  isize = ifirst = ilast = 0;
   
   for (jbl=0; jbl<Dstruct->nsplit; jbl++) {
     
@@ -295,8 +294,8 @@ int plarre(proc_t *procinfo, char *jobz, char *range, in_t *Dstruct,
 	*offsetp = ifirst - iil;
 	*nzp      = isize;
       }
-      rcount[i]  = ilast_tmp - ifirst_tmp + 1;
-      rdispl[i]  = ifirst_tmp - iil;
+      rcount[i]  = (int)(ilast_tmp - ifirst_tmp + 1);
+      rdispl[i]  = (int)(ifirst_tmp - iil);
       ifirst_tmp = ilast_tmp + 1;
       ifirst_tmp = imin(ifirst_tmp, iiu + 1);
     }
@@ -329,17 +328,17 @@ int plarre(proc_t *procinfo, char *jobz, char *range, in_t *Dstruct,
       assert(info == 0);    
     }
     
-    memcpy(work, &W[bl_begin], isize * sizeof(double) );
-    MPI_Allgatherv(work, isize, MPI_DOUBLE, &W[bl_begin], rcount, rdispl,
+    memcpy(work, &W[bl_begin], (size_t)isize * sizeof(double) );
+    MPI_Allgatherv(work, (int)isize, MPI_DOUBLE, &W[bl_begin], rcount, rdispl,
 		   MPI_DOUBLE, procinfo->comm);
     
-    memcpy(work, &Werr[bl_begin], isize * sizeof(double) );
-    MPI_Allgatherv(work, isize, MPI_DOUBLE, &Werr[bl_begin], rcount, rdispl,
+    memcpy(work, &Werr[bl_begin], (size_t)isize * sizeof(double) );
+    MPI_Allgatherv(work, (int)isize, MPI_DOUBLE, &Werr[bl_begin], rcount, rdispl,
 		   MPI_DOUBLE, procinfo->comm);
     
-    memcpy(iwork, &Windex[bl_begin], isize * sizeof(int) );
-    MPI_Allgatherv(iwork, isize, MPI_INT, &Windex[bl_begin], rcount, rdispl,
-		   MPI_INT, procinfo->comm);
+    memcpy(iwork, &Windex[bl_begin], (size_t)isize * sizeof(PMRRR_Int) );
+    MPI_Allgatherv(iwork, (int)isize, PMRRR_MPI_INT_TYPE, &Windex[bl_begin], rcount, rdispl,
+		   PMRRR_MPI_INT_TYPE, procinfo->comm);
     
     /* Ensure that within block eigenvalues sorted */
     sorted = false;
@@ -395,7 +394,7 @@ int plarre(proc_t *procinfo, char *jobz, char *range, in_t *Dstruct,
  * Free's on allocated memory of plarre routine
  */
 static  
-void clean_up_plarre(double *E2, double *work, int *iwork, 
+void clean_up_plarre(double *E2, double *work, PMRRR_Int *iwork, 
 		     int *rcount, int *rdispl)
 {
   free(E2);
@@ -409,16 +408,15 @@ void clean_up_plarre(double *E2, double *work, int *iwork,
 
 
 static 
-int eigval_approx_proc(proc_t *procinfo, int ifirst, int ilast, 
-			   int n, double *D, double *E, double *E2,  
-			   int *Windex, int *iblock, double *gersch, tol_t *tolstruct, 
+PMRRR_Int eigval_approx_proc(proc_t *procinfo, PMRRR_Int ifirst, PMRRR_Int ilast, 
+			   PMRRR_Int n, double *D, double *E, double *E2,  
+			   PMRRR_Int *Windex, PMRRR_Int *iblock, double *gersch, tol_t *tolstruct, 
 			   double *W, double *Werr, double *Wgap, double *work,
-			   int *iwork)
+			   PMRRR_Int *iwork)
 {
   /* Input parameter */
-  int              pid = procinfo->pid;
-  int              isize        = ilast-ifirst+1;
-  double       pivmin       = tolstruct->pivmin;
+  PMRRR_Int isize        = ilast-ifirst+1;
+  double    pivmin       = tolstruct->pivmin;
 
   /* double gl, gu, wl, wu; */
   double wl, wu;
@@ -427,23 +425,23 @@ int eigval_approx_proc(proc_t *procinfo, int ifirst, int ilast,
   double bsrtol;
 
   /* /\* Multithreading *\/ */
-  int            nthreads;
-  int              max_nthreads = procinfo->nthreads;
-  int            iifirst, iilast, chunk;
+  PMRRR_Int            nthreads;
+  PMRRR_Int              max_nthreads = procinfo->nthreads;
+  PMRRR_Int            iifirst, iilast, chunk;
   pthread_t      *threads;
   pthread_attr_t attr;
   auxarg1_t      *auxarg1;
   void           *status;
 
   /* Others */
-  int    nsplit, *isplit;
-  int    info, m, i, j;
+  PMRRR_Int    nsplit, *isplit;
+  PMRRR_Int    info, m, i, j;
   double dummy;
   
   /* Allocate workspace */
-  isplit = (int *) malloc( n * sizeof(int) );
+  isplit = (PMRRR_Int *) malloc( (size_t)n * sizeof(PMRRR_Int) );
   assert(isplit != NULL);
-  threads = (pthread_t *) malloc( max_nthreads * sizeof(pthread_t) );
+  threads = (pthread_t *) malloc( (size_t)max_nthreads * sizeof(pthread_t) );
   assert(threads != NULL);
 
   /* This is an unreduced block */
@@ -546,36 +544,34 @@ int eigval_approx_proc(proc_t *procinfo, int ifirst, int ilast,
 
 
 static 
-int eigval_root_proc(proc_t *procinfo, int ifirst, int ilast, 
-			   int n, double *D, double *E, double *E2,  
-			   int *Windex, int *iblock, double *gersch, tol_t *tolstruct, 
+PMRRR_Int eigval_root_proc(proc_t *procinfo, PMRRR_Int ifirst, PMRRR_Int ilast, 
+			   PMRRR_Int n, double *D, double *E, double *E2,  
+			   PMRRR_Int *Windex, PMRRR_Int *iblock, double *gersch, tol_t *tolstruct, 
 			   double *W, double *Werr, double *Wgap, double *work,
-			   int *iwork)
+			   PMRRR_Int *iwork)
 {
   /* Input parameter */
-  int              pid = procinfo->pid;
-  /* int              isize        = ilast-ifirst+1; */
-  double       pivmin       = tolstruct->pivmin;
+  double pivmin = tolstruct->pivmin;
 
   /* Tolerances */
   double rtl;
 
   /* Create random vector to perturb rrr, same seed */
-  int    two_n = 2*n;
-  int    iseed[4] = {1,1,1,1};
+  PMRRR_Int    two_n = 2*n;
+  PMRRR_Int    iseed[4] = {1,1,1,1};
   double *randvec;
 
   double isleft, isright, spdiam;
   double sigma, s1, s2;
-  int    sgndef, cnt, negcnt_lft, negcnt_rgt;
+  PMRRR_Int    sgndef, cnt, negcnt_lft, negcnt_rgt;
   double tau;
 
-  int    jtry, off_L, off_invD;
+  PMRRR_Int    jtry, off_L, off_invD;
   double Dpivot, Dmax;
   bool   noREP;
 
-  int   info, i, j;
-  int   IONE = 1, ITWO = 2;
+  PMRRR_Int   info, i, j;
+  PMRRR_Int   IONE = 1, ITWO = 2;
   double tmp, tmp1, tmp2;
   double gl, gu;
 
@@ -583,7 +579,7 @@ int eigval_root_proc(proc_t *procinfo, int ifirst, int ilast,
   rtl    = sqrt(DBL_EPSILON);
   
   /* Allocate workspace */
-  randvec = (double *) malloc( 2*n * sizeof(double) );
+  randvec = (double *) malloc( 2*(size_t)n * sizeof(double) );
   assert(randvec != NULL);
 
   /* create random vector to perturb rrr and broadcast it */
@@ -644,7 +640,7 @@ int eigval_root_proc(proc_t *procinfo, int ifirst, int ilast,
 
   /* define increment to perturb initial shift to find RRR
    * with not too much element growth */
-  tau = spdiam*DBL_EPSILON*n + 2.0*pivmin;
+  tau = spdiam*DBL_EPSILON*(double)n + 2.0*pivmin;
 
 
   /* try to find initial RRR of block:
@@ -686,17 +682,17 @@ int eigval_root_proc(proc_t *procinfo, int ifirst, int ilast,
        * so we should not end here */
       if (jtry == MAX_TRY_RRR-2) {
 	if (sgndef == ONE) { /* floating point comparison okay here */
-	  sigma = gl - FUDGE_FACTOR*spdiam*DBL_EPSILON*n
+	  sigma = gl - FUDGE_FACTOR*spdiam*DBL_EPSILON*(double)n
 	    - FUDGE_FACTOR*2.0*pivmin;
 	} else {
-	  sigma = gu + FUDGE_FACTOR*spdiam*DBL_EPSILON*n
+	  sigma = gu + FUDGE_FACTOR*spdiam*DBL_EPSILON*(double)n
 	    + FUDGE_FACTOR*2.0*pivmin;
 	}
       } else if (jtry == MAX_TRY_RRR-1) {
 	fprintf(stderr,"No initial representation could be found.\n");
 	exit(3);
       } else {
-	sigma -= sgndef*tau;
+	sigma -= (double)sgndef*tau;
 	tau   *= 2.0;
 	continue;
       }
@@ -707,8 +703,8 @@ int eigval_root_proc(proc_t *procinfo, int ifirst, int ilast,
   /* end trying to find initial RRR of block */
 
   /* save initial RRR and corresponding shift */
-  memcpy(D, &work[0],  n    * sizeof(double) );
-  memcpy(E, &work[n], (n-1) * sizeof(double) );
+  memcpy(D, &work[0], (size_t)n     * sizeof(double) );
+  memcpy(E, &work[n], (size_t)(n-1) * sizeof(double) );
   E[n-1] = sigma;
   /* work[0:4*n-1] can now be used again for anything */
 
@@ -736,48 +732,46 @@ int eigval_root_proc(proc_t *procinfo, int ifirst, int ilast,
 
 
 static 
-int eigval_refine_proc(proc_t *procinfo, int ifirst, int ilast, 
-			   int n, double *D, double *E, double *E2,  
-			   int *Windex, int *iblock, double *gersch, tol_t *tolstruct, 
+PMRRR_Int eigval_refine_proc(proc_t *procinfo, PMRRR_Int ifirst, PMRRR_Int ilast, 
+			   PMRRR_Int n, double *D, double *E, double *E2,  
+			   PMRRR_Int *Windex, PMRRR_Int *iblock, double *gersch, tol_t *tolstruct, 
 			   double *W, double *Werr, double *Wgap, double *work,
-			   int *iwork)
+			   PMRRR_Int *iwork)
 {
   /* Input parameter */
-  int              pid = procinfo->pid;
-  int              isize        = ilast-ifirst+1;
-  double       pivmin       = tolstruct->pivmin;
+  PMRRR_Int isize        = ilast-ifirst+1;
+  double    pivmin       = tolstruct->pivmin;
 
   /* double gl, gu, wl, wu; */
   double gl, gu;
 
   /* Multithreading */
-  int            nthreads;
-  int              max_nthreads = procinfo->nthreads;
-  int            iifirst, iilast, chunk;
+  PMRRR_Int            nthreads;
+  PMRRR_Int              max_nthreads = procinfo->nthreads;
+  PMRRR_Int            chunk;
   pthread_t      *threads;
   pthread_attr_t attr;
   auxarg2_t      *auxarg2;
   void           *status;
 
   /* Others */
-  int    nsplit, *isplit;
+  PMRRR_Int    *isplit;
   double spdiam;
-  int    i_low, i_upp;
+  PMRRR_Int    i_low, i_upp;
   double sigma;
 
-  int    off_DE2, offset;
-  int    rf_begin, rf_end;
+  PMRRR_Int    off_DE2, offset;
+  PMRRR_Int    rf_begin, rf_end;
 
-  int    info, i;
+  PMRRR_Int    info, i;
 
   /* Allocate space */
-  threads = (pthread_t *) malloc( max_nthreads * sizeof(pthread_t) );
+  threads = (pthread_t *) malloc( (size_t)max_nthreads * sizeof(pthread_t) );
   assert(threads != NULL);
-  isplit = (int *) malloc( n * sizeof(int) );
+  isplit = (PMRRR_Int *) malloc( (size_t)n * sizeof(PMRRR_Int) );
   assert(isplit != NULL);
 
   /* This is an unreduced block */
-  nsplit = 1;
   isplit[0] = n;
   
   /* Prepare multi-threading */
@@ -902,19 +896,19 @@ static
 void *eigval_subset_thread_a(void *argin)
 {
   /* from input argument */
-  int    n, il, iu, my_il, my_iu;
+  PMRRR_Int    n, il, iu, my_il, my_iu;
   double *D, *E, *E2, *gersch;
   double bsrtol, pivmin;
-  int    nsplit, *isplit;
+  PMRRR_Int    nsplit, *isplit;
 
   /* others */
-  int    info;
+  PMRRR_Int    info;
   double dummy1, dummy2;
-  int    num_vals;
+  PMRRR_Int    num_vals;
   double *W_tmp, *Werr_tmp, *W, *Werr;
-  int    *iblock_tmp, *Windex_tmp, *iblock, *Windex;
+  PMRRR_Int    *iblock_tmp, *Windex_tmp, *iblock, *Windex;
   double *work;
-  int    *iwork;
+  PMRRR_Int    *iwork;
   
   retrieve_auxarg1((auxarg1_t *) argin, &n, &D, &E, &E2,
 		   &il, &iu, &my_il, &my_iu, &nsplit,
@@ -922,22 +916,22 @@ void *eigval_subset_thread_a(void *argin)
 		   &W, &Werr, &Windex, &iblock);
 
   /* allocate memory */
-  W_tmp = (double *) malloc( n * sizeof(double) );
+  W_tmp = (double *) malloc( (size_t)n * sizeof(double) );
   assert(W_tmp != NULL);
   
-  Werr_tmp = (double *) malloc( n * sizeof(double) );
+  Werr_tmp = (double *) malloc( (size_t)n * sizeof(double) );
   assert(Werr_tmp != NULL);
   
-  Windex_tmp = (int *) malloc( n * sizeof(int) );
+  Windex_tmp = (PMRRR_Int *) malloc( (size_t)n * sizeof(PMRRR_Int) );
   assert(Windex_tmp != NULL);
 
-  iblock_tmp = (int *) malloc( n * sizeof(int) );
+  iblock_tmp = (PMRRR_Int *) malloc( (size_t)n * sizeof(PMRRR_Int) );
   assert(iblock_tmp != NULL);
 
-  work  = (double *) malloc( 4*n * sizeof(double) );
+  work  = (double *) malloc( 4*(size_t)n * sizeof(double) );
   assert (work != NULL);
 
-  iwork = (int *) malloc( 3*n * sizeof(int) );
+  iwork = (PMRRR_Int *) malloc( 3*(size_t)n * sizeof(PMRRR_Int) );
   assert (iwork != NULL);
 
   /* compute eigenvalues 'my_il' to 'my_iu', put into temporary arrays */
@@ -949,10 +943,10 @@ void *eigval_subset_thread_a(void *argin)
   assert(info == 0);
 
   /* copy computed values in W, Werr, Windex, iblock (which are work space) */
-  memcpy(&W[my_il-il],      W_tmp,      num_vals * sizeof(double) );
-  memcpy(&Werr[my_il-il],   Werr_tmp,   num_vals * sizeof(double) );
-  memcpy(&Windex[my_il-il], Windex_tmp, num_vals * sizeof(int)    );
-  memcpy(&iblock[my_il-il], iblock_tmp, num_vals * sizeof(int)    );
+  memcpy(&W[my_il-il],      W_tmp,      (size_t)num_vals * sizeof(double) );
+  memcpy(&Werr[my_il-il],   Werr_tmp,   (size_t)num_vals * sizeof(double) );
+  memcpy(&Windex[my_il-il], Windex_tmp, (size_t)num_vals * sizeof(PMRRR_Int)    );
+  memcpy(&iblock[my_il-il], iblock_tmp, (size_t)num_vals * sizeof(PMRRR_Int)    );
   
   free(W_tmp);
   free(Werr_tmp);
@@ -968,11 +962,11 @@ void *eigval_subset_thread_a(void *argin)
 
 
 static 
-auxarg1_t *create_auxarg1(int n, double *D, double *E, double *E2,
-			  int il, int iu, int my_il, int my_iu, 
-			  int nsplit, int *isplit, double bsrtol, 
+auxarg1_t *create_auxarg1(PMRRR_Int n, double *D, double *E, double *E2,
+			  PMRRR_Int il, PMRRR_Int iu, PMRRR_Int my_il, PMRRR_Int my_iu, 
+			  PMRRR_Int nsplit, PMRRR_Int *isplit, double bsrtol, 
 			  double pivmin, double *gersch, double *W, 
-			  double *Werr, int *Windex, int *iblock)
+			  double *Werr, PMRRR_Int *Windex, PMRRR_Int *iblock)
 {
   auxarg1_t *arg;
 
@@ -1004,12 +998,12 @@ auxarg1_t *create_auxarg1(int n, double *D, double *E, double *E2,
 
 
 static 
-void retrieve_auxarg1(auxarg1_t *arg, int *n, double **D, double **E,
-		      double **E2, int *il, int *iu, int *my_il, 
-		      int *my_iu, int *nsplit, int **isplit, 
+void retrieve_auxarg1(auxarg1_t *arg, PMRRR_Int *n, double **D, double **E,
+		      double **E2, PMRRR_Int *il, PMRRR_Int *iu, PMRRR_Int *my_il, 
+		      PMRRR_Int *my_iu, PMRRR_Int *nsplit, PMRRR_Int **isplit, 
 		      double *bsrtol, double *pivmin, double **gersch, 
-		      double **W, double **Werr, int **Windex, 
-		      int **iblock)
+		      double **W, double **Werr, PMRRR_Int **Windex, 
+		      PMRRR_Int **iblock)
 {
   *n      = arg->n;
   *D      = arg->D;
@@ -1039,28 +1033,27 @@ static
 void *eigval_subset_thread_r(void *argin)
 {
   /* from input argument */
-  int          bl_size, rf_begin, rf_end;
+  PMRRR_Int          bl_size, rf_begin, rf_end;
   double       *D, *DE2;
   double       rtol1, rtol2, pivmin;
   double       bl_spdiam;
-  val_t        *Wstruct;
 
   /* others */
-  int          info, offset;
+  PMRRR_Int          info, offset;
   double       *W, *Werr, *Wgap;
-  int          *Windex;
+  PMRRR_Int          *Windex;
   double       *work;
-  int          *iwork;
+  PMRRR_Int          *iwork;
 
   retrieve_auxarg2((auxarg2_t *) argin, &bl_size, &D, &DE2,
 		   &rf_begin, &rf_end, &W, &Werr, &Wgap, &Windex, &rtol1, &rtol2,
 		   &pivmin, &bl_spdiam);
 
   /* malloc work space */
-  work = (double *) malloc( 2*bl_size * sizeof(double) );
+  work = (double *) malloc( 2*(size_t)bl_size * sizeof(double) );
   assert(work != NULL);
   
-  iwork = (int *)   malloc( 2*bl_size * sizeof(int) );
+  iwork = (PMRRR_Int *)   malloc( 2*(size_t)bl_size * sizeof(PMRRR_Int) );
   assert(iwork != NULL);
 
   /* special case of only one eigenvalue */
@@ -1087,9 +1080,9 @@ void *eigval_subset_thread_r(void *argin)
 
 
 static 
-auxarg2_t *create_auxarg2(int bl_size, double *D, double *DE2,
-			  int rf_begin, int rf_end, double *W, double *Werr,
-			  double *Wgap, int *Windex,    
+auxarg2_t *create_auxarg2(PMRRR_Int bl_size, double *D, double *DE2,
+			  PMRRR_Int rf_begin, PMRRR_Int rf_end, double *W, double *Werr,
+			  double *Wgap, PMRRR_Int *Windex,    
 			  double rtol1, double rtol2, double pivmin, 
 			  double bl_spdiam)
 {
@@ -1119,9 +1112,9 @@ auxarg2_t *create_auxarg2(int bl_size, double *D, double *DE2,
 
 
 static 
-void retrieve_auxarg2(auxarg2_t *arg, int *bl_size, double **D,
-		      double **DE2, int *rf_begin, int *rf_end,
-		      double **W, double **Werr, double **Wgap, int **Windex, 
+void retrieve_auxarg2(auxarg2_t *arg, PMRRR_Int *bl_size, double **D,
+		      double **DE2, PMRRR_Int *rf_begin, PMRRR_Int *rf_end,
+		      double **W, double **Werr, double **Wgap, PMRRR_Int **Windex, 
 		      double *rtol1, double *rtol2,
 		      double *pivmin, double *bl_spdiam)
 {
@@ -1140,22 +1133,4 @@ void retrieve_auxarg2(auxarg2_t *arg, int *bl_size, double **D,
   *bl_spdiam = arg->bl_spdiam;
 
   free(arg);
-}
-
-
-
-/*
- * Compare function for using qsort() on an array
- * of doubles
- */
-static 
-int cmp(const void *a1, const void *a2)
-{
-  double arg1 = *(double *)a1;
-  double arg2 = *(double *)a2;
-
-  if (arg1 < arg2)
-    return(-1);
-  else
-    return(1);
 }

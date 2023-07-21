@@ -6,46 +6,47 @@
 #include <math.h>
 #include <float.h>
 #include <assert.h>
+#include "global.h"
 
 /* Table of constant values */
 #define TRUE_ (1)
 #define FALSE_ (0)
-static int c__1 = 1;
+static PMRRR_Int c__1 = 1;
 
 /* Subroutine */ 
-int odrrf_(int *n, double *d__, double *l, 
-	double *ld, int *clstrt, int *clend, double *w, 
+PMRRR_Int odrrf_(PMRRR_Int *n, double *d__, double *l, 
+	double *ld, PMRRR_Int *clstrt, PMRRR_Int *clend, double *w, 
 	double *wgap, double *werr, double *spdiam, double *
 	clgapl, double *clgapr, double *pivmin, double *sigma, 
-	double *dplus, double *lplus, double *work, int *info)
+	double *dplus, double *lplus, double *work, PMRRR_Int *info)
 {
     /* System generated locals */
-    int i__1;
+    PMRRR_Int i__1;
     double d__1, d__2, d__3;
 
     /* Builtin functions */
     //    double sqrt(double);
 
     /* Local variables */
-    int i__;
+    PMRRR_Int i__;
     double s, bestshift, smlgrowth, eps, tmp, max1, max2, rrr1, rrr2, 
 	    znm2, growthbound, fail, fact, oldp;
-    int indx;
+    PMRRR_Int indx;
     double prod;
-    int ktry;
+    PMRRR_Int ktry;
     double fail2, avgap, ldmax, rdmax;
-    int shift;
-    extern /* Subroutine */ int odcpy_(int *, double *, int *, 
-	    double *, int *);
-    int dorrr1;
+    PMRRR_Int shift;
+    extern /* Subroutine */ PMRRR_Int odcpy_(PMRRR_Int *, double *, PMRRR_Int *, 
+	    double *, PMRRR_Int *);
+    PMRRR_Int dorrr1;
     // extern double odmch_(char *);
     double ldelta;
-    int nofail;
+    PMRRR_Int nofail;
     double mingap, lsigma, rdelta;
-    extern int odnan_(double *);
-    int forcer;
+    extern PMRRR_Int odnan_(double *);
+    PMRRR_Int forcer;
     double rsigma, clwdth;
-    int sawnan1, sawnan2, tryrrr1;
+    PMRRR_Int sawnan1, sawnan2, tryrrr1;
 
 
 /*  -- LAPACK auxiliary routine (version 3.2) -- */
@@ -176,6 +177,8 @@ int odrrf_(int *n, double *d__, double *l,
 /*     Decide whether the code should accept the best among all */
 /*     representations despite large element growth or signal INFO=1 */
     nofail = TRUE_;
+
+    indx = 0;
 
 /*     Compute the average gap length of the cluster */
     clwdth = (d__1 = w[*clend] - w[*clstrt], fabs(d__1)) + werr[*clend] + werr[

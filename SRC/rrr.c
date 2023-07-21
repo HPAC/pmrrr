@@ -48,9 +48,9 @@
 
 rrr_t *PMR_create_rrr(double *restrict D, double *restrict L,
 		      double *restrict DL, double *restrict DLL,
-		      int size, int depth)
+		      PMRRR_Int size, PMRRR_Int depth)
 {
-  int   info;
+  PMRRR_Int   info;
   rrr_t *RRR;
 
   RRR = (rrr_t *) malloc( sizeof(rrr_t) );
@@ -76,7 +76,7 @@ rrr_t *PMR_create_rrr(double *restrict D, double *restrict L,
  
 rrr_t *PMR_reset_rrr(rrr_t *RRR, double *restrict D, 
 		     double *restrict L, double *restrict DL, 
-		     double *restrict DLL, int size, int depth)
+		     double *restrict DLL, PMRRR_Int size, PMRRR_Int depth)
 {
   RRR->D                = D;
   RRR->L                = L;
@@ -91,10 +91,10 @@ rrr_t *PMR_reset_rrr(rrr_t *RRR, double *restrict D,
 
 
 
-int PMR_increment_rrr_dependencies(rrr_t *RRR)
+PMRRR_Int PMR_increment_rrr_dependencies(rrr_t *RRR)
 {
   /* returns number of dependencies */
-  int i, info;
+  PMRRR_Int i, info;
 
   info = pthread_mutex_lock(&RRR->mutex);
   assert(info == 0);
@@ -110,9 +110,9 @@ int PMR_increment_rrr_dependencies(rrr_t *RRR)
 
 
 
-int PMR_set_parent_processed_flag(rrr_t *RRR)
+PMRRR_Int PMR_set_parent_processed_flag(rrr_t *RRR)
 {
-  int info;
+  PMRRR_Int info;
   
   info = pthread_mutex_lock(&RRR->mutex);
   assert(info == 0);
@@ -127,9 +127,9 @@ int PMR_set_parent_processed_flag(rrr_t *RRR)
 
 
 
-int PMR_set_copied_parent_rrr_flag(rrr_t *RRR, bool val)
+PMRRR_Int PMR_set_copied_parent_rrr_flag(rrr_t *RRR, bool val)
 {
-  int info;
+  PMRRR_Int info;
   
   info = pthread_mutex_lock(&RRR->mutex);
   assert(info == 0);
@@ -144,11 +144,11 @@ int PMR_set_copied_parent_rrr_flag(rrr_t *RRR, bool val)
 
 
 
-int PMR_try_destroy_rrr(rrr_t *RRR)
+PMRRR_Int PMR_try_destroy_rrr(rrr_t *RRR)
 {
   /* return 0 on success, otherwise 1 */
   
-  int info, tmp=0;
+  PMRRR_Int info, tmp=0;
 
   info = pthread_mutex_lock(&RRR->mutex);
   assert(info == 0);

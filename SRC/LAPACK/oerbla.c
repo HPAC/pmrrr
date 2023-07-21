@@ -6,12 +6,11 @@
 #include <math.h>
 #include <float.h>
 #include <assert.h>
+#include "global.h"
 
-/* Table of constant values */
-static int c__1 = 1;
 
 /* Subroutine */ 
-int oerbla_(char *srname, int *info)
+PMRRR_Int oerbla_(char *srname, PMRRR_Int *info)
 {
     
 
@@ -49,7 +48,7 @@ int oerbla_(char *srname, int *info)
 /*     .. Executable Statements .. */
 
     printf("** On entry to %6s, parameter number %2i had an illegal value\n",
-		srname, *info);
+		srname, (int)(*info));
 
 
 /*     End of OERBLA */

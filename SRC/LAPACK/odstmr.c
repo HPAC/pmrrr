@@ -6,9 +6,10 @@
 #include <math.h>
 #include <float.h>
 #include <assert.h>
+#include "global.h"
 
 /* Table of constant values */
-static int c__1 = 1;
+static PMRRR_Int c__1 = 1;
 static double c_b18 = .001;
 #define TRUE_ (1)
 #define FALSE_ (0)
@@ -16,87 +17,87 @@ static double c_b18 = .001;
 
 
 /* Subroutine */ 
-int odstmr_(char *jobz, char *range, int *n, double *d__, 
-	double *e, double *vl, double *vu, int *il, 
-	int *iu, int *m, double *w, double *z__, int *ldz, 
-	 int *nzc, int *isuppz, int *tryrac, double *work, 
-	int *lwork, int *iwork, int *liwork, int *info)
+PMRRR_Int odstmr_(char *jobz, char *range, PMRRR_Int *n, double *d__, 
+	double *e, double *vl, double *vu, PMRRR_Int *il, 
+	PMRRR_Int *iu, PMRRR_Int *m, double *w, double *z__, PMRRR_Int *ldz, 
+	 PMRRR_Int *nzc, PMRRR_Int *isuppz, PMRRR_Int *tryrac, double *work, 
+	PMRRR_Int *lwork, PMRRR_Int *iwork, PMRRR_Int *liwork, PMRRR_Int *info)
 {
     /* System generated locals */
-    int z_dim1, z_offset, i__1, i__2;
+    PMRRR_Int z_dim1, z_offset, i__1, i__2;
     double d__1, d__2;
 
     /* Builtin functions */
     // double sqrt(double);
 
     /* Local variables */
-    int i__, j;
+    PMRRR_Int i__, j;
     double r1, r2;
-    int jj;
+    PMRRR_Int jj;
     double cs;
-    int in;
+    PMRRR_Int in;
     double sn, wl, wu;
-    int iil, iiu;
+    PMRRR_Int iil, iiu;
     double eps, tmp;
-    int indd, iend, jblk, wend;
+    PMRRR_Int indd, iend, jblk, wend;
     double rmin, rmax;
-    int itmp;
+    PMRRR_Int itmp;
     double tnrm;
-    extern /* Subroutine */ int ode2_(double *, double *, double 
+    extern /* Subroutine */ PMRRR_Int ode2_(double *, double *, double 
 	    *, double *, double *);
-    int inde2, itmp2;
+    PMRRR_Int inde2, itmp2;
     double rtol1, rtol2;
-    extern /* Subroutine */ int odscl_(int *, double *, double *, 
-	    int *);
+    extern /* Subroutine */ PMRRR_Int odscl_(PMRRR_Int *, double *, double *, 
+	    PMRRR_Int *);
     double scale;
-    int indgp;
-    extern int olsame_(char *, char *);
-    int iinfo, iindw, ilast;
-    extern /* Subroutine */ int odcpy_(int *, double *, int *, 
-	    double *, int *), odswap_(int *, double *, int 
-	    *, double *, int *);
-    int lwmin;
-    int wantz;
-    extern /* Subroutine */ int odev2_(double *, double *, 
+    PMRRR_Int indgp;
+    extern PMRRR_Int olsame_(char *, char *);
+    PMRRR_Int iinfo, iindw, ilast;
+    extern /* Subroutine */ PMRRR_Int odcpy_(PMRRR_Int *, double *, PMRRR_Int *, 
+	    double *, PMRRR_Int *), odswap_(PMRRR_Int *, double *, PMRRR_Int 
+	    *, double *, PMRRR_Int *);
+    PMRRR_Int lwmin;
+    PMRRR_Int wantz;
+    extern /* Subroutine */ PMRRR_Int odev2_(double *, double *, 
 	    double *, double *, double *, double *, 
 	    double *);
     // extern double odmch_(char *);
-    int alleig;
-    int ibegin;
-    int indeig;
-    int iindbl;
-    int valeig;
-    extern /* Subroutine */ int odrrc_(char *, int *, double *, 
-	    double *, double *, double *, double *, int *, 
-	     int *, int *, int *), odrre_(char *, 
-	    int *, double *, double *, int *, int *, 
+    PMRRR_Int alleig;
+    PMRRR_Int ibegin;
+    PMRRR_Int indeig;
+    PMRRR_Int iindbl;
+    PMRRR_Int valeig;
+    extern /* Subroutine */ PMRRR_Int odrrc_(char *, PMRRR_Int *, double *, 
+	    double *, double *, double *, double *, PMRRR_Int *, 
+	     PMRRR_Int *, PMRRR_Int *, PMRRR_Int *), odrre_(char *, 
+	    PMRRR_Int *, double *, double *, PMRRR_Int *, PMRRR_Int *, 
 	    double *, double *, double *, double *, 
-	    double *, double *, int *, int *, int *, 
-	    double *, double *, double *, int *, int *, 
-	    double *, double *, double *, int *, int *);
-    int wbegin;
+	    double *, double *, PMRRR_Int *, PMRRR_Int *, PMRRR_Int *, 
+	    double *, double *, double *, PMRRR_Int *, PMRRR_Int *, 
+	    double *, double *, double *, PMRRR_Int *, PMRRR_Int *);
+    PMRRR_Int wbegin;
     double safmin;
-    extern /* Subroutine */ int odrrj_(int *, double *, double *, 
-	     int *, int *, double *, int *, double *, 
-	    double *, double *, int *, double *, double *, 
-	     int *), oerbla_(char *, int *);
+    extern /* Subroutine */ PMRRR_Int odrrj_(PMRRR_Int *, double *, double *, 
+	     PMRRR_Int *, PMRRR_Int *, double *, PMRRR_Int *, double *, 
+	    double *, double *, PMRRR_Int *, double *, double *, 
+	     PMRRR_Int *), oerbla_(char *, PMRRR_Int *);
     double bignum;
-    int inderr, iindwk, indgrs, offset;
-    extern double odnst_(char *, int *, double *, double *);
-    extern /* Subroutine */ int odrrr_(int *, double *, double *, 
-	     int *), odrrv_(int *, double *, double *, 
-	    double *, double *, double *, int *, int *, 
-	    int *, int *, double *, double *, double *, 
-	    double *, double *, double *, int *, int *, 
-	    double *, double *, int *, int *, double *, 
-	    int *, int *), odsrt_(char *, int *, double *, 
-	    int *);
+    PMRRR_Int inderr, iindwk, indgrs, offset;
+    extern double odnst_(char *, PMRRR_Int *, double *, double *);
+    extern /* Subroutine */ PMRRR_Int odrrr_(PMRRR_Int *, double *, double *, 
+	     PMRRR_Int *), odrrv_(PMRRR_Int *, double *, double *, 
+	    double *, double *, double *, PMRRR_Int *, PMRRR_Int *, 
+	    PMRRR_Int *, PMRRR_Int *, double *, double *, double *, 
+	    double *, double *, double *, PMRRR_Int *, PMRRR_Int *, 
+	    double *, double *, PMRRR_Int *, PMRRR_Int *, double *, 
+	    PMRRR_Int *, PMRRR_Int *), odsrt_(char *, PMRRR_Int *, double *, 
+	    PMRRR_Int *);
     double thresh;
-    int iinspl, ifirst, indwrk, liwmin, nzcmin;
+    PMRRR_Int iinspl, ifirst, indwrk, liwmin, nzcmin;
     double pivmin;
-    int nsplit;
+    PMRRR_Int nsplit;
     double smlnum;
-    int lquery, zquery;
+    PMRRR_Int lquery, zquery;
 
 
 /*  -- LAPACK computational routine (version 3.2) -- */

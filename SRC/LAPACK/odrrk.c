@@ -6,26 +6,27 @@
 #include <math.h>
 #include <float.h>
 #include <assert.h>
+#include "global.h"
 
 /* Subroutine */ 
-int odrrk_(int *n, int *iw, double *gl, 
+PMRRR_Int odrrk_(PMRRR_Int *n, PMRRR_Int *iw, double *gl, 
 	double *gu, double *d__, double *e2, double *pivmin, 
-	double *reltol, double *w, double *werr, int *info)
+	double *reltol, double *w, double *werr, PMRRR_Int *info)
 {
     /* System generated locals */
-    int i__1;
+    PMRRR_Int i__1;
     double d__1, d__2;
 
     /* Builtin functions */
     // double log(double);
 
     /* Local variables */
-    int i__, it;
+    PMRRR_Int i__, it;
     double mid, eps, tmp1, tmp2, left, atoli, right;
-    int itmax;
+    PMRRR_Int itmax;
     double rtoli, tnorm;
     // extern double odmch_(char *);
-    int negcnt;
+    PMRRR_Int negcnt;
 
 
 /*  -- LAPACK auxiliary routine (version 3.2) -- */
@@ -122,10 +123,10 @@ int odrrk_(int *n, int *iw, double *gl,
     tnorm = fmax(d__1,d__2);
     rtoli = *reltol;
     atoli = *pivmin * 4.;
-    itmax = (int) ((log(tnorm + *pivmin) - log(*pivmin)) / log(2.)) + 2;
+    itmax = (PMRRR_Int) ((log(tnorm + *pivmin) - log(*pivmin)) / log(2.)) + 2;
     *info = -1;
-    left = *gl - tnorm * 2. * eps * *n - *pivmin * 4.;
-    right = *gu + tnorm * 2. * eps * *n + *pivmin * 4.;
+    left = *gl - tnorm * 2. * eps * (double)(*n) - *pivmin * 4.;
+    right = *gu + tnorm * 2. * eps * (double)(*n) + *pivmin * 4.;
     it = 0;
 L10:
 

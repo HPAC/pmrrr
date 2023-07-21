@@ -47,44 +47,44 @@
 #include "queue.h"
 
 typedef struct {
-  int              n;
+  PMRRR_Int              n;
   double *restrict D;
   double *restrict E;
-  int              nsplit;
-  int    *restrict isplit ;
+  PMRRR_Int              nsplit;
+  PMRRR_Int    *restrict isplit ;
   double           spdiam;
 } in_t;
 
 typedef struct {
-  int              n;
+  PMRRR_Int              n;
   double           *vl;
   double           *vu;
-  int              *il;
-  int              *iu;
+  PMRRR_Int              *il;
+  PMRRR_Int              *iu;
   double *restrict W;
   double *restrict Werr;
   double *restrict Wgap;
-  int    *restrict Windex;
-  int    *restrict iblock;
-  int    *restrict iproc;
+  PMRRR_Int    *restrict Windex;
+  PMRRR_Int    *restrict iblock;
+  PMRRR_Int    *restrict iproc;
   double *restrict Wshifted;
   double *restrict gersch;
 } val_t;
 
 typedef struct {
-  int              ldz;
-  int              nz;
+  PMRRR_Int              ldz;
+  PMRRR_Int              nz;
   double *restrict Z;
-  int    *restrict Zsupp;
-  int    *restrict Zindex;
+  PMRRR_Int    *restrict Zsupp;
+  PMRRR_Int    *restrict Zindex;
 } vec_t;
 
 typedef struct {
-  int      pid;
-  int      nproc;
+  PMRRR_Int      pid;
+  PMRRR_Int      nproc;
   MPI_Comm comm;
-  int      nthreads;
-  int      thread_support;
+  PMRRR_Int      nthreads;
+  PMRRR_Int      thread_support;
 } proc_t;
 
 typedef struct {
@@ -95,7 +95,7 @@ typedef struct {
 } tol_t;
 
 typedef struct {
-  int         num_messages;
+  PMRRR_Int         num_messages;
   MPI_Request *requests;
   MPI_Status  *stats;
 } comm_t;
@@ -108,41 +108,41 @@ typedef struct {
 
 typedef struct {
   double lambda;
-  int    local_ind;
-  int    block_ind;
-  int    ind;
+  PMRRR_Int    local_ind;
+  PMRRR_Int    block_ind;
+  PMRRR_Int    ind;
 } sort_struct_t;
 
 typedef struct {
-  int    n;
+  PMRRR_Int    n;
   double *D;
   double *E;
   double *E2;
-  int    il;
-  int    iu;
-  int    my_il;
-  int    my_iu;
-  int    nsplit;
-  int    *isplit;
+  PMRRR_Int    il;
+  PMRRR_Int    iu;
+  PMRRR_Int    my_il;
+  PMRRR_Int    my_iu;
+  PMRRR_Int    nsplit;
+  PMRRR_Int    *isplit;
   double bsrtol;
   double pivmin;
   double *gersch;
   double *W;
   double *Werr;
-  int    *Windex;
-  int    *iblock;
+  PMRRR_Int    *Windex;
+  PMRRR_Int    *iblock;
 } auxarg1_t;
 
 typedef struct {
-  int          bl_size;
+  PMRRR_Int          bl_size;
   double       *D;
   double       *DE2;
-  int          rf_begin;
-  int          rf_end;
+  PMRRR_Int          rf_begin;
+  PMRRR_Int          rf_end;
   double        *W;
   double        *Werr;
   double        *Wgap;
-  int            *Windex;
+  PMRRR_Int            *Windex;
   double       rtol1;
   double       rtol2;
   double       pivmin;
@@ -150,7 +150,7 @@ typedef struct {
 } auxarg2_t;
 
 typedef struct {
-  int          tid;
+  PMRRR_Int          tid;
   proc_t       *procinfo;
   val_t        *Wstruct;
   vec_t        *Zstruct;

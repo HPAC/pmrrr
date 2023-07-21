@@ -61,27 +61,27 @@
 
 
 static inline 
-rrr_t* compute_new_rrr(cluster_t *cl, int tid, proc_t *procinfo,
+rrr_t* compute_new_rrr(cluster_t *cl, PMRRR_Int tid, proc_t *procinfo,
 		       val_t *Wstruct, vec_t *Zstruct,
-		       tol_t *tolstruct, double *work, int *iwork);
+		       tol_t *tolstruct, double *work, PMRRR_Int *iwork);
 
 static inline 
-int refine_eigvals(cluster_t *cl, int rf_begin, int rf_end,
-		   int tid, proc_t *procinfo,
+PMRRR_Int refine_eigvals(cluster_t *cl, PMRRR_Int rf_begin, PMRRR_Int rf_end,
+		   PMRRR_Int tid, proc_t *procinfo,
 		   rrr_t *RRR, val_t *Wstruct, vec_t *Zstruct,
 		   tol_t *tolstruct, counter_t *num_left, 
 		   workQ_t *workQ, double *work, 
-		   int *iwork);
+		   PMRRR_Int *iwork);
 
 static inline 
-int communicate_refined_eigvals(cluster_t *cl, proc_t *procinfo,
-				int tid, val_t *Wstruct, rrr_t *RRR);
+PMRRR_Int communicate_refined_eigvals(cluster_t *cl, proc_t *procinfo,
+				PMRRR_Int tid, val_t *Wstruct, rrr_t *RRR);
 
 static inline 
-int test_comm_status(cluster_t *cl, val_t *Wstruct);
+PMRRR_Int test_comm_status(cluster_t *cl, val_t *Wstruct);
 
 static inline 
-int create_subtasks(cluster_t *cl, int tid, proc_t *procinfo,
+PMRRR_Int create_subtasks(cluster_t *cl, PMRRR_Int tid, proc_t *procinfo,
 		    rrr_t *RRR, val_t *Wstruct, vec_t *Zstruct,
 		    workQ_t *workQ,
 		    counter_t *num_left);
@@ -89,22 +89,22 @@ int create_subtasks(cluster_t *cl, int tid, proc_t *procinfo,
 
 
 
-int PMR_process_c_task(cluster_t *cl, int tid, proc_t *procinfo,
+PMRRR_Int PMR_process_c_task(cluster_t *cl, PMRRR_Int tid, proc_t *procinfo,
 		       val_t *Wstruct, vec_t *Zstruct, 
 		       tol_t *tolstruct, workQ_t *workQ, 
-		       counter_t *num_left, double *work, int *iwork)
+		       counter_t *num_left, double *work, PMRRR_Int *iwork)
 {
   /* From inputs */
-  int   depth      = cl->depth;
-  int   left_pid   = cl->left_pid;
-  int   right_pid  = cl->right_pid;
-  int   pid        = procinfo->pid;
-  int   n          = Wstruct->n;
+  PMRRR_Int   depth      = cl->depth;
+  PMRRR_Int   left_pid   = cl->left_pid;
+  PMRRR_Int   right_pid  = cl->right_pid;
+  PMRRR_Int   pid        = procinfo->pid;
+  PMRRR_Int   n          = Wstruct->n;
 
   /* Others */
   rrr_t *RRR;
-  int   rf_begin, rf_end;
-  int   status;
+  PMRRR_Int   rf_begin, rf_end;
+  PMRRR_Int   status;
 
   /* Protection against infinitely deep trees */
   assert(depth < n);
@@ -127,6 +127,8 @@ int PMR_process_c_task(cluster_t *cl, int tid, proc_t *procinfo,
 
   RRR = compute_new_rrr(cl, tid, procinfo, Wstruct, Zstruct,
 			tolstruct, work, iwork);
+
+  rf_begin = rf_end = 0;
 
   /* Refine eigenvalues 'rf_begin' to 'rf_end' */
   if (left_pid != right_pid) {
@@ -166,24 +168,24 @@ int PMR_process_c_task(cluster_t *cl, int tid, proc_t *procinfo,
 
 
 static inline 
-rrr_t* compute_new_rrr(cluster_t *cl, int tid, proc_t *procinfo,
+rrr_t* compute_new_rrr(cluster_t *cl, PMRRR_Int tid, proc_t *procinfo,
 		       val_t *Wstruct, vec_t *Zstruct,
-		       tol_t *tolstruct, double *work, int *iwork)
+		       tol_t *tolstruct, double *work, PMRRR_Int *iwork)
 {
   /* From inputs */
-  int              cl_begin    = cl->begin;
-  int              cl_end      = cl->end;
-  int              cl_size     = cl_end - cl_begin + 1;
-  int              depth       = cl->depth;
-  int              bl_begin    = cl->bl_begin;
-  int              bl_end      = cl->bl_end;
-  int              bl_size     = bl_end - bl_begin + 1;
+  PMRRR_Int              cl_begin    = cl->begin;
+  PMRRR_Int              cl_end      = cl->end;
+  PMRRR_Int              cl_size     = cl_end - cl_begin + 1;
+  PMRRR_Int              depth       = cl->depth;
+  PMRRR_Int              bl_begin    = cl->bl_begin;
+  PMRRR_Int              bl_end      = cl->bl_end;
+  PMRRR_Int              bl_size     = bl_end - bl_begin + 1;
   double           bl_spdiam   = cl->bl_spdiam;
   rrr_t            *RRR_parent = cl->RRR;
 
   double *restrict Werr        = Wstruct->Werr;
   double *restrict Wgap        = Wstruct->Wgap;
-  int    *restrict Windex      = Wstruct->Windex;
+  PMRRR_Int    *restrict Windex      = Wstruct->Windex;
   double *restrict Wshifted    = Wstruct->Wshifted;
 
   double           pivmin      = tolstruct->pivmin;
@@ -199,21 +201,21 @@ rrr_t* compute_new_rrr(cluster_t *cl, int tid, proc_t *procinfo,
   double           savegap;
 
   /* Others */
-  int              i, k, p, info;
+  PMRRR_Int              i, k, p, info;
   double           tmp;
-  int              offset, IONE=1;
+  PMRRR_Int              offset, IONE=1;
 
   /* Allocate memory for new representation for cluster */
-  D   = (double *) malloc(bl_size * sizeof(double));
+  D   = (double *) malloc((size_t)bl_size * sizeof(double));
   assert(D != NULL);
   
-  L   = (double *) malloc(bl_size * sizeof(double));
+  L   = (double *) malloc((size_t)bl_size * sizeof(double));
   assert(L != NULL);
   
-  DL  = (double *) malloc(bl_size * sizeof(double));
+  DL  = (double *) malloc((size_t)bl_size * sizeof(double));
   assert(DL != NULL);
   
-  DLL = (double *) malloc(bl_size * sizeof(double));
+  DLL = (double *) malloc((size_t)bl_size * sizeof(double));
   assert(DLL != NULL);
 
   /* Recompute DL and DLL */
@@ -306,21 +308,21 @@ rrr_t* compute_new_rrr(cluster_t *cl, int tid, proc_t *procinfo,
  * Refine eigenvalues with respect to new rrr 
  */
 static inline 
-int refine_eigvals(cluster_t *cl, int rf_begin, int rf_end,
-		   int tid, proc_t *procinfo, rrr_t *RRR, 
+PMRRR_Int refine_eigvals(cluster_t *cl, PMRRR_Int rf_begin, PMRRR_Int rf_end,
+		   PMRRR_Int tid, proc_t *procinfo, rrr_t *RRR, 
 		   val_t *Wstruct, vec_t *Zstruct,
 		   tol_t *tolstruct, counter_t *num_left,
 		   workQ_t *workQ, double *work,
-		   int *iwork)
+		   PMRRR_Int *iwork)
 {
   /* From inputs */
-  int              rf_size   = rf_end-rf_begin+1;
-  int              bl_begin  = cl->bl_begin;
-  int              bl_end    = cl->bl_end;
-  int              bl_size   = bl_end - bl_begin + 1;
+  PMRRR_Int              rf_size   = rf_end-rf_begin+1;
+  PMRRR_Int              bl_begin  = cl->bl_begin;
+  PMRRR_Int              bl_end    = cl->bl_end;
+  PMRRR_Int              bl_size   = bl_end - bl_begin + 1;
   double           bl_spdiam = cl->bl_spdiam;
 
-  int              nthreads  = procinfo->nthreads;
+  PMRRR_Int              nthreads  = procinfo->nthreads;
 
   double *restrict D         = RRR->D;
   double *restrict L         = RRR->L;
@@ -329,29 +331,31 @@ int refine_eigvals(cluster_t *cl, int rf_begin, int rf_end,
   double *restrict W         = Wstruct->W;
   double *restrict Werr      = Wstruct->Werr;
   double *restrict Wgap      = Wstruct->Wgap;
-  int    *restrict Windex    = Wstruct->Windex;
+  PMRRR_Int    *restrict Windex    = Wstruct->Windex;
   double *restrict Wshifted  = Wstruct->Wshifted;
 
-  int              nz        = Zstruct->nz;
+  PMRRR_Int              nz        = Zstruct->nz;
 
   double           pivmin    = tolstruct->pivmin;
   double           rtol1     = tolstruct->rtol1;
   double           rtol2     = tolstruct->rtol2;
 
   /* Others */
-  int              info, i, p, q, offset;
+  PMRRR_Int              info, i, p, q, offset;
   double           sigma, savegap;
-  int              MIN_REFINE_CHUNK = fmax(2,nz/(4*nthreads));
-  int              left, own_part, others_part, num_tasks;
-  int              ts_begin, ts_end, chunk, count;
+  PMRRR_Int              MIN_REFINE_CHUNK = fmax(2,nz/(4*nthreads));
+  PMRRR_Int              left, own_part, others_part, num_tasks;
+  PMRRR_Int              ts_begin, ts_end, chunk, count;
   task_t           *task;
   sem_t            sem;
-  int              num_iter;
+  PMRRR_Int              num_iter;
 
   /* Determine if refinement should be split into tasks */
   left = PMR_get_counter_value(num_left);
-  own_part = (int) fmax( ceil( (double) left / nthreads ),
-			 MIN_REFINE_CHUNK);
+  own_part = (PMRRR_Int) fmax( ceil( (double) left / (double) nthreads ),
+			 (double)MIN_REFINE_CHUNK);
+
+  savegap = 0.0;
 
   if (own_part < rf_size) {
 
@@ -468,33 +472,33 @@ int refine_eigvals(cluster_t *cl, int rf_begin, int rf_end,
 
 
 static inline 
-int communicate_refined_eigvals(cluster_t *cl, proc_t *procinfo,
-				int tid, val_t *Wstruct, rrr_t *RRR)
+PMRRR_Int communicate_refined_eigvals(cluster_t *cl, proc_t *procinfo,
+				PMRRR_Int tid, val_t *Wstruct, rrr_t *RRR)
 {
   /* From inputs */
-  int              cl_begin     = cl->begin;
-  int              cl_end       = cl->end;
-  int              bl_begin     = cl->bl_begin;
-  int              bl_end       = cl->bl_end;
-  int              proc_W_begin = cl->proc_W_begin;
-  int              proc_W_end   = cl->proc_W_end;
-  int              left_pid     = cl->left_pid;
-  int              right_pid    = cl->right_pid;
-  int              num_messages;
-  //  int              num_messages = 4*(right_pid - left_pid);
+  PMRRR_Int              cl_begin     = cl->begin;
+  PMRRR_Int              cl_end       = cl->end;
+  PMRRR_Int              bl_begin     = cl->bl_begin;
+  PMRRR_Int              bl_end       = cl->bl_end;
+  PMRRR_Int              proc_W_begin = cl->proc_W_begin;
+  PMRRR_Int              proc_W_end   = cl->proc_W_end;
+  PMRRR_Int              left_pid     = cl->left_pid;
+  PMRRR_Int              right_pid    = cl->right_pid;
+  PMRRR_Int              num_messages;
+  //  PMRRR_Int              num_messages = 4*(right_pid - left_pid);
 
-  int              pid          = procinfo->pid;
+  PMRRR_Int              pid          = procinfo->pid;
 
   double *restrict W            = Wstruct->W;
   double *restrict Werr         = Wstruct->Werr;
   double *restrict Wgap         = Wstruct->Wgap;
   double *restrict Wshifted     = Wstruct->Wshifted;
-  int    *restrict iproc        = Wstruct->iproc;
+  PMRRR_Int    *restrict iproc        = Wstruct->iproc;
 
   /* Others */
-  int              p, i_msg, u, k, i;
-  int              my_begin, my_end, my_size;
-  int              other_begin, other_end, other_size;
+  PMRRR_Int              p, i_msg, u, k, i;
+  PMRRR_Int              my_begin, my_end, my_size;
+  PMRRR_Int              other_begin, other_end, other_size;
   double           sigma;
   int              status, communication_done;
   MPI_Request      *requests;
@@ -507,6 +511,7 @@ int communicate_refined_eigvals(cluster_t *cl, proc_t *procinfo,
   if (pid == left_pid ) my_begin = cl_begin;
   if (pid == right_pid) my_end   = cl_end;
   my_size  = my_end - my_begin + 1;
+  other_begin = 0;
 
   num_messages = 0;
   for (i=left_pid; i<=right_pid; i++) {
@@ -518,9 +523,9 @@ int communicate_refined_eigvals(cluster_t *cl, proc_t *procinfo,
     }    
   }
 
-  requests = (MPI_Request *) malloc( num_messages *
+  requests = (MPI_Request *) malloc( (size_t)num_messages *
 					  sizeof(MPI_Request) );
-  stats    = (MPI_Status  *) malloc( num_messages * 
+  stats    = (MPI_Status  *) malloc( (size_t)num_messages * 
 					  sizeof(MPI_Status) );
 
   i_msg = 0;
@@ -537,11 +542,11 @@ int communicate_refined_eigvals(cluster_t *cl, proc_t *procinfo,
     if (p != pid && proc_involved == true) {
 
       /* send message to process p (non-blocking) */
-      MPI_Isend(&Wshifted[my_begin], my_size, MPI_DOUBLE, p,
-		my_begin, procinfo->comm, &requests[4*i_msg]);
+      MPI_Isend(&Wshifted[my_begin], (int)my_size, MPI_DOUBLE, (int)p,
+		(int)my_begin, procinfo->comm, &requests[4*i_msg]);
 
-      MPI_Isend(&Werr[my_begin], my_size, MPI_DOUBLE, p,
-		my_begin, procinfo->comm, &requests[4*i_msg+1]);
+      MPI_Isend(&Werr[my_begin], (int)my_size, MPI_DOUBLE, (int)p,
+		(int)my_begin, procinfo->comm, &requests[4*i_msg+1]);
 
       /* Find eigenvalues in of process p */
       other_size = 0;
@@ -576,11 +581,11 @@ int communicate_refined_eigvals(cluster_t *cl, proc_t *procinfo,
       }
 
       /* receive message from process p (non-blocking) */
-      MPI_Irecv(&Wshifted[other_begin], other_size, MPI_DOUBLE,	p,
-		other_begin, procinfo->comm, &requests[4*i_msg+2]);
+      MPI_Irecv(&Wshifted[other_begin], (int)other_size, MPI_DOUBLE,	(int)p,
+		(int)other_begin, procinfo->comm, &requests[4*i_msg+2]);
 
-      MPI_Irecv(&Werr[other_begin], other_size, MPI_DOUBLE, p,
-		other_begin, procinfo->comm, &requests[4*i_msg+3]);
+      MPI_Irecv(&Werr[other_begin], (int)other_size, MPI_DOUBLE, (int)p,
+		(int)other_begin, procinfo->comm, &requests[4*i_msg+3]);
      
       i_msg++;
     }
@@ -588,7 +593,7 @@ int communicate_refined_eigvals(cluster_t *cl, proc_t *procinfo,
   } /* end for p */
   num_messages = 4*i_msg; /* messages actually send */
 
-  status = MPI_Testall(num_messages, requests, 
+  status = MPI_Testall((int)num_messages, requests, 
 		       &communication_done, stats);
   assert(status == MPI_SUCCESS);
 
@@ -628,15 +633,15 @@ int communicate_refined_eigvals(cluster_t *cl, proc_t *procinfo,
 
 
 static inline 
-int test_comm_status(cluster_t *cl, val_t *Wstruct)
+PMRRR_Int test_comm_status(cluster_t *cl, val_t *Wstruct)
 {
-  int         cl_begin            = cl->begin;
-  int         cl_end              = cl->end;
-  int         bl_begin            = cl->bl_begin;
-  int         bl_end              = cl->bl_end;
+  PMRRR_Int         cl_begin            = cl->begin;
+  PMRRR_Int         cl_end              = cl->end;
+  PMRRR_Int         bl_begin            = cl->bl_begin;
+  PMRRR_Int         bl_end              = cl->bl_end;
   rrr_t       *RRR                = cl->RRR;
   comm_t      *comm               = cl->messages;
-  int         num_messages        = comm->num_messages;
+  PMRRR_Int         num_messages        = comm->num_messages;
   MPI_Request *requests           = comm->requests;
   MPI_Status  *stats              = comm->stats;
   double      *restrict W         = Wstruct->W;
@@ -644,11 +649,12 @@ int test_comm_status(cluster_t *cl, val_t *Wstruct)
   double      *restrict Wgap      = Wstruct->Wgap;
   double      *restrict Wshifted  = Wstruct->Wshifted;
 
-  int         status, k, communication_done;
+  int         status, communication_done;
+  PMRRR_Int   k;
   double      sigma;
 
   /* Test if communication complete */
-  status = MPI_Testall(num_messages, requests, 
+  status = MPI_Testall((int)num_messages, requests, 
 		       &communication_done, stats);
   assert(status == MPI_SUCCESS);
 
@@ -680,45 +686,45 @@ int test_comm_status(cluster_t *cl, val_t *Wstruct)
 
 
 static inline 
-int create_subtasks(cluster_t *cl, int tid, proc_t *procinfo, 
+PMRRR_Int create_subtasks(cluster_t *cl, PMRRR_Int tid, proc_t *procinfo, 
 		    rrr_t *RRR, val_t *Wstruct, vec_t *Zstruct,
 		    workQ_t *workQ, counter_t *num_left)
 {
   /* From inputs */
-  int              cl_begin  = cl->begin;
-  int              cl_end    = cl->end;
-  int              depth     = cl->depth;
-  int              bl_begin  = cl->bl_begin;
-  int              bl_end    = cl->bl_end;
-  int              bl_size   = bl_end - bl_begin + 1;
+  PMRRR_Int              cl_begin  = cl->begin;
+  PMRRR_Int              cl_end    = cl->end;
+  PMRRR_Int              depth     = cl->depth;
+  PMRRR_Int              bl_begin  = cl->bl_begin;
+  PMRRR_Int              bl_end    = cl->bl_end;
+  PMRRR_Int              bl_size   = bl_end - bl_begin + 1;
   double           bl_spdiam = cl->bl_spdiam;
   double           lgap;
 
-  int              pid       = procinfo->pid;
-  int              nproc     = procinfo->nproc;
-  int              nthreads  = procinfo->nthreads;
+  PMRRR_Int              pid       = procinfo->pid;
+  PMRRR_Int              nproc     = procinfo->nproc;
+  PMRRR_Int              nthreads  = procinfo->nthreads;
   bool           proc_involved=true;
 
   double *restrict Wgap      = Wstruct->Wgap;
   double *restrict Wshifted  = Wstruct->Wshifted;
-  int    *restrict iproc     = Wstruct->iproc;
+  PMRRR_Int    *restrict iproc     = Wstruct->iproc;
 
-  int              ldz       = Zstruct->ldz;
+  PMRRR_Int              ldz       = Zstruct->ldz;
   double *restrict Z         = Zstruct->Z;
-  int    *restrict Zindex    = Zstruct->Zindex;
+  PMRRR_Int    *restrict Zindex    = Zstruct->Zindex;
 
   /* others */
-  int    i, l, k;
-  int    max_size;
+  PMRRR_Int    i, l, k;
+  PMRRR_Int    max_size;
   task_t *task;
   bool   task_inserted;
-  int    new_first, new_last, new_size, new_ftt1, new_ftt2;
-  int    sn_first, sn_last, sn_size;
+  PMRRR_Int    new_first, new_last, new_size, new_ftt1, new_ftt2;
+  PMRRR_Int    sn_first, sn_last, sn_size;
   rrr_t  *RRR_parent;
-  int    new_lpid, new_rpid;
+  PMRRR_Int    new_lpid, new_rpid;
   double *restrict D_parent;
   double *restrict L_parent;
-  int    my_first, my_last;
+  PMRRR_Int    my_first, my_last;
   bool   copy_parent_rrr;
 
 
@@ -726,6 +732,7 @@ int create_subtasks(cluster_t *cl, int tid, proc_t *procinfo,
 		     (fmin(depth+1,4)*nthreads) );
   task_inserted = true;
   new_first = cl_begin;
+  sn_size = sn_first = sn_last = 0;
   for (i=cl_begin; i<=cl_end; i++) {    
 
     if ( i == cl_end )
@@ -830,14 +837,14 @@ int create_subtasks(cluster_t *cl, int tid, proc_t *procinfo,
       if (copy_parent_rrr == true) {
 	/* Copy parent RRR into alloceted arrays and mark them
 	 * for freeing later */
-	D_parent = (double *) malloc(bl_size * sizeof(double));
+	D_parent = (double *) malloc((size_t)bl_size * sizeof(double));
 	assert(D_parent != NULL);
 	
-	L_parent = (double *) malloc(bl_size * sizeof(double));
+	L_parent = (double *) malloc((size_t)bl_size * sizeof(double));
 	assert(L_parent != NULL);
 
-	memcpy(D_parent, RRR->D, bl_size*sizeof(double));
-	memcpy(L_parent, RRR->L, bl_size*sizeof(double));
+	memcpy(D_parent, RRR->D, (size_t)bl_size*sizeof(double));
+	memcpy(L_parent, RRR->L, (size_t)bl_size*sizeof(double));
 
 	RRR_parent = PMR_create_rrr(D_parent, L_parent, NULL, 
 				    NULL, bl_size, depth);
@@ -846,9 +853,9 @@ int create_subtasks(cluster_t *cl, int tid, proc_t *procinfo,
       } else {
 	/* copy parent RRR into Z to make cluster task independent */
 	memcpy(&Z[new_ftt1*ldz+bl_begin], RRR->D, 
-	       bl_size*sizeof(double));
+	       (size_t)bl_size*sizeof(double));
 	memcpy(&Z[new_ftt2*ldz+bl_begin], RRR->L, 
-	       bl_size*sizeof(double));
+	       (size_t)bl_size*sizeof(double));
 
 	RRR_parent = PMR_create_rrr(&Z[new_ftt1*ldz + bl_begin],
 				    &Z[new_ftt2*ldz + bl_begin],
