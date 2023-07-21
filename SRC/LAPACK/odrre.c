@@ -283,6 +283,9 @@ PMRRR_Int odrre_(char *range, PMRRR_Int *n, double *vl,
 
     /* Function Body */
     *info = 0;
+    mb = 0;
+    wend = 0;
+    irange = 0;
 
 /*     Decode RANGE */
 

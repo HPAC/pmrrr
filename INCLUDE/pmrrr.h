@@ -301,4 +301,6 @@ extern void   odstmr_(char*, char*, PMRRR_Int*, double*, double*, double*,
 		      PMRRR_Int*, PMRRR_Int*, PMRRR_Int*, PMRRR_Int*, double*, PMRRR_Int*, PMRRR_Int*, 
 		      PMRRR_Int*, PMRRR_Int*);
 
+extern PMRRR_Int odscl_(PMRRR_Int *n, double *da, double *dx, PMRRR_Int *incx);
+
 #endif /* End of header file */

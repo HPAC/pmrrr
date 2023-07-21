@@ -11,10 +11,6 @@
 /* Table of constant values */
 static PMRRR_Int c__1 = 1;
 static PMRRR_Int c__2 = 2;
-static PMRRR_Int c__10 = 10;
-static PMRRR_Int c__3 = 3;
-static PMRRR_Int c__4 = 4;
-static PMRRR_Int c__11 = 11;
 
 /* Subroutine */ 
 PMRRR_Int odsq2_(PMRRR_Int *n, double *z__, PMRRR_Int *info)

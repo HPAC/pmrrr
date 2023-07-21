@@ -259,6 +259,9 @@ PMRRR_Int pmrrr(char *jobz, char *range, PMRRR_Int *np, double  *D,
   Zstruct->Zsupp           = Zsupp;
   Zstruct->Zindex          = Zindex;
 
+  isize = 0;
+  Dcopy = E2copy = NULL;
+
   /* Scale matrix to allowable range, returns 1.0 if not scaled */
   scale = scale_matrix(Dstruct, Wstruct, valeig);
 
@@ -447,6 +450,8 @@ PMRRR_Int handle_small_cases(char *jobz, char *range, PMRRR_Int *np, double  *D,
 
   MPI_Comm_size(comm, &nproc);
   MPI_Comm_rank(comm, &pid);
+
+  Z_tmp = NULL;
   
   if (onlyW) {
     lwork  = 12*n;
@@ -596,7 +601,6 @@ void invscale_eigenvalues(val_t *Wstruct, double scale,
 static 
 PMRRR_Int sort_eigenpairs_local(proc_t *procinfo, PMRRR_Int m, val_t *Wstruct, vec_t *Zstruct)
 {
-  PMRRR_Int              pid        = procinfo->pid;
   PMRRR_Int              n        = Wstruct->n;
   double *restrict W        = Wstruct->W;
   double *restrict work     = Wstruct->gersch;
@@ -853,25 +857,19 @@ PMRRR_Int refine_to_highrac(proc_t *procinfo, char *jobz, double *D,
 		      double *E2, in_t *Dstruct, PMRRR_Int *nzp,
 		      val_t *Wstruct, tol_t *tolstruct)
 {
-  PMRRR_Int              pid    = procinfo->pid;
-  bool             wantZ  = (jobz[0]  == 'V' || jobz[0]  == 'v');
   PMRRR_Int              n      = Dstruct->n;
   PMRRR_Int              nsplit = Dstruct->nsplit;
   PMRRR_Int    *restrict isplit = Dstruct->isplit;
   double           spdiam = Dstruct->spdiam;
-  PMRRR_Int              nz     = *nzp;
   double *restrict W      = Wstruct->W;
   double *restrict Werr   = Wstruct->Werr;
-  PMRRR_Int    *restrict Windex = Wstruct->Windex;
-  PMRRR_Int    *restrict iblock = Wstruct->iblock;
-  PMRRR_Int    *restrict iproc  = Wstruct->iproc;
   double           pivmin = tolstruct->pivmin; 
   double           tol    = 4 * DBL_EPSILON; 
   
   double *work;
   PMRRR_Int    *iwork;
   PMRRR_Int    ifirst, ilast, offset, info;
-  PMRRR_Int    i, j, k;
+  PMRRR_Int    j;
   PMRRR_Int    ibegin, iend, isize, nbl;
 
   work  = (double *) malloc( 2*(size_t)n * sizeof(double) );

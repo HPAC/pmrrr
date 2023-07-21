@@ -132,6 +132,8 @@ PMRRR_Int odruv_(PMRRR_Int *iseed, PMRRR_Int *n, double *x)
     i3 = iseed[3];
     i4 = iseed[4];
 
+    it1 = it2 = it3 = it4 = 0;
+
     i__1 = imin(*n,128);
     for (i__ = 1; i__ <= i__1; ++i__) {
 

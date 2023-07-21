@@ -15,7 +15,6 @@
 
 /* Table of constant values */
 static PMRRR_Int c__1 = 1;
-static PMRRR_Int c_n1 = -1;
 static PMRRR_Int c__3 = 3;
 static PMRRR_Int c__2 = 2;
 static PMRRR_Int c__0 = 0;
@@ -291,6 +290,8 @@ PMRRR_Int odrrd_(char *range, char *order, PMRRR_Int *n, double *vl,
 
     /* Function Body */
     *info = 0;
+
+    wlu = wul = 0.0;
 
 /*     Decode RANGE */
 

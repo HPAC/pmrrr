@@ -98,6 +98,8 @@ double odnst_(char *norm, PMRRR_Int *n, double *d__, double *e)
     --e;
     --d__;
 
+    anorm = 0.0;
+
     /* Function Body */
     if (*n <= 0) {
 	anorm = 0.;

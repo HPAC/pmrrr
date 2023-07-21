@@ -108,6 +108,8 @@ PMRRR_Int PMR_process_s_task(singleton_t *sng, PMRRR_Int tid, proc_t *procinfo,
   /* set tolerance parameter */
   tol  = 4.0 * log( (double) bl_size ) * DBL_EPSILON;
 
+  bstres = bstw = 0.0;
+
   /* loop over all singletons in the task */
   for (i=begin; i<=end; i++) {
 

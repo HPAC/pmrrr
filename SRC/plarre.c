@@ -105,8 +105,6 @@ void retrieve_auxarg2(auxarg2_t*, PMRRR_Int*, double**, double**, PMRRR_Int*,
 			  PMRRR_Int*, double**, double**, double**, PMRRR_Int**, double*, double*, double*,
 		      double*);
 
-static PMRRR_Int cmp(const void*, const void*);
-
 
 
 
@@ -255,7 +253,8 @@ PMRRR_Int plarre(proc_t *procinfo, char *jobz, char *range, in_t *Dstruct,
 
 
   /* loop over unreduced blocks */  
-  bl_begin  = 0;
+  bl_begin = 0;
+  isize = ifirst = ilast = 0;
   
   for (jbl=0; jbl<Dstruct->nsplit; jbl++) {
     
@@ -416,9 +415,8 @@ PMRRR_Int eigval_approx_proc(proc_t *procinfo, PMRRR_Int ifirst, PMRRR_Int ilast
 			   PMRRR_Int *iwork)
 {
   /* Input parameter */
-  PMRRR_Int              pid = procinfo->pid;
-  PMRRR_Int              isize        = ilast-ifirst+1;
-  double       pivmin       = tolstruct->pivmin;
+  PMRRR_Int isize        = ilast-ifirst+1;
+  double    pivmin       = tolstruct->pivmin;
 
   /* double gl, gu, wl, wu; */
   double wl, wu;
@@ -553,9 +551,7 @@ PMRRR_Int eigval_root_proc(proc_t *procinfo, PMRRR_Int ifirst, PMRRR_Int ilast,
 			   PMRRR_Int *iwork)
 {
   /* Input parameter */
-  PMRRR_Int              pid = procinfo->pid;
-  /* PMRRR_Int              isize        = ilast-ifirst+1; */
-  double       pivmin       = tolstruct->pivmin;
+  double pivmin = tolstruct->pivmin;
 
   /* Tolerances */
   double rtl;
@@ -743,9 +739,8 @@ PMRRR_Int eigval_refine_proc(proc_t *procinfo, PMRRR_Int ifirst, PMRRR_Int ilast
 			   PMRRR_Int *iwork)
 {
   /* Input parameter */
-  PMRRR_Int              pid = procinfo->pid;
-  PMRRR_Int              isize        = ilast-ifirst+1;
-  double       pivmin       = tolstruct->pivmin;
+  PMRRR_Int isize        = ilast-ifirst+1;
+  double    pivmin       = tolstruct->pivmin;
 
   /* double gl, gu, wl, wu; */
   double gl, gu;
@@ -753,14 +748,14 @@ PMRRR_Int eigval_refine_proc(proc_t *procinfo, PMRRR_Int ifirst, PMRRR_Int ilast
   /* Multithreading */
   PMRRR_Int            nthreads;
   PMRRR_Int              max_nthreads = procinfo->nthreads;
-  PMRRR_Int            iifirst, iilast, chunk;
+  PMRRR_Int            chunk;
   pthread_t      *threads;
   pthread_attr_t attr;
   auxarg2_t      *auxarg2;
   void           *status;
 
   /* Others */
-  PMRRR_Int    nsplit, *isplit;
+  PMRRR_Int    *isplit;
   double spdiam;
   PMRRR_Int    i_low, i_upp;
   double sigma;
@@ -777,7 +772,6 @@ PMRRR_Int eigval_refine_proc(proc_t *procinfo, PMRRR_Int ifirst, PMRRR_Int ilast
   assert(isplit != NULL);
 
   /* This is an unreduced block */
-  nsplit = 1;
   isplit[0] = n;
   
   /* Prepare multi-threading */
@@ -1043,7 +1037,6 @@ void *eigval_subset_thread_r(void *argin)
   double       *D, *DE2;
   double       rtol1, rtol2, pivmin;
   double       bl_spdiam;
-  val_t        *Wstruct;
 
   /* others */
   PMRRR_Int          info, offset;
@@ -1140,22 +1133,4 @@ void retrieve_auxarg2(auxarg2_t *arg, PMRRR_Int *bl_size, double **D,
   *bl_spdiam = arg->bl_spdiam;
 
   free(arg);
-}
-
-
-
-/*
- * Compare function for using qsort() on an array
- * of doubles
- */
-static 
-PMRRR_Int cmp(const void *a1, const void *a2)
-{
-  double arg1 = *(double *)a1;
-  double arg2 = *(double *)a2;
-
-  if (arg1 < arg2)
-    return(-1);
-  else
-    return(1);
 }

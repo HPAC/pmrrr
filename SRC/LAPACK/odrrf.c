@@ -178,6 +178,8 @@ PMRRR_Int odrrf_(PMRRR_Int *n, double *d__, double *l,
 /*     representations despite large element growth or signal INFO=1 */
     nofail = TRUE_;
 
+    indx = 0;
+
 /*     Compute the average gap length of the cluster */
     clwdth = (d__1 = w[*clend] - w[*clstrt], fabs(d__1)) + werr[*clend] + werr[
 	    *clstrt];

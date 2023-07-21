@@ -111,6 +111,8 @@ PMRRR_Int odsq4_(PMRRR_Int *i0, PMRRR_Int *n0, double *z__,
     /* Parameter adjustments */
     --z__;
 
+    s = 0.0;
+
     /* Function Body */
     if (*dmin__ <= 0.) {
 	*tau = -(*dmin__);

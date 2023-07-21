@@ -8,8 +8,6 @@
 #include <assert.h>
 #include "global.h"
 
-/* Table of constant values */
-static PMRRR_Int c__1 = 1;
 
 /* Subroutine */ 
 PMRRR_Int oerbla_(char *srname, PMRRR_Int *info)
@@ -50,7 +48,7 @@ PMRRR_Int oerbla_(char *srname, PMRRR_Int *info)
 /*     .. Executable Statements .. */
 
     printf("** On entry to %6s, parameter number %2i had an illegal value\n",
-		srname, *info);
+		srname, (int)(*info));
 
 
 /*     End of OERBLA */

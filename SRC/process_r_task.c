@@ -143,7 +143,7 @@ PMRRR_Int PMR_process_r_task(refine_t *rf, proc_t *procinfo,
 
   /* Others */
   PMRRR_Int    info, offset;
-  double savegap;
+  double savegap = 0.0;
 
   offset = Windex[ts_begin] - 1;
 

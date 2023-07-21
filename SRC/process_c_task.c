@@ -128,6 +128,8 @@ PMRRR_Int PMR_process_c_task(cluster_t *cl, PMRRR_Int tid, proc_t *procinfo,
   RRR = compute_new_rrr(cl, tid, procinfo, Wstruct, Zstruct,
 			tolstruct, work, iwork);
 
+  rf_begin = rf_end = 0;
+
   /* Refine eigenvalues 'rf_begin' to 'rf_end' */
   if (left_pid != right_pid) {
     rf_begin = imax(cl->begin, cl->proc_W_begin);
@@ -353,6 +355,8 @@ PMRRR_Int refine_eigvals(cluster_t *cl, PMRRR_Int rf_begin, PMRRR_Int rf_end,
   own_part = (PMRRR_Int) fmax( ceil( (double) left / (double) nthreads ),
 			 (double)MIN_REFINE_CHUNK);
 
+  savegap = 0.0;
+
   if (own_part < rf_size) {
 
     others_part = rf_size - own_part;
@@ -507,6 +511,7 @@ PMRRR_Int communicate_refined_eigvals(cluster_t *cl, proc_t *procinfo,
   if (pid == left_pid ) my_begin = cl_begin;
   if (pid == right_pid) my_end   = cl_end;
   my_size  = my_end - my_begin + 1;
+  other_begin = 0;
 
   num_messages = 0;
   for (i=left_pid; i<=right_pid; i++) {
@@ -727,6 +732,7 @@ PMRRR_Int create_subtasks(cluster_t *cl, PMRRR_Int tid, proc_t *procinfo,
 		     (fmin(depth+1,4)*nthreads) );
   task_inserted = true;
   new_first = cl_begin;
+  sn_size = sn_first = sn_last = 0;
   for (i=cl_begin; i<=cl_end; i++) {    
 
     if ( i == cl_end )

@@ -84,7 +84,6 @@ PMRRR_Int plarrv(proc_t *procinfo, in_t *Dstruct, val_t *Wstruct,
 	   PMRRR_Int *myfirstp)
 {
   /* Input variables */
-  PMRRR_Int            pid     = procinfo->pid;
   PMRRR_Int            nthreads = procinfo->nthreads;
   PMRRR_Int            n        = Dstruct->n;
   double         *W       = Wstruct->W;
@@ -219,6 +218,7 @@ PMRRR_Int assign_to_proc(proc_t *procinfo, in_t *Dstruct, val_t *Wstruct,
   isize = iu - il + 1;
 
   ibegin = il - 1;
+  iend = 0;
   for (id=0; id<nproc; id++) {
 
     chunk = imax(1, isize/nproc + (id < isize%nproc));
@@ -408,6 +408,7 @@ PMRRR_Int init_workQ(proc_t *procinfo, in_t *Dstruct, val_t *Wstruct,
     max_size = imax(1, nz/nthreads);
     task_inserted = false;
     new_first = ibegin;
+    sn_first = sn_last = 0;
     for (i=ibegin; i<=iend; i++) {    
 
       if (i == iend)
